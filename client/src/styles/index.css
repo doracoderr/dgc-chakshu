@@ -1,0 +1,146 @@
+:root {
+  --primary: #123B5D;
+  --secondary: #1F6FAE;
+  --accent: #0E8F87;
+  --bg: #F6F9FB;
+  --surface: #FFFFFF;
+  --text: #243447;
+  --muted: #667085;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--primary);
+  color: white;
+}
+
+.navbar-logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.navbar-links a:hover {
+  text-decoration: underline;
+}
+
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 60vh;
+}
+
+.home-page {
+  text-align: center;
+}
+
+.tagline {
+  color: var(--secondary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 1rem;
+}
+
+.search-bar {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 500px;
+  margin: 1.5rem auto;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.search-bar button {
+  padding: 0.65rem 1.25rem;
+  background: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.search-bar button:hover {
+  background: var(--primary);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.location-card {
+  background: var(--surface);
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.location-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+.location-card-body {
+  padding: 0.85rem 1rem;
+}
+
+.location-card-body h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.location-card-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #EF4444;
+}
+
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  border-top: 1px solid #E2E8F0;
+  margin-top: 3rem;
+}
