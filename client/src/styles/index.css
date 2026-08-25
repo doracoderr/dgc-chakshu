@@ -23,27 +23,40 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  height: 56px;
+  padding: 12px 16px;
   background: var(--primary);
-  color: white;
+  color: #FFFFFF;
 }
 
 .navbar-logo {
   font-weight: 700;
-  font-size: 1.25rem;
-  color: white;
+  font-size: 20px;
+  color: #FFFFFF;
   text-decoration: none;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .navbar-links a {
-  color: white;
+  color: #FFFFFF;
   text-decoration: none;
-  margin-left: 1.5rem;
-  font-size: 0.95rem;
+  font-size: 14px;
 }
 
 .navbar-links a:hover {
-  text-decoration: underline;
+  color: var(--accent);
+}
+
+@media (min-width: 1025px) {
+  .navbar {
+    height: 64px;
+    padding: 16px 24px;
+  }
 }
 
 .page {
