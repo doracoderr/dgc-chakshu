@@ -46,6 +46,7 @@ body {
   text-decoration: underline;
 }
 
+
 .page {
   max-width: 1000px;
   margin: 0 auto;
@@ -143,4 +144,118 @@ body {
   font-size: 0.85rem;
   border-top: 1px solid #E2E8F0;
   margin-top: 3rem;
+}
+
+/* my change  */
+
+/* for navbar */
+.navbar {
+  width: 100%;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 35px;
+  box-sizing: border-box;
+  background: linear-gradient(90deg, #e2e5e9, #8da6c5, #7191b0);
+  border-bottom: 2px solid #8b1e2d;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.12);
+}
+
+/* for logo */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo img {
+  width: 220px;
+  height: 65px;
+  object-fit: contain;
+
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.02);
+}
+
+.navbar-logo:hover img {
+  transform: scale(1.04);
+  filter: drop-shadow(0 3px 6px rgba(139, 30, 45, 0.3));
+}
+
+.navbar-logo img {
+  width: 220px;
+  height: 65px;
+  object-fit: contain;
+}
+
+/* for link */
+.navbar-links {
+  display: flex;
+  gap: 34px;
+}
+
+.navbar-links a {
+  position: relative;
+  color: black;
+  text-decoration: none !important;
+  font-size: 16px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 0;
+  height: 2px;
+  background: #8b1e2d;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width 0.4s ease;
+}
+
+.navbar-links a:hover {
+  color: #8b1e2d;
+}
+
+.navbar-links a:hover::after {
+  width: 100%;
+}
+
+/* for icon */
+.menu-icon {
+  display: none;
+  border: none;
+  background: none;
+  font-size: 26px;
+  color: #8b1e2d;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .navbar {
+    height: 68px;
+    padding: 0 18px;
+  }
+
+  .navbar-logo img {
+    width: 145px;
+    height: 55px;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .menu-icon {
+    display: block;
+  }
 }
