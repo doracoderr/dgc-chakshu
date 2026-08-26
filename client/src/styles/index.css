@@ -19,6 +19,27 @@ body {
   color: var(--text);
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+
 .navbar {
   display: flex;
   align-items: center;
@@ -295,7 +316,7 @@ body {
 /* footer section */
 
 .footer {
-  margin-top: 3rem;
+  margin-top: 0;
   background: var(--primary);
   color: white;
 }

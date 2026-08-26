@@ -10,7 +10,6 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-
       {/* Logo */}
       <Link to="/" className="navbar-logo" onClick={closeMenu}>
         <img src="/navlogo.jpeg" alt="DGC Chakshu" />
@@ -60,7 +59,6 @@ export default function Navbar() {
         <span></span>
         <span></span>
       </button>
-
     </nav>
   );
 }
