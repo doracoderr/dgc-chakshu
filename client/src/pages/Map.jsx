@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import '../styles/map.css';
 
 function Map() {
   const [zoom, setZoom] = useState(1);
@@ -7,6 +8,35 @@ function Map() {
   const [panY, setPanY] = useState(0);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
+  const [lastTouchDistance, setLastTouchDistance] = useState(0);
+  const [lastTap, setLastTap] = useState(0);
+  const [controlsBottom, setControlsBottom] = useState('1rem');
+  const mapContainerRef = useRef(null);
+  const controlsRef = useRef(null);
+
+  // Handle scroll to adjust controls position
+  useEffect(() => {
+    const handleScroll = () => {
+      if (controlsRef.current) {
+        const footer = document.querySelector('.footer');
+        if (footer) {
+          const footerRect = footer.getBoundingClientRect();
+          const controlsRect = controlsRef.current.getBoundingClientRect();
+          
+          // If controls are above footer, adjust position
+          if (footerRect.top < controlsRect.bottom + 20) {
+            const newBottom = window.innerHeight - footerRect.top + 10;
+            setControlsBottom(`${newBottom}px`);
+          } else {
+            setControlsBottom('1rem');
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3));
@@ -20,6 +50,23 @@ function Map() {
     setZoom(1);
     setPanX(0);
     setPanY(0);
+  };
+
+  // Double click zoom
+  const handleDoubleClick = () => {
+    if (zoom < 2) {
+      setZoom(2);
+    } else {
+      handleReset();
+    }
+  };
+
+  // Get touch distance for pinch
+  const getTouchDistance = (touches) => {
+    if (touches.length !== 2) return 0;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   const handleMouseDown = (e) => {
@@ -42,7 +89,11 @@ function Map() {
   };
 
   const handleTouchStart = (e) => {
-    if (zoom > 1) {
+    if (e.touches.length === 2) {
+      // Pinch gesture
+      setLastTouchDistance(getTouchDistance(e.touches));
+    } else if (e.touches.length === 1 && zoom > 1) {
+      // Single finger pan
       setIsPanning(true);
       setStartX(e.touches[0].clientX - panX);
       setStartY(e.touches[0].clientY - panY);
@@ -50,78 +101,116 @@ function Map() {
   };
 
   const handleTouchMove = (e) => {
-    if (isPanning && zoom > 1) {
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      const currentDistance = getTouchDistance(e.touches);
+      if (lastTouchDistance > 0) {
+        const scale = currentDistance / lastTouchDistance;
+        setZoom(prev => Math.max(1, Math.min(prev * scale, 3)));
+      }
+      setLastTouchDistance(currentDistance);
+    } else if (e.touches.length === 1 && isPanning && zoom > 1) {
+      // Pan
       setPanX(e.touches[0].clientX - startX);
       setPanY(e.touches[0].clientY - startY);
     }
   };
 
+  const handleTouchEnd = (e) => {
+    setIsPanning(false);
+    setLastTouchDistance(0);
+
+    // Double tap zoom
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      if (zoom >= 2) {
+        handleReset();
+      } else {
+        setZoom(prev => Math.min(prev + 0.5, 3));
+      }
+    }
+    setLastTap(now);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="map-wrapper">
       {/* Header */}
-      <div className="bg-white shadow-md p-4 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center">DGC Campus Map</h1>
+      <div className="map-header">
+        <h1>DGC Campus Map</h1>
       </div>
 
       {/* Map Container */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Controls */}
-        <div className="bg-white border-b border-gray-200 p-3 md:p-4 flex justify-center gap-2 md:gap-3 flex-wrap">
-          <button
-            onClick={handleZoomIn}
-            className="px-3 md:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition text-sm md:text-base"
-          >
-            + Zoom In
-          </button>
-          <button
-            onClick={handleZoomOut}
-            disabled={zoom <= 1}
-            className="px-3 md:px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition text-sm md:text-base"
-          >
-            − Zoom Out
-          </button>
-          <button
-            onClick={handleReset}
-            className="px-3 md:px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition text-sm md:text-base"
-          >
-            ↺ Reset
-          </button>
-          <span className="px-3 md:px-4 py-2 bg-gray-100 text-gray-800 rounded-lg text-sm md:text-base font-medium">
-            {Math.round(zoom * 100)}%
-          </span>
-        </div>
-
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Map Viewer */}
         <div
-          className="flex-1 overflow-hidden bg-gray-100 cursor-move"
+          ref={mapContainerRef}
+          className="map-viewer"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onDoubleClick={handleDoubleClick}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
-          onTouchEnd={handleMouseUp}
+          onTouchEnd={handleTouchEnd}
         >
+          {/* Floating Controls */}
+          <div 
+            ref={controlsRef}
+            className="map-floating-controls"
+            style={{ bottom: controlsBottom }}
+          >
+            <button
+              onClick={handleZoomIn}
+              className="map-float-btn zoom-in-btn"
+              title="Zoom In"
+            >
+              +
+            </button>
+            <button
+              onClick={handleZoomOut}
+              disabled={zoom <= 1}
+              className="map-float-btn zoom-out-btn"
+              title="Zoom Out"
+            >
+              −
+            </button>
+            <button
+              onClick={handleReset}
+              className="map-float-btn reset-btn"
+              title="Reset View"
+            >
+              ⟲
+            </button>
+            <div className="map-zoom-indicator">
+              {Math.round(zoom * 100)}%
+            </div>
+          </div>
+
           <div
-            className="w-full h-full flex items-center justify-center transition-transform"
+            className="map-image-container"
             style={{
               transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
               transformOrigin: 'center center',
+              transition: zoom === 1 && panX === 0 && panY === 0 ? 'transform 0.3s ease-out' : 'none',
             }}
           >
             <img
               src="/map.png"
               alt="DGC Campus Layout"
-              className="max-w-none h-auto select-none pointer-events-none rounded-lg shadow-lg"
               draggable={false}
             />
           </div>
         </div>
 
         {/* Info Text */}
-        <div className="bg-white border-t border-gray-200 p-3 md:p-4">
-          <p className="text-xs md:text-sm text-gray-600 text-center">
-            {zoom > 1 ? 'Drag to pan • Use buttons to zoom' : 'Click Zoom In to explore • Works on all devices'}
+        <div className="map-info">
+          <p>
+            {zoom > 1 ? (
+              <>🖱️ Drag to pan • 🔄 Double-click to reset • Mobile: Pinch/Swipe • Double-tap to reset</>
+            ) : (
+              <>🖱️ Double-click to zoom • 👆 Pinch on mobile • Double-tap to zoom</>
+            )}
           </p>
         </div>
       </div>
