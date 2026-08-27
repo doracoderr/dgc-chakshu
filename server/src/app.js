@@ -10,7 +10,25 @@ const searchRoutes = require('./routes/search.routes');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
+// CLIENT_URL can be a single origin or a comma-separated list
+// (e.g. "http://localhost:5173,https://your-app.vercel.app")
+const allowedOrigins = (process.env.CLIENT_URL || '*')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins.includes('*')
+    ? '*'
+    : (origin, callback) => {
+        // allow non-browser requests (no origin) and whitelisted origins
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      }
+}));
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
