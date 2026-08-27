@@ -7,6 +7,7 @@ import FacultyDirectory from '../pages/FacultyDirectory';
 import RoomDetail from '../pages/RoomDetail';
 import SearchResults from '../pages/SearchResults';
 import Map from '../pages/Map';
+import Admin from '../pages/Admin';
 
 export default function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
       <Route path="/map" element={<Map />} />
       <Route path="/rooms/:id" element={<RoomDetail />} />
       <Route path="/search" element={<SearchResults />} />
+      <Route path="/admin" element={<Admin />} />
     </Routes>
   );
 }
