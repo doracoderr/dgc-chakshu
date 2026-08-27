@@ -40,17 +40,22 @@ main {
 }
 
 
+/* =========================
+   NAVBAR
+   ========================= */
+
 .navbar {
   display: flex;
   align-items: center;
-  gap: 24px;
-  min-height: 64px;
-  padding: 10px 24px;
+  gap: 20px;
+  min-height: 68px;
+  padding: 6px 24px;
   background: var(--primary);
   color: #FFFFFF;
   position: relative;
   z-index: 1000;
 }
+
 
 /* Logo */
 .navbar-logo {
@@ -58,46 +63,67 @@ main {
   align-items: center;
   flex-shrink: 0;
   text-decoration: none;
+  height: 60px;
 }
 
 .navbar-logo img {
   display: block;
-  width: 165px;
-  height: 44px;
+  height: 60px;
+  width: auto;
+  max-width: 230px;
   object-fit: contain;
+  border-radius: 14px;
 }
 
-/* Desktop Search */
+
+/* Search */
 .navbar-search {
   display: flex;
   align-items: center;
-  width: 260px;
-  height: 38px;
-  background: #FFFFFF;
-  border-radius: 6px;
-  overflow: hidden;
+  gap: 8px;
+  width: 325px;
+  height: 40px;
+  background: transparent;
+  border-radius: 8px;
+  overflow: visible;
   flex-shrink: 0;
-}
-
-.navbar-search .search-icon {
-  padding-left: 12px;
-  font-size: 15px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .navbar-search input {
-  width: 100%;
+  flex: 1;
   height: 100%;
   border: none;
   outline: none;
-  padding: 0 10px;
-  font-size: 14px;
+  padding: 0 12px;
+  font-size: 16px;
   color: #333333;
   background: #FFFFFF;
+  border-radius: 8px;
 }
 
 .navbar-search input::placeholder {
   color: #777777;
 }
+
+.navbar-search-btn {
+  height: 100%;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--secondary);
+  color: #FFFFFF;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: filter 0.2s ease;
+}
+
+.navbar-search-btn:hover {
+  filter: brightness(1.15);
+}
+
 
 /* Navigation Links */
 .navbar-links {
@@ -121,13 +147,6 @@ main {
   color: var(--accent);
 }
 
-/* Mobile Search Icon */
-.navbar-mobile-search {
-  display: none;
-  color: #FFFFFF;
-  text-decoration: none;
-  font-size: 20px;
-}
 
 /* Hamburger Button */
 .navbar-menu-button {
@@ -151,45 +170,66 @@ main {
   border-radius: 2px;
 }
 
-/* Mobile */
+
+/* =========================
+   MOBILE NAVBAR
+   ========================= */
+
 @media (max-width: 768px) {
   .navbar {
-    min-height: 60px;
-    padding: 8px 16px;
-    gap: 12px;
+    flex-wrap: nowrap;
+    min-height: 52px;
+    padding: 6px 16px;
+    gap: 10px;
+  }
+
+  .navbar-logo {
+    height: 42px;
+    order: 1;
   }
 
   .navbar-logo img {
-    width: 125px;
-    height: 40px;
-  }
-
-  .navbar-search {
-    display: none;
-  }
-
-  .navbar-mobile-search {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
+    height: 42px;
+    width: auto;
+    max-width: 120px;
+    border-radius: 11px;
   }
 
   .navbar-menu-button {
     display: flex;
+    order: 3;
+    margin-left: 0;
+  }
+
+  .navbar-search {
+    position: static;
+    transform: none;
+    order: 2;
+    width: auto;
+    flex: 1;
+    min-width: 0;
+    margin-left: auto;
+  }
+
+  .navbar-search-btn {
+    display: none;
   }
 
   .navbar-links {
     display: none;
     position: absolute;
     top: 100%;
-    left: 0;
+    left: auto;
     right: 0;
+    width: 70%;
+    max-width: 260px;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
     margin: 0;
     padding: 8px 16px 12px;
     background: var(--primary);
+    border-radius: 0 0 0 8px;
   }
 
   .navbar-links.open {
@@ -202,19 +242,25 @@ main {
   }
 }
 
-/* Small phones */
+
+/* =========================
+   SMALL PHONES
+   ========================= */
+
 @media (max-width: 480px) {
   .navbar {
-    padding: 7px 12px;
+    padding: 5px 12px;
+  }
+
+  .navbar-logo {
+    height: 38px;
   }
 
   .navbar-logo img {
-    width: 110px;
-    height: 36px;
-  }
-
-  .navbar-mobile-search {
-    font-size: 18px;
+    height: 38px;
+    width: auto;
+    max-width: 100px;
+    border-radius: 10px;
   }
 
   .navbar-menu-button {
@@ -222,6 +268,11 @@ main {
     height: 36px;
   }
 }
+
+
+/* =========================
+   PAGE
+   ========================= */
 
 .page {
   max-width: 1000px;
@@ -271,7 +322,7 @@ main {
 }
 
 .search-bar button:hover {
-  background: var(--primary);
+  background: var(--accent);
 }
 
 .card-grid {
@@ -313,7 +364,10 @@ main {
   color: #EF4444;
 }
 
-/* footer section */
+
+/* =========================
+   FOOTER
+   ========================= */
 
 .footer {
   margin-top: 0;
@@ -353,6 +407,7 @@ main {
   line-height: 1.7;
 }
 
+
 /* Social icons */
 
 .footer-socials {
@@ -376,9 +431,10 @@ main {
 }
 
 .footer-socials a:hover {
-   background: var(--primary);
+  background: var(--accent);
   transform: translateY(-2px);
 }
+
 
 /* Latest news */
 
@@ -420,6 +476,7 @@ main {
   font-size: 0.7rem;
 }
 
+
 /* Quick links */
 
 .footer-links {
@@ -437,9 +494,10 @@ main {
 }
 
 .footer-links a:hover {
-  color: white;
+  color: var(--accent);
   transform: translateX(3px);
 }
+
 
 /* Contact */
 
@@ -464,7 +522,6 @@ main {
   align-items: flex-start;
   gap: 0.8rem;
   transition: transform 0.2s ease;
-
 }
 
 .contact-item:hover .contact-icon {
@@ -478,6 +535,7 @@ main {
   font-size: 0.82rem;
   line-height: 1.5;
 }
+
 
 /* Bottom */
 
@@ -493,7 +551,10 @@ main {
   font-size: 0.78rem;
 }
 
-/* Responsive */
+
+/* =========================
+   RESPONSIVE FOOTER
+   ========================= */
 
 @media (max-width: 850px) {
   .footer-content {
@@ -511,3 +572,5 @@ main {
     max-width: none;
   }
 }
+
+
