@@ -1,11 +1,20 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
 
   const closeMenu = () => {
     setMenuOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   return (
@@ -15,27 +24,17 @@ export default function Navbar() {
         <img src="/navlogo.jpeg" alt="DGC Chakshu" />
       </Link>
 
-      {/* Desktop Search Bar */}
-      <div className="navbar-search">
-        <span className="search-icon" aria-hidden="true">
-          🔍
-        </span>
-
+      {/* Search Bar */}
+      <form className="navbar-search" onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Search rooms, blocks..."
           aria-label="Search rooms and blocks"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
-      </div>
-
-      {/* Mobile Search Icon */}
-      <Link
-        to="/search"
-        className="navbar-mobile-search"
-        aria-label="Search"
-      >
-        🔍
-      </Link>
+        <button type="submit" className="navbar-search-btn">Search</button>
+      </form>
 
       {/* Navigation Links */}
       <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
