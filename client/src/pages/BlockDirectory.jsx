@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import LocationCard from '../components/LocationCard';
 
@@ -24,7 +25,9 @@ export default function BlockDirectory() {
       <div className="card-grid">
         {blocks.length === 0 && <p>No blocks added yet.</p>}
         {blocks.map((block) => (
-          <LocationCard key={block._id} title={block.name} subtitle={block.description} image={block.coverImage} />
+          <Link to={`/blocks/${block._id}`} key={block._id} className="home-block-link">
+            <LocationCard title={block.name} subtitle={block.description} image={block.coverImage} />
+          </Link>
         ))}
       </div>
     </div>

@@ -2,7 +2,7 @@ const Department = require('../models/Department');
 
 exports.getAllDepartments = async (req, res, next) => {
   try {
-    const departments = await Department.find();
+    const departments = await Department.find().populate('blockId', 'name');
     res.json({ success: true, message: 'OK', data: departments });
   } catch (err) {
     next(err);
