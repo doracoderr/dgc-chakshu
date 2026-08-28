@@ -2,7 +2,12 @@ import api from '../api/axios';
 
 const MAX_FILE_SIZE_MB = 5;
 
-export async function uploadImage(file, adminKey) {
+/**
+ * @param {File} file
+ * @param {string} adminKey
+ * @param {'block'|'room'|'faculty'} type - decides which Cloudinary subfolder the image goes into
+ */
+export async function uploadImage(file, adminKey, type) {
   if (!file) throw new Error('No file selected');
 
   if (!file.type.startsWith('image/')) {
@@ -17,10 +22,14 @@ export async function uploadImage(file, adminKey) {
     throw new Error('Admin key is required to upload images');
   }
 
-  // 1. Ask our backend for a short-lived signed upload payload.
-  //    The backend holds the Cloudinary API secret, so only requests
-  //    carrying a valid admin key can obtain a signature.
+  if (!type) {
+    throw new Error('Upload type is required (block, room, or faculty)');
+  }
+
+  // 1. Ask our backend for a short-lived signed upload payload, scoped
+  //    to a category-specific folder (e.g. dgc-chakshu/faculty).
   const { data: signatureRes } = await api.get('/upload/signature', {
+    params: { type },
     headers: { 'x-admin-key': adminKey },
   });
   const { timestamp, signature, apiKey, cloudName, folder } = signatureRes.data;
