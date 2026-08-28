@@ -13,9 +13,14 @@ const roomSchema = new mongoose.Schema(
     },
     departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
     photos: [{ type: String }],
-    verified: { type: Boolean, default: false }
+    verified: { type: Boolean, default: false },
+    location: {
+      lat: Number,
+      lng: Number
+    }
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model('Room', roomSchema);
+

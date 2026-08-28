@@ -1,0 +1,64 @@
+import api from '../api/axios';
+
+const MAX_FILE_SIZE_MB = 3;
+
+/**
+ * @param {File} file
+ * @param {string} adminKey
+ * @param {'block'|'room'|'faculty'} type - decides which Cloudinary subfolder the image goes into
+ * @param {string} identifier - name used to build a unique per-entity folder (e.g. faculty name)
+ */
+export async function uploadImage(file, adminKey, type, identifier) {
+  if (!file) throw new Error('No file selected');
+
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Only image files are allowed');
+  }
+
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    throw new Error(`Image must be under ${MAX_FILE_SIZE_MB}MB`);
+  }
+
+  if (!adminKey) {
+    throw new Error('Admin key is required to upload images');
+  }
+
+  if (!type) {
+    throw new Error('Upload type is required (block, room, or faculty)');
+  }
+
+  if (!identifier || !identifier.trim()) {
+    throw new Error('Please enter a name first, then upload the photo');
+  }
+
+  // 1. Ask our backend for a short-lived signed upload payload, scoped
+  //    to a new, unique folder for this specific entity
+  //    (e.g. dgc-chakshu/faculty/john-doe-a1b2c3).
+  const { data: signatureRes } = await api.get('/upload/signature', {
+    params: { type, name: identifier },
+    headers: { 'x-admin-key': adminKey },
+  });
+  const { timestamp, signature, apiKey, cloudName, folder } = signatureRes.data;
+
+  // 2. Upload directly to Cloudinary using that signature.
+  //    These params MUST exactly match what the backend signed.
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('api_key', apiKey);
+  formData.append('timestamp', timestamp);
+  formData.append('signature', signature);
+  formData.append('folder', folder);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.error?.message || 'Image upload failed');
+  }
+
+  const data = await res.json();
+  return data.secure_url;
+}

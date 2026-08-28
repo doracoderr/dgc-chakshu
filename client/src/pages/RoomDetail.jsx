@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import api from '../api/axios';
 
 export default function RoomDetail() {
@@ -20,13 +20,46 @@ export default function RoomDetail() {
   if (error) return <p className="page error">Error: {error}</p>;
   if (!room) return <p className="page">Room not found.</p>;
 
+  const hasLocation = room.location && room.location.lat != null && room.location.lng != null;
+
   return (
-    <div className="page">
+    <div className="page room-detail">
       <h1>{room.name}</h1>
-      <p>Room No: {room.roomNumber}</p>
-      <p>Floor: {room.floorNumber}</p>
-      <p>Type: {room.type}</p>
-      {room.departmentId && <p>Department: {room.departmentId.name}</p>}
+      <div className="room-detail-meta">
+        <span className="room-detail-badge">Room {room.roomNumber}</span>
+        <span className="room-detail-badge">Floor {room.floorNumber}</span>
+        <span className="room-detail-badge room-detail-type">{room.type}</span>
+      </div>
+
+      {room.departmentId && (
+        <p className="subtitle">Department: {room.departmentId.name}</p>
+      )}
+
+      {room.blockId && (
+        <p className="subtitle">
+          Block: {room.blockId.name || room.blockId}
+        </p>
+      )}
+
+      {hasLocation && (
+        <p className="subtitle">
+          Coordinates: {room.location.lat}, {room.location.lng}
+        </p>
+      )}
+
+      {room.photos && room.photos.length > 0 && (
+        <div className="room-detail-photos">
+          {room.photos.map((src, i) => (
+            <img key={i} src={src} alt={`${room.name} photo ${i + 1}`} />
+          ))}
+        </div>
+      )}
+
+      <div className="about-cta">
+        <Link to="/map" className="btn-secondary">
+          View on map
+        </Link>
+      </div>
     </div>
   );
 }
