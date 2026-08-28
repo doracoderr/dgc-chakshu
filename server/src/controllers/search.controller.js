@@ -26,7 +26,13 @@ exports.search = async (req, res, next) => {
     ]);
 
     const matchingBlockIds = matchingBlocks.map((b) => b._id);
-    const matchingDeptIds = matchingDepartments.map((d) => d._id);
+
+    // Only widen rooms/faculty search using departments matched by NAME or CODE —
+    // a match on hodName alone (e.g. searching a person's name) should surface the
+    // department itself, but shouldn't pull in every other faculty member in it.
+    const matchingDeptIds = matchingDepartments
+      .filter((d) => regex.test(d.name) || (d.code && regex.test(d.code)))
+      .map((d) => d._id);
 
     const [rooms, faculty] = await Promise.all([
       Room.find({
