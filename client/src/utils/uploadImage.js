@@ -1,8 +1,8 @@
-const MAX_FILE_SIZE_MB = 5;
-const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+import api from '../api/axios';
 
-export async function uploadImage(file) {
+const MAX_FILE_SIZE_MB = 5;
+
+export async function uploadImage(file, adminKey) {
   if (!file) throw new Error('No file selected');
 
   if (!file.type.startsWith('image/')) {
@@ -13,16 +13,28 @@ export async function uploadImage(file) {
     throw new Error(`Image must be under ${MAX_FILE_SIZE_MB}MB`);
   }
 
-  if (!CLOUD_NAME || !UPLOAD_PRESET) {
-    throw new Error('Image upload is not configured. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET.');
+  if (!adminKey) {
+    throw new Error('Admin key is required to upload images');
   }
 
+  // 1. Ask our backend for a short-lived signed upload payload.
+  //    The backend holds the Cloudinary API secret, so only requests
+  //    carrying a valid admin key can obtain a signature.
+  const { data: signatureRes } = await api.get('/upload/signature', {
+    headers: { 'x-admin-key': adminKey },
+  });
+  const { timestamp, signature, apiKey, cloudName, folder } = signatureRes.data;
+
+  // 2. Upload directly to Cloudinary using that signature.
+  //    These params MUST exactly match what the backend signed.
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
-  formData.append('folder', 'dgc-chakshu');
+  formData.append('api_key', apiKey);
+  formData.append('timestamp', timestamp);
+  formData.append('signature', signature);
+  formData.append('folder', folder);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
     method: 'POST',
     body: formData,
   });

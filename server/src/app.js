@@ -7,6 +7,7 @@ const roomRoutes = require('./routes/room.routes');
 const departmentRoutes = require('./routes/department.routes');
 const facultyRoutes = require('./routes/faculty.routes');
 const searchRoutes = require('./routes/search.routes');
+const uploadRoutes = require('./routes/upload.routes');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/faculty', facultyRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found', error: { code: 'NOT_FOUND' } });
