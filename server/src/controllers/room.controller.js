@@ -13,7 +13,9 @@ exports.getRoomsByBlock = async (req, res, next) => {
 
 exports.getRoomById = async (req, res, next) => {
   try {
-    const room = await Room.findById(req.params.id).populate('departmentId', 'name');
+    const room = await Room.findById(req.params.id)
+      .populate('blockId', 'name')
+      .populate('departmentId', 'name');
     if (!room) {
       return res.status(404).json({ success: false, message: 'Room not found', error: { code: 'NOT_FOUND' } });
     }

@@ -1,11 +1,47 @@
 import { useEffect, useState } from 'react';
+import { FaBuilding, FaChalkboardTeacher, FaDoorOpen, FaUserTie } from 'react-icons/fa';
 import api from '../api/axios';
 import { uploadImage } from '../utils/uploadImage';
 import { generateId } from '../utils/generateId';
 import ImageCropModal from '../components/ImageCropModal';
 
-const TABS = ['Blocks', 'Departments', 'Rooms', 'Faculty'];
+const TAB_CONFIG = [
+  { key: 'Blocks', icon: <FaBuilding /> },
+  { key: 'Departments', icon: <FaChalkboardTeacher /> },
+  { key: 'Rooms', icon: <FaDoorOpen /> },
+  { key: 'Faculty', icon: <FaUserTie /> },
+];
 const RAW_SELECT_MAX_MB = 15; // generous cap on the original file before cropping shrinks it
+
+/* =========================
+   TOAST NOTIFICATIONS
+   ========================= */
+function ToastContainer({ toasts }) {
+  if (toasts.length === 0) return null;
+  return (
+    <div className="toast-container">
+      {toasts.map((t) => (
+        <div key={t.id} className={`toast toast-${t.type}`}>
+          {t.type === 'success' ? '✓' : '⚠'} {t.message}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function useToasts() {
+  const [toasts, setToasts] = useState([]);
+
+  const notify = (type, message) => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3500);
+  };
+
+  return { toasts, notify };
+}
 
 function ImageUploadField({ label, value, onChange, adminKey, type, identifier, enableCrop }) {
   const [uploading, setUploading] = useState(false);
@@ -131,7 +167,7 @@ function AdminLogin({ onSubmit }) {
 /* =========================
    BLOCK FORM (add + edit)
    ========================= */
-function BlockForm({ initial, onSaved, onCancel, adminKey }) {
+function BlockForm({ initial, onSaved, onCancel, adminKey, notify }) {
   const isEdit = Boolean(initial?._id);
   const [form, setForm] = useState(() => ({
     _id: initial?._id || generateId(),
@@ -143,11 +179,11 @@ function BlockForm({ initial, onSaved, onCancel, adminKey }) {
     lat: initial?.location?.lat ?? '',
     lng: initial?.location?.lng ?? '',
   }));
-  const [status, setStatus] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    setStatus('saving');
+    setSaving(true);
     try {
       const { lat, lng, _id, ...rest } = form;
       const payload = {
@@ -156,22 +192,25 @@ function BlockForm({ initial, onSaved, onCancel, adminKey }) {
       };
       if (isEdit) {
         await api.put(`/blocks/${initial._id}`, payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `"${form.name}" building updated.`);
       } else {
         await api.post('/blocks', payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `"${form.name}" building added.`);
       }
-      setStatus('saved');
       onSaved();
       if (isEdit) onCancel();
       else setForm({ _id: generateId(), name: '', code: '', description: '', coverImage: '', floorCount: 1, lat: '', lng: '' });
     } catch (err) {
-      setStatus(err.response?.data?.message || 'Failed to save');
+      notify('error', err.response?.data?.message || 'Failed to save block');
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <form className={`admin-form ${isEdit ? 'is-editing' : ''}`} onSubmit={submit}>
       <div className="admin-form-header">
-        <h3>{isEdit ? 'Edit Block (Building)' : 'Add Block (Building)'}</h3>
+        <h3>{isEdit ? '✏️ Edit Block (Building)' : '➕ Add Block (Building)'}</h3>
         {isEdit && <button type="button" className="admin-cancel-edit-btn" onClick={onCancel}>Cancel</button>}
       </div>
       <input placeholder="Name (e.g. Block A)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
@@ -193,7 +232,7 @@ function BlockForm({ initial, onSaved, onCancel, adminKey }) {
         onChange={(e) => setForm({ ...form, floorCount: Number(e.target.value) })}
       />
       <p className="admin-hint">
-        This is just the total floor count of the building (e.g. Ground + 3 upper floors = 4).
+        📌 This is just the total floor count of the building (e.g. Ground + 3 upper floors = 4).
         You'll pick which specific floor a room or department is on when you add it below.
       </p>
       <div className="admin-form-row">
@@ -201,8 +240,9 @@ function BlockForm({ initial, onSaved, onCancel, adminKey }) {
         <input type="number" step="any" placeholder="Longitude" value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} />
       </div>
       <p className="admin-hint">Lat/Long are optional for now — used later for the real campus map.</p>
-      <button type="submit" className="btn-primary">{isEdit ? 'Update Block' : 'Save Block'}</button>
-      {status && status !== 'saving' && <p className="admin-status">{status === 'saved' ? 'Saved!' : status}</p>}
+      <button type="submit" className="btn-primary" disabled={saving}>
+        {saving ? 'Saving…' : isEdit ? 'Update Block' : 'Save Block'}
+      </button>
     </form>
   );
 }
@@ -210,7 +250,7 @@ function BlockForm({ initial, onSaved, onCancel, adminKey }) {
 /* =========================
    DEPARTMENT FORM (add + edit)
    ========================= */
-function DepartmentForm({ initial, onSaved, onCancel, adminKey, blocks }) {
+function DepartmentForm({ initial, onSaved, onCancel, adminKey, blocks, notify }) {
   const isEdit = Boolean(initial?._id);
   const [form, setForm] = useState(() => ({
     name: initial?.name || '',
@@ -221,11 +261,11 @@ function DepartmentForm({ initial, onSaved, onCancel, adminKey, blocks }) {
     hodName: initial?.hodName || '',
     contactEmail: initial?.contactEmail || '',
   }));
-  const [status, setStatus] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    setStatus('saving');
+    setSaving(true);
     try {
       const payload = {
         ...form,
@@ -233,22 +273,25 @@ function DepartmentForm({ initial, onSaved, onCancel, adminKey, blocks }) {
       };
       if (isEdit) {
         await api.put(`/departments/${initial._id}`, payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `"${form.name}" department updated.`);
       } else {
         await api.post('/departments', payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `"${form.name}" department added.`);
       }
-      setStatus('saved');
       onSaved();
       if (isEdit) onCancel();
       else setForm({ name: '', code: '', blockId: '', floorNumber: '', description: '', hodName: '', contactEmail: '' });
     } catch (err) {
-      setStatus(err.response?.data?.message || 'Failed to save');
+      notify('error', err.response?.data?.message || 'Failed to save department');
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <form className={`admin-form ${isEdit ? 'is-editing' : ''}`} onSubmit={submit}>
       <div className="admin-form-header">
-        <h3>{isEdit ? 'Edit Department' : 'Add Department'}</h3>
+        <h3>{isEdit ? '✏️ Edit Department' : '➕ Add Department'}</h3>
         {isEdit && <button type="button" className="admin-cancel-edit-btn" onClick={onCancel}>Cancel</button>}
       </div>
       <input placeholder="Name (e.g. Computer Science)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
@@ -266,12 +309,13 @@ function DepartmentForm({ initial, onSaved, onCancel, adminKey, blocks }) {
         value={form.floorNumber}
         onChange={(e) => setForm({ ...form, floorNumber: e.target.value })}
       />
-      <p className="admin-hint">Use the same floor numbering as the building (Ground = 0, next floor = 1, and so on).</p>
+      <p className="admin-hint">📌 Use the same floor numbering as the building (Ground = 0, next floor = 1, and so on).</p>
       <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
       <input placeholder="HOD name" value={form.hodName} onChange={(e) => setForm({ ...form, hodName: e.target.value })} />
       <input placeholder="Contact email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
-      <button type="submit" className="btn-primary">{isEdit ? 'Update Department' : 'Save Department'}</button>
-      {status && status !== 'saving' && <p className="admin-status">{status === 'saved' ? 'Saved!' : status}</p>}
+      <button type="submit" className="btn-primary" disabled={saving}>
+        {saving ? 'Saving…' : isEdit ? 'Update Department' : 'Save Department'}
+      </button>
     </form>
   );
 }
@@ -279,7 +323,7 @@ function DepartmentForm({ initial, onSaved, onCancel, adminKey, blocks }) {
 /* =========================
    ROOM FORM (add + edit)
    ========================= */
-function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments }) {
+function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments, notify }) {
   const isEdit = Boolean(initial?._id);
   const [form, setForm] = useState(() => ({
     _id: initial?._id || generateId(),
@@ -292,11 +336,11 @@ function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments })
     verified: initial?.verified ?? true,
     photo: initial?.photos?.[0] || '',
   }));
-  const [status, setStatus] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    setStatus('saving');
+    setSaving(true);
     try {
       const { photo, _id, ...rest } = form;
       const payload = {
@@ -306,22 +350,25 @@ function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments })
       };
       if (isEdit) {
         await api.put(`/rooms/${initial._id}`, payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `Room "${form.roomNumber}" updated.`);
       } else {
         await api.post('/rooms', payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `Room "${form.roomNumber}" added.`);
       }
-      setStatus('saved');
       onSaved();
       if (isEdit) onCancel();
       else setForm({ _id: generateId(), blockId: '', floorNumber: 1, roomNumber: '', name: '', type: 'classroom', departmentId: '', verified: true, photo: '' });
     } catch (err) {
-      setStatus(err.response?.data?.message || 'Failed to save');
+      notify('error', err.response?.data?.message || 'Failed to save room');
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <form className={`admin-form ${isEdit ? 'is-editing' : ''}`} onSubmit={submit}>
       <div className="admin-form-header">
-        <h3>{isEdit ? 'Edit Room' : 'Add Room'}</h3>
+        <h3>{isEdit ? '✏️ Edit Room' : '➕ Add Room'}</h3>
         {isEdit && <button type="button" className="admin-cancel-edit-btn" onClick={onCancel}>Cancel</button>}
       </div>
       <select value={form.blockId} onChange={(e) => setForm({ ...form, blockId: e.target.value })} required>
@@ -338,7 +385,7 @@ function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments })
         onChange={(e) => setForm({ ...form, floorNumber: Number(e.target.value) })}
         required
       />
-      <p className="admin-hint">Use the same floor numbering as the building (Ground = 0, next floor = 1, and so on).</p>
+      <p className="admin-hint">📌 Use the same floor numbering as the building (Ground = 0, next floor = 1, and so on).</p>
       <input placeholder="Room number (e.g. B-201)" value={form.roomNumber} onChange={(e) => setForm({ ...form, roomNumber: e.target.value })} required />
       <input placeholder="Room name (e.g. Programming Lab)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
       <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
@@ -366,8 +413,9 @@ function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments })
         <input type="checkbox" checked={form.verified} onChange={(e) => setForm({ ...form, verified: e.target.checked })} />
         Verified (shows on site)
       </label>
-      <button type="submit" className="btn-primary">{isEdit ? 'Update Room' : 'Save Room'}</button>
-      {status && status !== 'saving' && <p className="admin-status">{status === 'saved' ? 'Saved!' : status}</p>}
+      <button type="submit" className="btn-primary" disabled={saving}>
+        {saving ? 'Saving…' : isEdit ? 'Update Room' : 'Save Room'}
+      </button>
     </form>
   );
 }
@@ -375,7 +423,7 @@ function RoomForm({ initial, onSaved, onCancel, adminKey, blocks, departments })
 /* =========================
    FACULTY FORM (add + edit)
    ========================= */
-function FacultyForm({ initial, onSaved, onCancel, adminKey, departments }) {
+function FacultyForm({ initial, onSaved, onCancel, adminKey, departments, notify }) {
   const isEdit = Boolean(initial?._id);
   const [form, setForm] = useState(() => ({
     _id: initial?._id || generateId(),
@@ -387,11 +435,11 @@ function FacultyForm({ initial, onSaved, onCancel, adminKey, departments }) {
     phone: initial?.phone || '',
     approvedForDisplay: initial?.approvedForDisplay ?? true,
   }));
-  const [status, setStatus] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    setStatus('saving');
+    setSaving(true);
     try {
       const { _id, ...rest } = form;
       const payload = {
@@ -402,22 +450,25 @@ function FacultyForm({ initial, onSaved, onCancel, adminKey, departments }) {
       };
       if (isEdit) {
         await api.put(`/faculty/${initial._id}`, payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `"${form.name}" updated.`);
       } else {
         await api.post('/faculty', payload, { headers: { 'x-admin-key': adminKey } });
+        notify('success', `"${form.name}" added.`);
       }
-      setStatus('saved');
       onSaved();
       if (isEdit) onCancel();
       else setForm({ _id: generateId(), name: '', designation: '', departmentId: '', photo: '', email: '', phone: '', approvedForDisplay: true });
     } catch (err) {
-      setStatus(err.response?.data?.message || 'Failed to save');
+      notify('error', err.response?.data?.message || 'Failed to save faculty');
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <form className={`admin-form ${isEdit ? 'is-editing' : ''}`} onSubmit={submit}>
       <div className="admin-form-header">
-        <h3>{isEdit ? 'Edit Faculty' : 'Add Faculty'}</h3>
+        <h3>{isEdit ? '✏️ Edit Faculty' : '➕ Add Faculty'}</h3>
         {isEdit && <button type="button" className="admin-cancel-edit-btn" onClick={onCancel}>Cancel</button>}
       </div>
       <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
@@ -443,14 +494,15 @@ function FacultyForm({ initial, onSaved, onCancel, adminKey, departments }) {
         <input type="checkbox" checked={form.approvedForDisplay} onChange={(e) => setForm({ ...form, approvedForDisplay: e.target.checked })} />
         Approved for display (shows on site)
       </label>
-      <button type="submit" className="btn-primary">{isEdit ? 'Update Faculty' : 'Save Faculty'}</button>
-      {status && status !== 'saving' && <p className="admin-status">{status === 'saved' ? 'Saved!' : status}</p>}
+      <button type="submit" className="btn-primary" disabled={saving}>
+        {saving ? 'Saving…' : isEdit ? 'Update Faculty' : 'Save Faculty'}
+      </button>
     </form>
   );
 }
 
 function RoomGroupedList({ rooms, onDelete, onEdit }) {
-  if (rooms.length === 0) return <p className="subtitle">No entries yet.</p>;
+  if (rooms.length === 0) return <p className="subtitle">No rooms yet — add your first one using the form.</p>;
 
   const byBlock = rooms.reduce((acc, room) => {
     const blockName = room.blockId?.name || 'Unassigned block';
@@ -480,12 +532,12 @@ function RoomGroupedList({ rooms, onDelete, onEdit }) {
                             {room.roomNumber} · {room.type}
                             {room.departmentId ? ` · ${room.departmentId.name}` : ''}
                             {' · '}
-                            {room.verified ? 'Verified' : 'Not verified'}
+                            {room.verified ? '✅ Verified' : '⏳ Not verified'}
                           </p>
                         </div>
                         <div className="admin-item-actions">
                           <button type="button" className="admin-edit-btn" onClick={() => onEdit(room)}>Edit</button>
-                          <button type="button" className="btn-secondary admin-delete-btn" onClick={() => onDelete(room._id)}>Delete</button>
+                          <button type="button" className="btn-secondary admin-delete-btn" onClick={() => onDelete(room._id, room.name)}>Delete</button>
                         </div>
                       </li>
                     ))}
@@ -499,8 +551,8 @@ function RoomGroupedList({ rooms, onDelete, onEdit }) {
   );
 }
 
-function EntityList({ items, labelKey, subLabelFn, onDelete, onEdit }) {
-  if (items.length === 0) return <p className="subtitle">No entries yet.</p>;
+function EntityList({ items, labelKey, subLabelFn, onDelete, onEdit, emptyText }) {
+  if (items.length === 0) return <p className="subtitle">{emptyText || 'No entries yet.'}</p>;
   return (
     <ul className="admin-list">
       {items.map((item) => (
@@ -511,7 +563,7 @@ function EntityList({ items, labelKey, subLabelFn, onDelete, onEdit }) {
           </div>
           <div className="admin-item-actions">
             <button type="button" className="admin-edit-btn" onClick={() => onEdit(item)}>Edit</button>
-            <button type="button" className="btn-secondary admin-delete-btn" onClick={() => onDelete(item._id)}>Delete</button>
+            <button type="button" className="btn-secondary admin-delete-btn" onClick={() => onDelete(item._id, item[labelKey])}>Delete</button>
           </div>
         </li>
       ))}
@@ -521,12 +573,13 @@ function EntityList({ items, labelKey, subLabelFn, onDelete, onEdit }) {
 
 export default function Admin() {
   const { key, save, clear } = useAdminKey();
+  const { toasts, notify } = useToasts();
   const [tab, setTab] = useState('Blocks');
   const [blocks, setBlocks] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [faculty, setFaculty] = useState([]);
-  const [authError, setAuthError] = useState(null);
+  const [loadingData, setLoadingData] = useState(true);
 
   const [editingBlock, setEditingBlock] = useState(null);
   const [editingDepartment, setEditingDepartment] = useState(null);
@@ -545,12 +598,13 @@ export default function Admin() {
       setDepartments(d.data.data || []);
       setRooms(r.data.data || []);
       setFaculty(f.data.data || []);
-      setAuthError(null);
     } catch (err) {
       if (err.response?.status === 401) {
-        setAuthError('Invalid admin key');
+        notify('error', 'Invalid admin key.');
         clear();
       }
+    } finally {
+      setLoadingData(false);
     }
   };
 
@@ -559,39 +613,56 @@ export default function Admin() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  const handleDelete = async (type, id) => {
-    if (!window.confirm('Delete this entry? This cannot be undone.')) return;
-    await api.delete(`/${type}/${id}`, { headers: { 'x-admin-key': key } });
-    loadAll(key);
+  const handleLogin = (k) => {
+    save(k);
+    notify('success', 'Logged in.');
+  };
+
+  const handleLogout = () => {
+    clear();
+    notify('success', 'Logged out.');
+  };
+
+  const handleDelete = async (type, id, label) => {
+    if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/${type}/${id}`, { headers: { 'x-admin-key': key } });
+      notify('success', `"${label}" deleted.`);
+      loadAll(key);
+    } catch (err) {
+      notify('error', err.response?.data?.message || 'Failed to delete');
+    }
   };
 
   if (!key) {
-    return (
-      <>
-        <AdminLogin onSubmit={(k) => save(k)} />
-        {authError && <p className="page error">{authError}</p>}
-      </>
-    );
+    return <AdminLogin onSubmit={handleLogin} />;
   }
 
   return (
     <div className="page admin-page">
+      <ToastContainer toasts={toasts} />
+
       <div className="admin-header">
         <h1>Admin Panel</h1>
-        <button type="button" className="btn-secondary" onClick={clear}>Log out</button>
+        <button type="button" className="btn-secondary" onClick={handleLogout}>Log out</button>
       </div>
 
       <div className="admin-tabs">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            className={`admin-tab ${tab === t ? 'active' : ''}`}
-            onClick={() => setTab(t)}
-          >
-            {t}
-          </button>
-        ))}
+        {TAB_CONFIG.map(({ key: t, icon }) => {
+          const counts = { Blocks: blocks.length, Departments: departments.length, Rooms: rooms.length, Faculty: faculty.length };
+          return (
+            <button
+              key={t}
+              type="button"
+              className={`admin-tab ${tab === t ? 'active' : ''}`}
+              onClick={() => setTab(t)}
+            >
+              <span className="admin-tab-icon">{icon}</span>
+              {t}
+              <span className="admin-tab-count">{loadingData ? '…' : counts[t]}</span>
+            </button>
+          );
+        })}
       </div>
 
       {tab === 'Blocks' && (
@@ -600,6 +671,7 @@ export default function Admin() {
             key={editingBlock?._id || 'new-block'}
             initial={editingBlock}
             adminKey={key}
+            notify={notify}
             onSaved={() => loadAll(key)}
             onCancel={() => setEditingBlock(null)}
           />
@@ -609,8 +681,9 @@ export default function Admin() {
               items={blocks}
               labelKey="name"
               subLabelFn={(b) => `${b.description || ''}${b.location?.lat != null ? ' · 📍 located' : ''} · ${b.floorCount || 1} floor(s)`}
-              onDelete={(id) => handleDelete('blocks', id)}
+              onDelete={(id, label) => handleDelete('blocks', id, label)}
               onEdit={(item) => setEditingBlock(item)}
+              emptyText="No buildings yet — add your first block above."
             />
           </div>
         </div>
@@ -623,6 +696,7 @@ export default function Admin() {
             initial={editingDepartment}
             adminKey={key}
             blocks={blocks}
+            notify={notify}
             onSaved={() => loadAll(key)}
             onCancel={() => setEditingDepartment(null)}
           />
@@ -638,8 +712,9 @@ export default function Admin() {
                 if (d.hodName) parts.push(`HOD: ${d.hodName}`);
                 return parts.join(' · ');
               }}
-              onDelete={(id) => handleDelete('departments', id)}
+              onDelete={(id, label) => handleDelete('departments', id, label)}
               onEdit={(item) => setEditingDepartment(item)}
+              emptyText="No departments yet — add your first one above."
             />
           </div>
         </div>
@@ -653,6 +728,7 @@ export default function Admin() {
             adminKey={key}
             blocks={blocks}
             departments={departments}
+            notify={notify}
             onSaved={() => loadAll(key)}
             onCancel={() => setEditingRoom(null)}
           />
@@ -660,7 +736,7 @@ export default function Admin() {
             <h3>Existing Rooms</h3>
             <RoomGroupedList
               rooms={rooms}
-              onDelete={(id) => handleDelete('rooms', id)}
+              onDelete={(id, label) => handleDelete('rooms', id, label)}
               onEdit={(item) => setEditingRoom(item)}
             />
           </div>
@@ -674,6 +750,7 @@ export default function Admin() {
             initial={editingFaculty}
             adminKey={key}
             departments={departments}
+            notify={notify}
             onSaved={() => loadAll(key)}
             onCancel={() => setEditingFaculty(null)}
           />
@@ -682,9 +759,10 @@ export default function Admin() {
             <EntityList
               items={faculty}
               labelKey="name"
-              subLabelFn={(f) => `${f.designation || ''} · ${f.approvedForDisplay ? 'Approved' : 'Pending'}`}
-              onDelete={(id) => handleDelete('faculty', id)}
+              subLabelFn={(f) => `${f.designation || ''} · ${f.approvedForDisplay ? '✅ Approved' : '⏳ Pending'}`}
+              onDelete={(id, label) => handleDelete('faculty', id, label)}
               onEdit={(item) => setEditingFaculty(item)}
+              emptyText="No faculty yet — add your first one above."
             />
           </div>
         </div>

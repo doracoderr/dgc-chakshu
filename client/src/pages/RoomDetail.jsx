@@ -37,7 +37,7 @@ export default function RoomDetail() {
 
       {room.blockId && (
         <p className="subtitle">
-          Block: {typeof room.blockId === 'object' ? room.blockId.name : room.blockId}
+          Block: {room.blockId.name || room.blockId}
         </p>
       )}
 
