@@ -1,27 +1,65 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { uploadImage } from '../utils/uploadImage';
+import { generateId } from '../utils/generateId';
+import ImageCropModal from '../components/ImageCropModal';
 
 const TABS = ['Blocks', 'Departments', 'Rooms', 'Faculty'];
+const RAW_SELECT_MAX_MB = 15; // generous cap on the original file before cropping shrinks it
 
-function ImageUploadField({ label, value, onChange, adminKey, type }) {
+function ImageUploadField({ label, value, onChange, adminKey, type, identifier, enableCrop }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [cropSrc, setCropSrc] = useState(null);
+  const [pendingFileName, setPendingFileName] = useState('photo.jpg');
 
-  const handleFile = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const doUpload = async (fileToUpload) => {
     setUploading(true);
     setError(null);
     try {
-      const url = await uploadImage(file, adminKey, type);
+      const url = await uploadImage(fileToUpload, adminKey, type, identifier);
       onChange(url);
     } catch (err) {
       setError(err.message);
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
+  };
+
+  const handleFile = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError('Only image files are allowed');
+      return;
+    }
+
+    if (enableCrop) {
+      if (file.size > RAW_SELECT_MAX_MB * 1024 * 1024) {
+        setError(`Image must be under ${RAW_SELECT_MAX_MB}MB`);
+        return;
+      }
+      setError(null);
+      setPendingFileName(file.name || 'photo.jpg');
+      setCropSrc(URL.createObjectURL(file));
+      return;
+    }
+
+    await doUpload(file);
+  };
+
+  const handleCropDone = async (blob) => {
+    const croppedFile = new File([blob], pendingFileName, { type: 'image/jpeg' });
+    URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    await doUpload(croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
   };
 
   return (
@@ -41,6 +79,9 @@ function ImageUploadField({ label, value, onChange, adminKey, type }) {
       </div>
       {uploading && <p className="admin-status">Uploading…</p>}
       {error && <p className="admin-status error">{error}</p>}
+      {cropSrc && (
+        <ImageCropModal imageSrc={cropSrc} onCancel={handleCropCancel} onCropDone={handleCropDone} />
+      )}
     </div>
   );
 }
@@ -88,7 +129,7 @@ function AdminLogin({ onSubmit }) {
 }
 
 function BlockForm({ onSaved, adminKey }) {
-  const [form, setForm] = useState({ name: '', code: '', description: '', coverImage: '', floorCount: 1, lat: '', lng: '' });
+  const [form, setForm] = useState({ _id: generateId(), name: '', code: '', description: '', coverImage: '', floorCount: 1, lat: '', lng: '' });
   const [status, setStatus] = useState(null);
 
   const submit = async (e) => {
@@ -101,7 +142,7 @@ function BlockForm({ onSaved, adminKey }) {
         location: (lat !== '' && lng !== '') ? { lat: Number(lat), lng: Number(lng) } : undefined,
       };
       await api.post('/blocks', payload, { headers: { 'x-admin-key': adminKey } });
-      setForm({ name: '', code: '', description: '', coverImage: '', floorCount: 1, lat: '', lng: '' });
+      setForm({ _id: generateId(), name: '', code: '', description: '', coverImage: '', floorCount: 1, lat: '', lng: '' });
       setStatus('saved');
       onSaved();
     } catch (err) {
@@ -121,6 +162,7 @@ function BlockForm({ onSaved, adminKey }) {
         onChange={(url) => setForm({ ...form, coverImage: url })}
         adminKey={adminKey}
         type="block"
+        identifier={form._id}
       />
       <input type="number" min="1" placeholder="Floor count" value={form.floorCount} onChange={(e) => setForm({ ...form, floorCount: Number(e.target.value) })} />
       <div className="admin-form-row">
@@ -178,7 +220,7 @@ function DepartmentForm({ onSaved, adminKey, blocks }) {
 
 function RoomForm({ onSaved, adminKey, blocks, departments }) {
   const [form, setForm] = useState({
-    blockId: '', floorNumber: 1, roomNumber: '', name: '', type: 'classroom',
+    _id: generateId(), blockId: '', floorNumber: 1, roomNumber: '', name: '', type: 'classroom',
     departmentId: '', verified: true, photo: '',
   });
   const [status, setStatus] = useState(null);
@@ -194,7 +236,7 @@ function RoomForm({ onSaved, adminKey, blocks, departments }) {
         photos: photo ? [photo] : [],
       };
       await api.post('/rooms', payload, { headers: { 'x-admin-key': adminKey } });
-      setForm({ blockId: '', floorNumber: 1, roomNumber: '', name: '', type: 'classroom', departmentId: '', verified: true, photo: '' });
+      setForm({ _id: generateId(), blockId: '', floorNumber: 1, roomNumber: '', name: '', type: 'classroom', departmentId: '', verified: true, photo: '' });
       setStatus('saved');
       onSaved();
     } catch (err) {
@@ -233,6 +275,7 @@ function RoomForm({ onSaved, adminKey, blocks, departments }) {
         onChange={(url) => setForm({ ...form, photo: url })}
         adminKey={adminKey}
         type="room"
+        identifier={form._id}
       />
       <label className="admin-checkbox">
         <input type="checkbox" checked={form.verified} onChange={(e) => setForm({ ...form, verified: e.target.checked })} />
@@ -245,16 +288,21 @@ function RoomForm({ onSaved, adminKey, blocks, departments }) {
 }
 
 function FacultyForm({ onSaved, adminKey, departments }) {
-  const [form, setForm] = useState({ name: '', designation: '', departmentId: '', photo: '', approvedForDisplay: true });
+  const [form, setForm] = useState({ _id: generateId(), name: '', designation: '', departmentId: '', photo: '', email: '', phone: '', approvedForDisplay: true });
   const [status, setStatus] = useState(null);
 
   const submit = async (e) => {
     e.preventDefault();
     setStatus('saving');
     try {
-      const payload = { ...form, departmentId: form.departmentId || undefined };
+      const payload = {
+        ...form,
+        departmentId: form.departmentId || undefined,
+        email: form.email.trim() || undefined,
+        phone: form.phone.trim() || undefined,
+      };
       await api.post('/faculty', payload, { headers: { 'x-admin-key': adminKey } });
-      setForm({ name: '', designation: '', departmentId: '', photo: '', approvedForDisplay: true });
+      setForm({ _id: generateId(), name: '', designation: '', departmentId: '', photo: '', email: '', phone: '', approvedForDisplay: true });
       setStatus('saved');
       onSaved();
     } catch (err) {
@@ -273,12 +321,16 @@ function FacultyForm({ onSaved, adminKey, departments }) {
           <option key={d._id} value={d._id}>{d.name}</option>
         ))}
       </select>
+      <input type="email" placeholder="Email (optional)" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+      <input type="tel" placeholder="Phone number (optional)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
       <ImageUploadField
         label="Faculty photo"
         value={form.photo}
         onChange={(url) => setForm({ ...form, photo: url })}
         adminKey={adminKey}
         type="faculty"
+        identifier={form._id}
+        enableCrop
       />
       <label className="admin-checkbox">
         <input type="checkbox" checked={form.approvedForDisplay} onChange={(e) => setForm({ ...form, approvedForDisplay: e.target.checked })} />

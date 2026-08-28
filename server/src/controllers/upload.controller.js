@@ -7,6 +7,15 @@ const ALLOWED_TYPES = {
   faculty: 'faculty',
 };
 
+function slugify(name) {
+  return String(name)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40);
+}
+
 exports.getUploadSignature = async (req, res, next) => {
   try {
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
@@ -28,7 +37,10 @@ exports.getUploadSignature = async (req, res, next) => {
       });
     }
 
-    const folder = `${BASE_FOLDER}/${subFolder}`;
+    const rawName = (req.query.name || '').trim();
+    const slug = slugify(rawName) || 'untitled';
+    const folder = `${BASE_FOLDER}/${subFolder}/${slug}`;
+
     const timestamp = Math.round(Date.now() / 1000);
     const paramsToSign = { timestamp, folder };
 

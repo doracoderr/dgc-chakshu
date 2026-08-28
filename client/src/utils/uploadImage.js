@@ -1,13 +1,14 @@
 import api from '../api/axios';
 
-const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_MB = 3;
 
 /**
  * @param {File} file
  * @param {string} adminKey
  * @param {'block'|'room'|'faculty'} type - decides which Cloudinary subfolder the image goes into
+ * @param {string} identifier - name used to build a unique per-entity folder (e.g. faculty name)
  */
-export async function uploadImage(file, adminKey, type) {
+export async function uploadImage(file, adminKey, type, identifier) {
   if (!file) throw new Error('No file selected');
 
   if (!file.type.startsWith('image/')) {
@@ -26,10 +27,15 @@ export async function uploadImage(file, adminKey, type) {
     throw new Error('Upload type is required (block, room, or faculty)');
   }
 
+  if (!identifier || !identifier.trim()) {
+    throw new Error('Please enter a name first, then upload the photo');
+  }
+
   // 1. Ask our backend for a short-lived signed upload payload, scoped
-  //    to a category-specific folder (e.g. dgc-chakshu/faculty).
+  //    to a new, unique folder for this specific entity
+  //    (e.g. dgc-chakshu/faculty/john-doe-a1b2c3).
   const { data: signatureRes } = await api.get('/upload/signature', {
-    params: { type },
+    params: { type, name: identifier },
     headers: { 'x-admin-key': adminKey },
   });
   const { timestamp, signature, apiKey, cloudName, folder } = signatureRes.data;
