@@ -42,9 +42,19 @@ const run = async () => {
 
   const departments = await Department.insertMany([
     {
+      name: 'Political Science',
+      code: 'POLSC',
+      blockId: blockB._id,
+      floorNumber: 0,
+      description: 'Undergraduate political science department.',
+      hodName: 'Dr. Meena Rathi',
+      contactEmail: 'polsci@dgc.edu',
+    },
+    {
       name: 'Computer Science & Engineering',
       code: 'CSE',
       blockId: blockB._id,
+      floorNumber: 1,
       description: 'Runs BTech and MCA programs.',
       hodName: 'Dr. Rakesh Kumar',
       contactEmail: 'cse@dgc.edu',
@@ -53,6 +63,7 @@ const run = async () => {
       name: 'Information Technology',
       code: 'IT',
       blockId: blockB._id,
+      floorNumber: 1,
       description: 'Runs BTech IT program.',
       hodName: 'Dr. Anita Sharma',
       contactEmail: 'it@dgc.edu',
@@ -61,13 +72,14 @@ const run = async () => {
       name: 'Administration',
       code: 'ADMIN',
       blockId: blockA._id,
+      floorNumber: 0,
       description: 'Admissions, accounts and general administration.',
       hodName: 'Mr. Suresh Yadav',
       contactEmail: 'admin@dgc.edu',
     },
   ]);
 
-  const [cse, it] = departments;
+  const [, cse, it] = departments;
 
   const rooms = await Room.insertMany([
     {

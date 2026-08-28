@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home';
 import About from '../pages/About';
 import BlockDirectory from '../pages/BlockDirectory';
+import BlockDetail from '../pages/BlockDetail';
 import DepartmentDirectory from '../pages/DepartmentDirectory';
 import FacultyDirectory from '../pages/FacultyDirectory';
 import RoomDetail from '../pages/RoomDetail';
@@ -15,6 +16,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/blocks" element={<BlockDirectory />} />
+      <Route path="/blocks/:id" element={<BlockDetail />} />
       <Route path="/departments" element={<DepartmentDirectory />} />
       <Route path="/faculty" element={<FacultyDirectory />} />
       <Route path="/map" element={<Map />} />

@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import LocationCard from '../components/LocationCard';
+
+function floorLabel(floorNumber) {
+  if (floorNumber == null) return '';
+  return floorNumber === 0 ? 'Ground floor' : `Floor ${floorNumber}`;
+}
 
 export default function DepartmentDirectory() {
   const [departments, setDepartments] = useState([]);
@@ -23,9 +29,24 @@ export default function DepartmentDirectory() {
       <h1>Departments</h1>
       <div className="card-grid">
         {departments.length === 0 && <p>No departments added yet.</p>}
-        {departments.map((dept) => (
-          <LocationCard key={dept._id} title={dept.name} subtitle={dept.hodName ? `HOD: ${dept.hodName}` : ''} />
-        ))}
+        {departments.map((dept) => {
+          const blockName = dept.blockId?.name;
+          const subtitleParts = [];
+          if (blockName) subtitleParts.push(blockName);
+          const floor = floorLabel(dept.floorNumber);
+          if (floor) subtitleParts.push(floor);
+          if (dept.hodName) subtitleParts.push(`HOD: ${dept.hodName}`);
+
+          const card = <LocationCard title={dept.name} subtitle={subtitleParts.join(' · ')} />;
+
+          return dept.blockId?._id ? (
+            <Link to={`/blocks/${dept.blockId._id}`} key={dept._id} className="home-block-link">
+              {card}
+            </Link>
+          ) : (
+            <div key={dept._id}>{card}</div>
+          );
+        })}
       </div>
     </div>
   );

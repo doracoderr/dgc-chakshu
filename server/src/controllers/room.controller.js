@@ -2,7 +2,9 @@ const Room = require('../models/Room');
 
 exports.getRoomsByBlock = async (req, res, next) => {
   try {
-    const rooms = await Room.find({ blockId: req.params.blockId, verified: true });
+    const rooms = await Room.find({ blockId: req.params.blockId, verified: true })
+      .populate('departmentId', 'name')
+      .sort({ floorNumber: 1, roomNumber: 1 });
     res.json({ success: true, message: 'OK', data: rooms });
   } catch (err) {
     next(err);

@@ -93,14 +93,15 @@ export default function Home() {
         {!loadingDepts && departments.length > 0 && (
           <>
             <div className="card-grid">
-              {departments.slice(0, 6).map((dept) => (
-                <Link to="/departments" key={dept._id} className="home-block-link">
-                  <LocationCard
-                    title={dept.name}
-                    subtitle={dept.hodName ? `HOD: ${dept.hodName}` : ''}
-                  />
-                </Link>
-              ))}
+              {departments.slice(0, 6).map((dept) => {
+                const floor = dept.floorNumber != null ? (dept.floorNumber === 0 ? 'Ground floor' : `Floor ${dept.floorNumber}`) : '';
+                const subtitle = [dept.blockId?.name, floor].filter(Boolean).join(' · ') || (dept.hodName ? `HOD: ${dept.hodName}` : '');
+                return (
+                  <Link to="/departments" key={dept._id} className="home-block-link">
+                    <LocationCard title={dept.name} subtitle={subtitle} />
+                  </Link>
+                );
+              })}
             </div>
             <div className="about-cta">
               <Link to="/departments" className="btn-secondary">
