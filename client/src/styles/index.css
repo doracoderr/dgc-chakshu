@@ -716,6 +716,43 @@ main {
   font-size: 13px;
 }
 
+.admin-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.admin-edit-btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--secondary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-form.is-editing {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 2px rgba(31, 111, 174, 0.15);
+}
+
+.admin-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-cancel-edit-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
 @media (max-width: 768px) {
   .admin-tab-content {
     grid-template-columns: 1fr;
