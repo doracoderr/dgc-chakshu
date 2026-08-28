@@ -16,6 +16,13 @@ exports.search = async (req, res, next) => {
 
     const regex = new RegExp(escapeRegex(q), 'i');
 
+    // "room 22", "room no 22", "22" should all find a room whose roomNumber
+    // is "22" — the phrase-level regex above only matches an exact literal
+    // substring, so we also pull out any number in the query and match
+    // roomNumber against that alone.
+    const numberMatch = q.match(/\d+/);
+    const numberRegex = numberMatch ? new RegExp(`^${escapeRegex(numberMatch[0])}$`, 'i') : null;
+
     // Find matching blocks & departments first so rooms/faculty inside them
     // also surface even if the room/faculty name itself doesn't match the query.
     const [matchingBlocks, matchingDepartments] = await Promise.all([
@@ -41,6 +48,7 @@ exports.search = async (req, res, next) => {
           { name: regex },
           { roomNumber: regex },
           { type: regex },
+          ...(numberRegex ? [{ roomNumber: numberRegex }] : []),
           ...(matchingBlockIds.length ? [{ blockId: { $in: matchingBlockIds } }] : []),
           ...(matchingDeptIds.length ? [{ departmentId: { $in: matchingDeptIds } }] : []),
         ],
