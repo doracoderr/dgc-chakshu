@@ -4,7 +4,7 @@ import { uploadImage } from '../utils/uploadImage';
 
 const TABS = ['Blocks', 'Departments', 'Rooms', 'Faculty'];
 
-function ImageUploadField({ label, value, onChange }) {
+function ImageUploadField({ label, value, onChange, adminKey }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,7 +14,7 @@ function ImageUploadField({ label, value, onChange }) {
     setUploading(true);
     setError(null);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, adminKey);
       onChange(url);
     } catch (err) {
       setError(err.message);
@@ -119,6 +119,7 @@ function BlockForm({ onSaved, adminKey }) {
         label="Cover image"
         value={form.coverImage}
         onChange={(url) => setForm({ ...form, coverImage: url })}
+        adminKey={adminKey}
       />
       <input type="number" min="1" placeholder="Floor count" value={form.floorCount} onChange={(e) => setForm({ ...form, floorCount: Number(e.target.value) })} />
       <div className="admin-form-row">
@@ -229,6 +230,7 @@ function RoomForm({ onSaved, adminKey, blocks, departments }) {
         label="Room photo"
         value={form.photo}
         onChange={(url) => setForm({ ...form, photo: url })}
+        adminKey={adminKey}
       />
       <label className="admin-checkbox">
         <input type="checkbox" checked={form.verified} onChange={(e) => setForm({ ...form, verified: e.target.checked })} />
@@ -273,6 +275,7 @@ function FacultyForm({ onSaved, adminKey, departments }) {
         label="Faculty photo"
         value={form.photo}
         onChange={(url) => setForm({ ...form, photo: url })}
+        adminKey={adminKey}
       />
       <label className="admin-checkbox">
         <input type="checkbox" checked={form.approvedForDisplay} onChange={(e) => setForm({ ...form, approvedForDisplay: e.target.checked })} />
