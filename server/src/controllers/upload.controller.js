@@ -1,6 +1,11 @@
 const cloudinary = require('../config/cloudinary');
 
-const UPLOAD_FOLDER = 'dgc-chakshu';
+const BASE_FOLDER = 'dgc-chakshu';
+const ALLOWED_TYPES = {
+  block: 'blocks',
+  room: 'rooms',
+  faculty: 'faculty',
+};
 
 exports.getUploadSignature = async (req, res, next) => {
   try {
@@ -12,8 +17,20 @@ exports.getUploadSignature = async (req, res, next) => {
       });
     }
 
+    const requestedType = req.query.type;
+    const subFolder = ALLOWED_TYPES[requestedType];
+
+    if (!subFolder) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid or missing "type". Must be one of: ${Object.keys(ALLOWED_TYPES).join(', ')}`,
+        error: { code: 'INVALID_TYPE' },
+      });
+    }
+
+    const folder = `${BASE_FOLDER}/${subFolder}`;
     const timestamp = Math.round(Date.now() / 1000);
-    const paramsToSign = { timestamp, folder: UPLOAD_FOLDER };
+    const paramsToSign = { timestamp, folder };
 
     const signature = cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET);
 
@@ -25,7 +42,7 @@ exports.getUploadSignature = async (req, res, next) => {
         signature,
         apiKey: process.env.CLOUDINARY_API_KEY,
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-        folder: UPLOAD_FOLDER,
+        folder,
       },
     });
   } catch (err) {
