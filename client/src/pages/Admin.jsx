@@ -25,7 +25,7 @@ import { uploadImage } from '../utils/uploadImage';
 import { generateId } from '../utils/generateId';
 import ImageCropModal from '../components/ImageCropModal';
 
-import "../styles/Admin.css";
+import "../styles/admin.css";
 
 const TAB_CONFIG = [
   { key: 'Blocks', icon: <FaBuilding /> },
