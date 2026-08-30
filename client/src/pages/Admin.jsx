@@ -2789,6 +2789,14 @@ export default function Admin() {
           'Failed to delete.'
       );
     }
+
+    if (filter === 'approved')
+      return 'Approved';
+
+    if (filter === 'pending')
+      return 'Pending';
+
+    return 'All Faculty';
   };
 
   /* ==========================================================
