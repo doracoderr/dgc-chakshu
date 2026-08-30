@@ -1019,6 +1019,9 @@ function RoomForm({
 
     capacity:
       initial?.capacity ?? '',
+
+    verified:
+      Boolean(initial?.verified),
   });
 
   const [saving, setSaving] =
@@ -1067,6 +1070,9 @@ function RoomForm({
             : Number(
                 form.capacity
               ),
+
+        verified:
+          form.verified,
       };
 
       if (isEdit) {
@@ -1278,6 +1284,25 @@ function RoomForm({
           }
         />
       </div>
+
+      <label className="admin-checkbox-row">
+        <input
+          type="checkbox"
+          checked={
+            form.verified
+          }
+          onChange={(e) =>
+            update(
+              'verified',
+              e.target.checked
+            )
+          }
+        />
+
+        <span>
+          Verified — visible to public
+        </span>
+      </label>
 
       <FormActions
         isEdit={isEdit}
@@ -1806,6 +1831,12 @@ function EntityViewModal({
                   {item.floorNumber ??
                     '—'}
                 </span>
+
+                <span>
+                  {item.verified
+                    ? 'Verified'
+                    : 'Unverified — not visible to public'}
+                </span>
               </div>
 
               <p>
@@ -2117,6 +2148,28 @@ function EntityCard({
 
                 <small>
                   Floor
+                </small>
+              </div>
+            </div>
+
+            <div className="block-meta-item">
+              <span>
+                {item.verified ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaClock />
+                )}
+              </span>
+
+              <div>
+                <strong>
+                  {item.verified
+                    ? 'Verified'
+                    : 'Unverified'}
+                </strong>
+
+                <small>
+                  Public status
                 </small>
               </div>
             </div>
@@ -2736,6 +2789,14 @@ export default function Admin() {
           'Failed to delete.'
       );
     }
+
+    if (filter === 'approved')
+      return 'Approved';
+
+    if (filter === 'pending')
+      return 'Pending';
+
+    return 'All Faculty';
   };
 
   /* ==========================================================
