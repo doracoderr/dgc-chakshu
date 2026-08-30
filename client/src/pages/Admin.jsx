@@ -32,7 +32,7 @@ import { generateId } from '../utils/generateId';
 import { generateCodeFromName } from '../utils/generateCode';
 import ImageCropModal from '../components/ImageCropModal';
 
-import '../styles/Admin.css';
+import '../styles/admin.css';
 
 const TAB_CONFIG = [
   { key: 'Blocks', icon: <FaBuilding /> },
