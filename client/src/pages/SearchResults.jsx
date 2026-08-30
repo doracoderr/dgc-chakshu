@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import LocationCard from '../components/LocationCard';
 
@@ -11,14 +11,11 @@ function floorLabel(floorNumber) {
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const q = searchParams.get('q') || '';
-  const [input, setInput] = useState(q);
-  const navigate = useNavigate();
   const [results, setResults] = useState({ blocks: [], rooms: [], departments: [], faculty: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setInput(q);
     if (!q) return;
     setLoading(true);
     setError(null);
@@ -29,11 +26,6 @@ export default function SearchResults() {
       .finally(() => setLoading(false));
   }, [q]);
 
-  const handleRefine = (e) => {
-    e.preventDefault();
-    if (input.trim()) navigate(`/search?q=${encodeURIComponent(input.trim())}`);
-  };
-
   const totalResults =
     (results.blocks?.length || 0) +
     (results.rooms?.length || 0) +
@@ -43,17 +35,8 @@ export default function SearchResults() {
   return (
     <div className="page search-results-page">
       <h1>Search</h1>
-      <form className="search-refine-bar" onSubmit={handleRefine}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Search rooms, blocks, departments, faculty..."
-        />
-        <button type="submit" className="btn-primary">Search</button>
-      </form>
 
-      {!q && <p className="subtitle">Type something above to search the campus.</p>}
+      {!q && <p className="subtitle">Type something in the search bar above to search the campus.</p>}
       {q && loading && <p className="subtitle">Searching for "{q}"...</p>}
       {q && error && <p className="page error">Error: {error}</p>}
 
@@ -116,9 +99,9 @@ export default function SearchResults() {
                   return (
                     <Link to={`/rooms/${r._id}`} key={r._id} className="home-block-link">
                       <LocationCard
-                        title={r.name}
+                        title={r.name || `Room ${r.roomNumber}`}
                         subtitle={subtitleParts.filter(Boolean).join(' · ')}
-                        image={r.photos?.[0]}
+                        image={r.photos?.[0] || r.coverImage}
                       />
                     </Link>
                   );
@@ -136,7 +119,7 @@ export default function SearchResults() {
                     <LocationCard
                       title={f.name}
                       subtitle={[f.designation, f.departmentId?.name].filter(Boolean).join(' · ')}
-                      image={f.photo}
+                      image={f.photo || f.coverImage}
                     />
                   </Link>
                 ))}

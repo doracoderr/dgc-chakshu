@@ -37,7 +37,7 @@ export default function DepartmentDirectory() {
           if (floor) subtitleParts.push(floor);
           if (dept.hodName) subtitleParts.push(`HOD: ${dept.hodName}`);
 
-          const card = <LocationCard title={dept.name} subtitle={subtitleParts.join(' · ')} />;
+          const card = <LocationCard title={dept.name} subtitle={subtitleParts.join(' · ')} image={dept.coverImage} />;
 
           return dept.blockId?._id ? (
             <Link to={`/blocks/${dept.blockId._id}`} key={dept._id} className="home-block-link">
