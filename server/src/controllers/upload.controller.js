@@ -3,6 +3,7 @@ const cloudinary = require('../config/cloudinary');
 const BASE_FOLDER = 'dgc-chakshu';
 const ALLOWED_TYPES = {
   block: 'blocks',
+   department: 'departments',
   room: 'rooms',
   faculty: 'faculty',
 };
