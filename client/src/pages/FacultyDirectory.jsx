@@ -24,7 +24,7 @@ export default function FacultyDirectory() {
       <div className="card-grid">
         {faculty.length === 0 && <p>No faculty added yet.</p>}
         {faculty.map((f) => (
-          <LocationCard key={f._id} title={f.name} subtitle={f.designation} image={f.photo} />
+          <LocationCard key={f._id} title={f.name} subtitle={f.designation} image={f.photo || f.coverImage} />
         ))}
       </div>
     </div>
