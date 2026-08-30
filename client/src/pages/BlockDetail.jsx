@@ -51,7 +51,10 @@ function FloorBlueprint({ rooms }) {
               {room.roomNumber}
             </text>
             <text x={x + 12} y={y + 46} fontSize={11} fill="#667085">
-              {room.name.length > 20 ? `${room.name.slice(0, 20)}…` : room.name}
+              {(() => {
+                const label = room.name || `Room ${room.roomNumber}`;
+                return label.length > 20 ? `${label.slice(0, 20)}…` : label;
+              })()}
             </text>
             <text x={x + 12} y={y + 64} fontSize={10} fill={color} fontWeight={600}>
               {room.type}
@@ -155,7 +158,7 @@ export default function BlockDetail() {
               <Link to={`/rooms/${room._id}`} className="floor-room-list-item">
                 <span className="floor-room-badge" style={{ background: TYPE_COLORS[room.type] || TYPE_COLORS.other }} />
                 <span>
-                  <strong>{room.roomNumber}</strong> — {room.name}
+                  <strong>{room.roomNumber}</strong>{room.name ? ` — ${room.name}` : ''}
                   {room.departmentId ? ` · ${room.departmentId.name}` : ''}
                 </span>
               </Link>

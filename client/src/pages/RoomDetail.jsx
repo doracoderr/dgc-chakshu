@@ -22,9 +22,14 @@ export default function RoomDetail() {
 
   const hasLocation = room.location && room.location.lat != null && room.location.lng != null;
 
+  const allPhotos = [
+    ...(room.coverImage ? [room.coverImage] : []),
+    ...(room.photos || []),
+  ].filter((src, i, arr) => arr.indexOf(src) === i);
+
   return (
     <div className="page room-detail">
-      <h1>{room.name}</h1>
+      <h1>{room.name || `Room ${room.roomNumber}`}</h1>
       <div className="room-detail-meta">
         <span className="room-detail-badge">Room {room.roomNumber}</span>
         <span className="room-detail-badge">Floor {room.floorNumber}</span>
@@ -47,9 +52,9 @@ export default function RoomDetail() {
         </p>
       )}
 
-      {room.photos && room.photos.length > 0 && (
+      {allPhotos.length > 0 && (
         <div className="room-detail-photos">
-          {room.photos.map((src, i) => (
+          {allPhotos.map((src, i) => (
             <img key={i} src={src} alt={`${room.name} photo ${i + 1}`} />
           ))}
         </div>

@@ -6,6 +6,7 @@ const facultySchema = new mongoose.Schema(
     designation: { type: String },
     departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
     roomId: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
+    coverImage: { type: String },
     photo: { type: String },
     email: { type: String },
     phone: { type: String },

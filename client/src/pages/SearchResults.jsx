@@ -99,9 +99,9 @@ export default function SearchResults() {
                   return (
                     <Link to={`/rooms/${r._id}`} key={r._id} className="home-block-link">
                       <LocationCard
-                        title={r.name}
+                        title={r.name || `Room ${r.roomNumber}`}
                         subtitle={subtitleParts.filter(Boolean).join(' · ')}
-                        image={r.photos?.[0]}
+                        image={r.photos?.[0] || r.coverImage}
                       />
                     </Link>
                   );
@@ -119,7 +119,7 @@ export default function SearchResults() {
                     <LocationCard
                       title={f.name}
                       subtitle={[f.designation, f.departmentId?.name].filter(Boolean).join(' · ')}
-                      image={f.photo}
+                      image={f.photo || f.coverImage}
                     />
                   </Link>
                 ))}
