@@ -7,6 +7,7 @@ const departmentSchema = new mongoose.Schema(
     blockId: { type: mongoose.Schema.Types.ObjectId, ref: 'Block' },
     floorNumber: { type: Number },
     description: { type: String },
+    coverImage: { type: String },
     hodName: { type: String },
     contactEmail: { type: String }
   },

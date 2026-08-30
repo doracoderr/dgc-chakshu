@@ -1001,7 +1001,9 @@ function RoomForm({
       initial?.roomNumber || '',
 
     type:
-      initial?.type || '',
+      ['classroom', 'lab', 'office', 'facility', 'other'].includes(initial?.type)
+        ? initial.type
+        : 'classroom',
 
     description:
       initial?.description || '',
@@ -1122,12 +1124,12 @@ function RoomForm({
     >
       <div className="admin-field">
         <label>
-          Room Name <span>*</span>
+          Room Name
         </label>
 
         <input
           type="text"
-          placeholder="e.g. Computer Lab"
+          placeholder="e.g. Computer Lab (optional)"
           value={form.name}
           onChange={(e) =>
             update(
@@ -1135,7 +1137,6 @@ function RoomForm({
               e.target.value
             )
           }
-          required
         />
       </div>
 
@@ -1166,9 +1167,7 @@ function RoomForm({
             Room Type
           </label>
 
-          <input
-            type="text"
-            placeholder="Lab / Class / Office"
+          <select
             value={form.type}
             onChange={(e) =>
               update(
@@ -1176,7 +1175,13 @@ function RoomForm({
                 e.target.value
               )
             }
-          />
+          >
+            <option value="classroom">Classroom</option>
+            <option value="lab">Lab</option>
+            <option value="office">Office</option>
+            <option value="facility">Facility</option>
+            <option value="other">Other</option>
+          </select>
         </div>
       </div>
 
@@ -2731,32 +2736,6 @@ export default function Admin() {
           'Failed to delete.'
       );
     }
-
-    if (filter === 'approved')
-      return 'Approved';
-
-    if (filter === 'pending')
-      return 'Pending';
-
-    return 'All Faculty';
-  };
-
-  /* ==========================================================
-     COUNTS
-     ========================================================== */
-
-  const counts = {
-    Blocks:
-      blocks.length,
-
-    Departments:
-      departments.length,
-
-    Rooms:
-      rooms.length,
-
-    Faculty:
-      faculty.length,
   };
 
   /* ==========================================================
@@ -2766,7 +2745,6 @@ export default function Admin() {
   const openAdd = () => {
     setEditingItem({
       __new: true,
-      type: tab,
     });
   };
 
@@ -2779,7 +2757,6 @@ export default function Admin() {
   ) => {
     setEditingItem({
       ...item,
-      type: tab,
     });
   };
 
