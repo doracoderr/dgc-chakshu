@@ -2731,32 +2731,6 @@ export default function Admin() {
           'Failed to delete.'
       );
     }
-
-    if (filter === 'approved')
-      return 'Approved';
-
-    if (filter === 'pending')
-      return 'Pending';
-
-    return 'All Faculty';
-  };
-
-  /* ==========================================================
-     COUNTS
-     ========================================================== */
-
-  const counts = {
-    Blocks:
-      blocks.length,
-
-    Departments:
-      departments.length,
-
-    Rooms:
-      rooms.length,
-
-    Faculty:
-      faculty.length,
   };
 
   /* ==========================================================
