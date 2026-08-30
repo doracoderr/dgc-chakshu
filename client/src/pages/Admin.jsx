@@ -29,6 +29,7 @@ import {
 import api from '../api/axios';
 import { uploadImage } from '../utils/uploadImage';
 import { generateId } from '../utils/generateId';
+import { generateCodeFromName } from '../utils/generateCode';
 import ImageCropModal from '../components/ImageCropModal';
 
 import '../styles/Admin.css';
@@ -572,18 +573,35 @@ function BlockForm({
           Block Code <span>*</span>
         </label>
 
-        <input
-          type="text"
-          placeholder="e.g. A"
-          value={form.code}
-          onChange={(e) =>
-            update(
-              'code',
-              e.target.value
-            )
-          }
-          required
-        />
+        <div className="admin-field-row" style={{ gap: '8px' }}>
+          <input
+            type="text"
+            placeholder="e.g. A"
+            value={form.code}
+            onChange={(e) =>
+              update(
+                'code',
+                e.target.value
+              )
+            }
+            required
+          />
+
+          <button
+            type="button"
+            className="btn-secondary"
+            title="Suggest a code from the block name"
+            onClick={() =>
+              update(
+                'code',
+                generateCodeFromName(form.name)
+              )
+            }
+            disabled={!form.name.trim()}
+          >
+            Generate
+          </button>
+        </div>
       </div>
 
       <div className="admin-field">
@@ -833,20 +851,38 @@ function DepartmentForm({
 
       <div className="admin-field">
         <label>
-          Department Code
+          Department Code <span>*</span>
         </label>
 
-        <input
-          type="text"
-          placeholder="e.g. CSE"
-          value={form.code}
-          onChange={(e) =>
-            update(
-              'code',
-              e.target.value
-            )
-          }
-        />
+        <div className="admin-field-row" style={{ gap: '8px' }}>
+          <input
+            type="text"
+            required
+            placeholder="e.g. CSE"
+            value={form.code}
+            onChange={(e) =>
+              update(
+                'code',
+                e.target.value
+              )
+            }
+          />
+
+          <button
+            type="button"
+            className="btn-secondary"
+            title="Suggest a code from the department name"
+            onClick={() =>
+              update(
+                'code',
+                generateCodeFromName(form.name)
+              )
+            }
+            disabled={!form.name.trim()}
+          >
+            Generate
+          </button>
+        </div>
       </div>
 
       <div className="admin-field">
@@ -1106,12 +1142,13 @@ function RoomForm({
       <div className="admin-field-row">
         <div className="admin-field">
           <label>
-            Room Number
+            Room Number <span>*</span>
           </label>
 
           <input
             type="text"
             placeholder="e.g. 101"
+            required
             value={
               form.roomNumber
             }
@@ -1171,6 +1208,7 @@ function RoomForm({
         }
         options={blocks}
         placeholder="Select block"
+        required
       />
 
       <div className="admin-field-row">
@@ -2693,6 +2731,32 @@ export default function Admin() {
           'Failed to delete.'
       );
     }
+
+    if (filter === 'approved')
+      return 'Approved';
+
+    if (filter === 'pending')
+      return 'Pending';
+
+    return 'All Faculty';
+  };
+
+  /* ==========================================================
+     COUNTS
+     ========================================================== */
+
+  const counts = {
+    Blocks:
+      blocks.length,
+
+    Departments:
+      departments.length,
+
+    Rooms:
+      rooms.length,
+
+    Faculty:
+      faculty.length,
   };
 
   /* ==========================================================
