@@ -1,0 +1,1395 @@
+/* ============================================================
+   ADMIN PANEL - SCREENSHOT STYLE UI
+   ============================================================ */
+
+.admin-page {
+  min-height: calc(100vh - 64px);
+  background: #f8fafc;
+  padding: 28px 7%;
+  color: #172b4d;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.admin-header-new {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.admin-header-new h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #172b4d;
+}
+
+.admin-logout-btn {
+  background: white;
+  color: #1769aa;
+  border: 1px solid #8dbde5;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+.admin-tabs-new {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid #dbe3ec;
+  margin-bottom: 22px;
+}
+
+.admin-tab-new {
+  border: 0;
+  background: transparent;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.admin-tab-new span {
+  display: flex;
+  align-items: center;
+}
+
+.admin-tab-new b {
+  background: #e2e8f0;
+  color: #334155;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.admin-tab-new.active {
+  color: #1769aa;
+  border-bottom-color: #1769aa;
+}
+
+.admin-tab-new.active b {
+  background: #1769aa;
+  color: white;
+}
+
+/* ============================================================
+   BLOCK MANAGEMENT LAYOUT
+   ============================================================ */
+
+.blocks-management {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 28px;
+  align-items: start;
+}
+
+.blocks-main {
+  min-width: 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #172b4d;
+}
+
+.section-heading p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.add-block-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: #1769aa;
+  color: white;
+  border-radius: 5px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-block-btn:hover {
+  background: #12588e;
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+.block-search-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.block-search {
+  height: 34px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: white;
+  border: 1px solid #dbe3ec;
+  border-radius: 5px;
+  padding: 0 11px;
+}
+
+.block-search svg {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.block-search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  font-size: 11px;
+  color: #334155;
+}
+
+.block-search-row select {
+  height: 34px;
+  width: 105px;
+  border: 1px solid #dbe3ec;
+  border-radius: 5px;
+  background: white;
+  color: #334155;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+/* ============================================================
+   BLOCK GRID
+   ============================================================ */
+
+.blocks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.block-card {
+  background: white;
+  border: 1px solid #dbe3ec;
+  border-radius: 7px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.block-card-image-wrap {
+  height: 100px;
+  margin: 7px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #e2e8f0;
+}
+
+.block-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.block-card-no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 28px;
+}
+
+.floor-badge {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  background: #1769aa;
+  color: white;
+  padding: 4px 7px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.block-card-body {
+  padding: 4px 9px 10px;
+}
+
+.block-card-body h3 {
+  margin: 0 0 3px;
+  font-size: 13px;
+  color: #172b4d;
+}
+
+.block-code {
+  font-size: 10px;
+  color: #1769aa;
+}
+
+.block-code strong {
+  font-weight: 600;
+}
+
+.block-description {
+  height: 29px;
+  margin: 7px 0;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.block-stats {
+  display: flex;
+  gap: 9px;
+  margin-bottom: 7px;
+  color: #475569;
+  font-size: 8px;
+}
+
+.block-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.block-stats svg {
+  font-size: 8px;
+}
+
+.block-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #64748b;
+  font-size: 8px;
+}
+
+.block-location svg {
+  color: #64748b;
+}
+
+/* ============================================================
+   CARD BUTTONS
+   ============================================================ */
+
+.block-card-actions {
+  display: flex;
+  gap: 5px;
+  padding: 7px 8px;
+  border-top: 1px solid #e5eaf0;
+}
+
+.block-card-actions button {
+  min-height: 25px;
+  border-radius: 4px;
+  background: white;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.card-view-btn {
+  flex: 1;
+  color: #1769aa;
+  border: 1px solid #a8ccec;
+}
+
+
+
+.card-edit-btn {
+  flex: 1;
+  color: #1769aa;
+  border: 1px solid #a8ccec;
+}
+
+.card-delete-btn {
+  width: 28px;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+/* ============================================================
+   RIGHT SIDE FORM
+   ============================================================ */
+
+.block-form-sidebar {
+  background: white;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
+  position: sticky;
+  top: 20px;
+}
+
+.block-side-form {
+  padding: 16px;
+}
+
+.block-form-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.block-form-title h2 {
+  margin: 0;
+  color: #172b4d;
+  font-size: 15px;
+}
+
+.close-form-btn {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ============================================================
+   FORM FIELDS
+   ============================================================ */
+
+.admin-field {
+  margin-bottom: 10px;
+}
+
+.admin-field label,
+.admin-field-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #334155;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.admin-field label span {
+  color: #ef4444;
+}
+
+.admin-field input,
+.admin-field textarea,
+.admin-url-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dbe3ec;
+  border-radius: 5px;
+  background: white;
+  color: #334155;
+  padding: 8px 9px;
+  outline: none;
+  font-family: inherit;
+  font-size: 10px;
+}
+
+.admin-field textarea {
+  resize: vertical;
+  min-height: 54px;
+}
+
+.admin-field input:focus,
+.admin-field textarea:focus,
+.admin-url-input:focus {
+  border-color: #5a9bd0;
+  box-shadow: 0 0 0 2px rgba(23, 105, 170, 0.08);
+}
+
+.admin-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* ============================================================
+   IMAGE UPLOAD
+   ============================================================ */
+
+.admin-image-field {
+  margin-bottom: 10px;
+}
+
+.admin-upload-box {
+  min-height: 62px;
+  position: relative;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.admin-upload-box input[type='file'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.admin-upload-placeholder {
+  min-height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #64748b;
+}
+
+.admin-upload-placeholder svg {
+  font-size: 16px;
+}
+
+.admin-upload-placeholder span {
+  font-size: 8px;
+}
+
+.admin-upload-placeholder small {
+  font-size: 7px;
+}
+
+.admin-upload-preview {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-url-input {
+  margin-top: 6px;
+  padding: 7px 8px;
+  font-size: 9px;
+}
+
+/* ============================================================
+   FORM BUTTONS
+   ============================================================ */
+
+.block-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.admin-cancel-btn {
+  border: 1px solid #9ec5e5;
+  background: white;
+  color: #1769aa;
+  border-radius: 5px;
+  padding: 8px 14px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-save-btn,
+.admin-primary-btn {
+  border: 0;
+  background: #1769aa;
+  color: white;
+  border-radius: 5px;
+  padding: 8px 15px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-save-btn:hover,
+.admin-primary-btn:hover {
+  background: #12588e;
+}
+
+.admin-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #dbe3ec;
+  border-radius: 4px;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.pagination button.active {
+  background: #1769aa;
+  border-color: #1769aa;
+  color: white;
+}
+
+/* ============================================================
+   OTHER TABS
+   ============================================================ */
+
+.simple-admin-section {
+  background: white;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.simple-admin-section h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.entity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entity-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+}
+
+.entity-list-item strong {
+  font-size: 13px;
+}
+
+.entity-list-item p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.entity-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.entity-actions button {
+  border: 1px solid #bfdbfe;
+  background: white;
+  color: #1769aa;
+  border-radius: 5px;
+  padding: 6px 9px;
+  cursor: pointer;
+}
+
+.entity-actions button.danger {
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.block-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.block-modal {
+  position: relative;
+  width: min(500px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 15px 50px rgba(15, 23, 42, 0.25);
+}
+
+.block-modal > img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: white;
+  color: #334155;
+  cursor: pointer;
+}
+
+.block-modal-content {
+  padding: 20px;
+}
+
+.block-modal-content h2 {
+  margin: 0 0 7px;
+  font-size: 20px;
+}
+
+.block-modal-content p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.modal-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modal-meta span {
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.toast-success {
+  background: #0e8f87;
+}
+
+.toast-error {
+  background: #ef4444;
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+.admin-login {
+  max-width: 400px;
+  margin: 80px auto;
+  text-align: center;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.admin-login-form input {
+  padding: 11px;
+  border: 1px solid #dbe3ec;
+  border-radius: 6px;
+}
+
+/* ============================================================
+   STATES
+   ============================================================ */
+
+.admin-loading,
+.admin-empty {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.admin-empty svg {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.admin-empty h3 {
+  margin: 0;
+  color: #334155;
+  font-size: 15px;
+}
+
+.admin-empty p {
+  font-size: 11px;
+}
+
+.admin-status {
+  margin: 5px 0;
+  color: #0e8f87;
+  font-size: 10px;
+}
+
+.admin-status.error {
+  color: #ef4444;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1000px) {
+  .blocks-management {
+    grid-template-columns: 1fr;
+  }
+
+  .block-form-sidebar {
+    position: static;
+  }
+
+  .blocks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-page {
+    padding: 20px 4%;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .block-search-row {
+    flex-direction: column;
+  }
+
+  .block-search-row select {
+    width: 100%;
+  }
+
+  .blocks-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-tabs-new {
+    overflow-x: auto;
+  }
+
+  .admin-tab-new {
+    white-space: nowrap;
+  }
+}
+
+/* =========================================================
+   BLOCKS ADMIN UI
+   ========================================================= */
+
+.blocks-admin-page {
+  width: 100%;
+}
+
+.blocks-admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.blocks-admin-topbar h2 {
+  margin: 0;
+  font-size: 26px;
+  color: var(--primary);
+}
+
+.blocks-admin-topbar p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.blocks-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--secondary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.blocks-add-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.blocks-add-btn span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+
+/* =========================
+   SEARCH / FILTER
+   ========================= */
+
+.blocks-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.blocks-filter {
+  position: relative;
+}
+
+.blocks-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 100;
+  min-width: 170px;
+  padding: 5px;
+  background: var(--surface);
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(18, 59, 93, 0.12);
+}
+
+.blocks-filter-menu button {
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.blocks-filter-menu button:hover {
+  background: var(--bg);
+}
+.blocks-search {
+  position: relative;
+  flex: 1;
+  max-width: 520px;
+}
+
+.blocks-search span {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.blocks-search svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.blocks-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+.blocks-search input:focus {
+  border-color: var(--secondary);
+}
+
+.blocks-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 14px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+
+/* =========================
+   BLOCK CARD GRID
+   ========================= */
+
+.blocks-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.block-admin-card {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(18, 59, 93, 0.06);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.block-admin-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(18, 59, 93, 0.12);
+}
+
+
+/* =========================
+   CARD IMAGE
+   ========================= */
+
+.block-admin-image {
+  position: relative;
+  height: 125px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.block-admin-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.block-admin-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  background: var(--bg);
+}
+
+.block-code-badge {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--secondary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* =========================
+   CARD CONTENT
+   ========================= */
+
+.block-admin-card-body {
+  padding: 12px;
+}
+
+.block-admin-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.block-admin-title-row h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.block-admin-description {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.block-more-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 19px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.block-more-btn:hover {
+  background: var(--bg);
+}
+
+
+/* =========================
+   META
+   ========================= */
+
+.block-admin-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 13px 0;
+  padding: 9px 0;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.block-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.block-meta-item > span {
+  font-size: 13px;
+}
+
+.block-meta-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.block-meta-item strong {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.block-meta-item small {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+
+/* =========================
+   CARD ACTIONS
+   ========================= */
+
+.block-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.block-view-btn,
+.block-edit-btn,
+.block-delete-btn {
+  height: 31px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.block-view-btn {
+  flex: 1;
+  border: 1px solid var(--secondary);
+  background: var(--secondary);
+  color: #fff;
+   display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.block-edit-btn {
+  padding: 0 10px;
+  border: 1px solid #E2E8F0;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.block-edit-btn svg {
+  font-size: 10px;
+}
+
+.block-delete-btn {
+  width: 32px;
+  border: 1px solid #FECACA;
+  background: #FEF2F2;
+  color: #EF4444;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.block-delete-btn svg {
+  font-size: 11px;
+}
+
+
+/* =========================
+   EMPTY STATE
+   ========================= */
+
+.blocks-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 70px 20px;
+  background: var(--surface);
+  border: 1px dashed #CBD5E1;
+  border-radius: 12px;
+}
+
+.blocks-empty-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.blocks-empty h3 {
+  margin: 0;
+  color: var(--text);
+}
+
+.blocks-empty p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 20px;
+}
+
+
+/* =========================================================
+   ADD / EDIT MODAL
+   ========================================================= */
+
+.block-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(15, 23, 42, 0.45);
+  animation: block-overlay-in .2s ease;
+}
+
+.block-modal {
+  width: min(500px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  background: var(--surface);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.16);
+  animation: block-panel-in .25s ease;
+}
+
+.block-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.block-modal-header h2 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 22px;
+}
+
+.block-modal-header p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.block-modal-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.block-modal-close:hover {
+  background: #E2E8F0;
+}
+
+.block-modal .admin-form {
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 24px;
+  background: var(--surface);
+}
+
+.block-modal .admin-form-header {
+  display: none;
+}
+
+.block-modal .admin-form.is-editing {
+  border: none;
+  box-shadow: none;
+}
+
+
+/* =========================
+   ANIMATIONS
+   ========================= */
+
+@keyframes block-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes block-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 1100px) {
+  .blocks-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .blocks-admin-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .blocks-add-btn {
+    width: 100%;
+  }
+
+  .blocks-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .blocks-search {
+    max-width: none;
+  }
+
+  .blocks-filter-btn {
+    justify-content: space-between;
+  }
+
+  .blocks-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .block-modal {
+    width: 100%;
+  }
+}
