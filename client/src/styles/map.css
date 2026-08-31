@@ -162,6 +162,230 @@
   margin: 0;
 }
 
+/* Interactive vs Image map toggle */
+.map-view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.map-toggle-btn {
+  border: 1px solid var(--secondary);
+  background: var(--surface);
+  color: var(--secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-toggle-btn:hover {
+  background: #EAF3FA;
+}
+
+.map-toggle-btn.active {
+  background: var(--secondary);
+  color: #FFFFFF;
+}
+
+/* Leaflet Interactive Map */
+.leaflet-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaflet-map-container-outer {
+  position: relative;
+  width: 100%;
+  /* Big, comfortable map area on both phone and PC instead of a tiny
+     squeezed strip between the header and footer. */
+  height: min(75vh, 720px);
+  min-height: 420px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.leaflet-map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.campus-locate-btn {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 650;
+
+  border: none;
+  background: var(--secondary);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(18, 59, 93, 0.35);
+}
+
+.campus-locate-btn:hover:not(:disabled) {
+  background: var(--primary);
+}
+
+.campus-locate-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.user-location-dot {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1.5px #1a73e8;
+}
+
+.user-location-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(26, 115, 232, 0.35);
+  animation: user-location-pulse 1.8s ease-out infinite;
+}
+
+@keyframes user-location-pulse {
+  0% { transform: scale(0.4); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.leaflet-map-wrapper .map-info,
+.leaflet-map-wrapper .map-error-msg {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  max-width: 90%;
+  box-shadow: 0 2px 8px rgba(18, 59, 93, 0.15);
+  border-radius: 0.5rem;
+}
+
+.campus-marker .marker-dot {
+  display: block;
+}
+
+.campus-marker-thumb {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 2px 8px rgba(18, 59, 93, 0.4);
+  cursor: pointer;
+}
+
+.campus-marker-popup {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  color: var(--text);
+  width: min(220px, 60vw);
+}
+
+.campus-popup-img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 0.375rem 0.375rem 0 0;
+  margin: -0.6rem -0.85rem 0.5rem;
+  width: calc(100% + 1.7rem);
+}
+
+.campus-popup-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.campus-popup-type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.15rem;
+}
+
+.campus-marker-popup strong {
+  display: block;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.campus-marker-popup p {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+}
+
+.campus-popup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.campus-marker-link,
+.campus-marker-directions {
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.campus-marker-link {
+  background: var(--secondary);
+  color: #FFFFFF;
+}
+
+.campus-marker-link:hover {
+  background: var(--primary);
+}
+
+.campus-marker-directions {
+  background: #EAF3FA;
+  color: var(--primary);
+  border: 1px solid var(--secondary);
+}
+
+.campus-marker-directions:hover {
+  background: var(--secondary);
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .map-view-toggle {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 /* =========================
    RESPONSIVE MAP
    ========================= */
@@ -229,6 +453,17 @@
   .map-info {
     padding: 0.65rem;
     font-size: 0.65rem;
+  }
+
+  .leaflet-map-container-outer {
+    height: min(65vh, 520px);
+    min-height: 340px;
+    border-radius: 0;
+  }
+
+  .campus-locate-btn {
+    font-size: 0.72rem;
+    padding: 0.5rem 0.8rem;
   }
 }
 

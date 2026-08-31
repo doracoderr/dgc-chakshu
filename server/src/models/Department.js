@@ -9,7 +9,11 @@ const departmentSchema = new mongoose.Schema(
     description: { type: String },
     coverImage: { type: String },
     hodName: { type: String },
-    contactEmail: { type: String }
+    contactEmail: { type: String },
+    location: {
+      lat: Number,
+      lng: Number
+    }
   },
   { timestamps: true }
 );

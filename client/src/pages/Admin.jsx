@@ -405,6 +405,33 @@ function AdminSelect({
   );
 }
 
+function GeoLocateButton({ onLocate }) {
+  const [status, setStatus] = useState('idle'); // idle | locating | error
+
+  const handleClick = () => {
+    if (!navigator.geolocation) {
+      setStatus('error');
+      return;
+    }
+    setStatus('locating');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        onLocate(pos.coords.latitude, pos.coords.longitude);
+        setStatus('idle');
+      },
+      () => setStatus('error'),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  return (
+    <button type="button" className="btn-secondary" onClick={handleClick} disabled={status === 'locating'}>
+      <FaMapMarkerAlt />{' '}
+      {status === 'locating' ? 'Locating…' : status === 'error' ? 'Retry location' : 'Use my current location'}
+    </button>
+  );
+}
+
 /* ============================================================
    BLOCK FORM
    ============================================================ */
@@ -585,23 +612,28 @@ function BlockForm({
               )
             }
             required
+            readOnly={isEdit}
+            title={isEdit ? 'Code is locked once a block is created, so it always stays the same.' : undefined}
           />
 
-          <button
-            type="button"
-            className="btn-secondary"
-            title="Suggest a code from the block name"
-            onClick={() =>
-              update(
-                'code',
-                generateCodeFromName(form.name)
-              )
-            }
-            disabled={!form.name.trim()}
-          >
-            Generate
-          </button>
+          {!isEdit && (
+            <button
+              type="button"
+              className="btn-secondary"
+              title="Suggest a code from the block name"
+              onClick={() =>
+                update(
+                  'code',
+                  generateCodeFromName(form.name)
+                )
+              }
+              disabled={!form.name.trim()}
+            >
+              Generate
+            </button>
+          )}
         </div>
+        {isEdit && <p className="admin-hint">Code is permanent and can't be changed after creation.</p>}
       </div>
 
       <div className="admin-field">
@@ -691,6 +723,13 @@ function BlockForm({
         </div>
       </div>
 
+      <GeoLocateButton
+        onLocate={(lat, lng) => {
+          update('lat', lat);
+          update('lng', lng);
+        }}
+      />
+
       <FormActions
         isEdit={isEdit}
         saving={saving}
@@ -737,6 +776,12 @@ function DepartmentForm({
 
     hodName:
       initial?.hodName || '',
+
+    lat:
+      initial?.location?.lat ?? '',
+
+    lng:
+      initial?.location?.lng ?? '',
   });
 
   const [saving, setSaving] =
@@ -775,6 +820,15 @@ function DepartmentForm({
 
         hodName:
           form.hodName,
+
+        location:
+          form.lat !== '' &&
+          form.lng !== ''
+            ? {
+                lat: Number(form.lat),
+                lng: Number(form.lng),
+              }
+            : undefined,
       };
 
       if (isEdit) {
@@ -866,23 +920,28 @@ function DepartmentForm({
                 e.target.value
               )
             }
+            readOnly={isEdit}
+            title={isEdit ? 'Code is locked once a department is created, so it always stays the same.' : undefined}
           />
 
-          <button
-            type="button"
-            className="btn-secondary"
-            title="Suggest a code from the department name"
-            onClick={() =>
-              update(
-                'code',
-                generateCodeFromName(form.name)
-              )
-            }
-            disabled={!form.name.trim()}
-          >
-            Generate
-          </button>
+          {!isEdit && (
+            <button
+              type="button"
+              className="btn-secondary"
+              title="Suggest a code from the department name"
+              onClick={() =>
+                update(
+                  'code',
+                  generateCodeFromName(form.name)
+                )
+              }
+              disabled={!form.name.trim()}
+            >
+              Generate
+            </button>
+          )}
         </div>
+        {isEdit && <p className="admin-hint">Code is permanent and can't be changed after creation.</p>}
       </div>
 
       <div className="admin-field">
@@ -967,6 +1026,49 @@ function DepartmentForm({
           }
         />
       </div>
+
+      <div className="admin-field-row">
+        <div className="admin-field">
+          <label>Latitude</label>
+
+          <input
+            type="number"
+            step="any"
+            placeholder="Latitude"
+            value={form.lat}
+            onChange={(e) =>
+              update(
+                'lat',
+                e.target.value
+              )
+            }
+          />
+        </div>
+
+        <div className="admin-field">
+          <label>Longitude</label>
+
+          <input
+            type="number"
+            step="any"
+            placeholder="Longitude"
+            value={form.lng}
+            onChange={(e) =>
+              update(
+                'lng',
+                e.target.value
+              )
+            }
+          />
+        </div>
+      </div>
+
+      <GeoLocateButton
+        onLocate={(lat, lng) => {
+          update('lat', lat);
+          update('lng', lng);
+        }}
+      />
 
       <FormActions
         isEdit={isEdit}
