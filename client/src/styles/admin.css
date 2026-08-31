@@ -333,14 +333,14 @@
 
 
 .blocks-card-grid {
-  width: 50%;
+  width: 100%;
   max-width: 100%;
   min-width: 0;
 
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 
-  gap: 10px;
+  gap: 16px;
   align-items: start;
 }
 
@@ -379,16 +379,19 @@
 .block-admin-image {
   position: relative;
   width: 100%;
-  height: 40px;
+  height: 160px;
   overflow: hidden;
-  background: #f8fafc;
+  background: #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .block-admin-image img {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .block-admin-image-placeholder {
@@ -410,16 +413,19 @@
 .entity-image-card .entity-card-image {
   position: relative;
   width: 100%;
-  height: 68px;
+  height: 160px;
   overflow: hidden;
-  background: #f8fafc;
+  background: #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .entity-image-card .entity-card-image img {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .entity-card-image-placeholder {
@@ -501,21 +507,22 @@
   margin: 0;
 
   color: #172b4d;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.3;
 
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .block-admin-description {
-  height: 24px;
-  margin: 3px 0 0;
+  min-height: 28px;
+  margin: 4px 0 0;
 
   color: #64748b;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.4;
 
   display: -webkit-box;
@@ -581,7 +588,7 @@
   align-items: center;
   justify-content: center;
 
-  font-size: 9px;
+  font-size: 12px;
   color: #1769aa;
 }
 
@@ -596,7 +603,7 @@
   min-width: 0;
 
   color: #334155;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.2;
 
   white-space: nowrap;
@@ -606,7 +613,7 @@
 
 .block-meta-item small {
   color: #64748b;
-  font-size: 6.5px;
+  font-size: 9px;
   line-height: 1.2;
 
   white-space: nowrap;
@@ -626,11 +633,11 @@
 .block-view-btn,
 .block-edit-btn,
 .block-delete-btn {
-  height: 23px;
+  height: 32px;
 
   border-radius: 4px;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 
   cursor: pointer;
@@ -684,18 +691,21 @@
 }
 
 .block-card-image-wrap {
-  height: 75px;
+  height: 160px;
   margin: 6px;
   position: relative;
   overflow: hidden;
   border-radius: 5px;
-  background: #e2e8f0;
+  background: #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .block-card-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .block-card-no-image {
@@ -925,6 +935,19 @@
   min-height: 54px;
 }
 
+.admin-field input[readonly] {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.admin-hint {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 9px;
+  font-style: italic;
+}
+
 .admin-field input:focus,
 .admin-field textarea:focus,
 .admin-url-input:focus {
@@ -997,8 +1020,9 @@
 
 .admin-upload-preview {
   width: 100%;
-  height: 100px;
-  object-fit: cover;
+  height: 140px;
+  object-fit: contain;
+  background: #eef2f7;
   display: block;
 }
 
@@ -1344,8 +1368,9 @@
 .entity-view-image {
   display: block;
   width: 100%;
-  height: 240px;
-  object-fit: cover;
+  height: 320px;
+  object-fit: contain;
+  background: #eef2f7;
 }
 
 .entity-view-modal .block-modal-content {
@@ -1535,13 +1560,8 @@
   }
 
   .blocks-card-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .block-admin-image,
-  .entity-image-card .entity-card-image {
-    height: 72px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
   }
 }
 
@@ -1565,7 +1585,7 @@
   }
 
   .blocks-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 
   .blocks-grid {
@@ -1588,13 +1608,13 @@
   }
 
   .blocks-card-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     width: 100%;
   }
 
   .block-admin-image,
   .entity-image-card .entity-card-image {
-    height: 72px;
+    height: 130px;
   }
 
   .section-heading,
@@ -1708,21 +1728,15 @@
     grid-template-columns: 1fr;
   }
 
-  @media (max-width: 480px) {
   .blocks-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     width: 100%;
-    gap: 8px;
+    gap: 10px;
   }
-}
-
-  /*
-     Mobile card image still compact
-  */
 
   .block-admin-image,
   .entity-image-card .entity-card-image {
-    height: 95px;
+    height: 120px;
   }
 
   .block-admin-card-body {
@@ -1827,12 +1841,13 @@
   }
 
   .blocks-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 7px;
   }
 
   .block-admin-image,
   .entity-image-card .entity-card-image {
-    height: 85px;
+    height: 100px;
   }
 
   .block-admin-card-body {
