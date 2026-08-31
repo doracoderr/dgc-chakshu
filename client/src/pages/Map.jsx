@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import '../styles/map.css';
+import CampusLeafletMap from '../components/CampusLeafletMap';
 
 function Map() {
+  const [view, setView] = useState('interactive'); // 'interactive' | 'image'
   const [zoom, setZoom] = useState(1);
   const [isPanning, setIsPanning] = useState(false);
   const [panX, setPanX] = useState(0);
@@ -137,9 +139,29 @@ function Map() {
       {/* Header */}
       <div className="map-header">
         <h1>DGC Campus Map</h1>
+        <div className="map-view-toggle">
+          <button
+            type="button"
+            className={`map-toggle-btn ${view === 'interactive' ? 'active' : ''}`}
+            onClick={() => setView('interactive')}
+          >
+            📍 Interactive Map
+          </button>
+          <button
+            type="button"
+            className={`map-toggle-btn ${view === 'image' ? 'active' : ''}`}
+            onClick={() => setView('image')}
+          >
+            🗺️ Campus Layout Image
+          </button>
+        </div>
       </div>
 
-      {/* Map Container */}
+      {view === 'interactive' ? (
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <CampusLeafletMap />
+        </div>
+      ) : (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Map Viewer */}
         <div
@@ -214,6 +236,7 @@ function Map() {
           </p>
         </div>
       </div>
+      )}
     </div>
   );
 }
