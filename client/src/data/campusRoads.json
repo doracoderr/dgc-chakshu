@@ -1,0 +1,243 @@
+{
+  "type": "FeatureCollection",
+  "name": "DGC Gurugram Campus Road Network",
+  "description": "Campus roads traced from map image and mapped to GPS coordinates",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Main College Entrance Road",
+        "type": "primary",
+        "description": "Main road from college entry gate running north-south",
+        "width": 8
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02355, 28.46835],
+          [77.02355, 28.46820],
+          [77.02355, 28.46800],
+          [77.02355, 28.46780],
+          [77.02355, 28.46750],
+          [77.02355, 28.46720],
+          [77.02355, 28.46700]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "East-West Central Road",
+        "type": "primary",
+        "description": "Main horizontal road connecting east and west campus",
+        "width": 8
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02260, 28.46710],
+          [77.02285, 28.46710],
+          [77.02310, 28.46710],
+          [77.02340, 28.46710],
+          [77.02370, 28.46710],
+          [77.02400, 28.46710],
+          [77.02430, 28.46710],
+          [77.02460, 28.46710],
+          [77.02480, 28.46710]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "North Connector Road",
+        "type": "primary",
+        "description": "Road connecting northern parking and facilities",
+        "width": 7
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02310, 28.46780],
+          [77.02310, 28.46800],
+          [77.02310, 28.46820]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Library Complex Road",
+        "type": "secondary",
+        "description": "Road leading to library and computer department area",
+        "width": 6
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02285, 28.46710],
+          [77.02285, 28.46750],
+          [77.02285, 28.46780],
+          [77.02285, 28.46810]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Arts Block Access Road",
+        "type": "secondary",
+        "description": "Road to arts block and southern academic areas",
+        "width": 6
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02260, 28.46710],
+          [77.02260, 28.46680],
+          [77.02260, 28.46650],
+          [77.02260, 28.46620]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Science Block Road",
+        "type": "secondary",
+        "description": "Road to JC Boss science block and academic facilities",
+        "width": 6
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02370, 28.46710],
+          [77.02370, 28.46750],
+          [77.02370, 28.46790]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hostel Access Road - West",
+        "type": "secondary",
+        "description": "Road to girls hostel and residential areas",
+        "width": 5
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02260, 28.46710],
+          [77.02230, 28.46710],
+          [77.02200, 28.46710],
+          [77.02180, 28.46730]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "East Campus Corridor",
+        "type": "secondary",
+        "description": "Road connecting east campus buildings - Chanakya block area",
+        "width": 6
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02460, 28.46710],
+          [77.02460, 28.46740],
+          [77.02460, 28.46770],
+          [77.02460, 28.46800]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Canteen & Dining Road",
+        "type": "secondary",
+        "description": "Road to canteen, seating area and dining facilities",
+        "width": 5
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02400, 28.46710],
+          [77.02430, 28.46710],
+          [77.02450, 28.46730]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sports Complex Access",
+        "type": "tertiary",
+        "description": "Road to basketball court and exercise/sports areas",
+        "width": 5
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02400, 28.46710],
+          [77.02420, 28.46690],
+          [77.02440, 28.46670]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Administration Building Road",
+        "type": "secondary",
+        "description": "Road to principal office and administration complex",
+        "width": 6
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02340, 28.46710],
+          [77.02360, 28.46690],
+          [77.02380, 28.46670],
+          [77.02400, 28.46650]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Southern Access Road",
+        "type": "tertiary",
+        "description": "Road connecting southern buildings and parking",
+        "width": 5
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02310, 28.46650],
+          [77.02340, 28.46650],
+          [77.02370, 28.46650],
+          [77.02400, 28.46650]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Canwinn Aarogya Access",
+        "type": "tertiary",
+        "description": "Road to Canwinn Aarogya Dham building on north side",
+        "width": 4
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.02430, 28.46800],
+          [77.02460, 28.46820]
+        ]
+      }
+    }
+  ]
+}
