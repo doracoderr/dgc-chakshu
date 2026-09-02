@@ -78,34 +78,59 @@
    ============================================================ */
 
 .block-directory-total {
-  min-width: 145px;
+  flex-shrink: 0;
 
-  padding: 11px 14px;
+  padding: 6px 12px 6px 6px;
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
-  gap: 12px;
+  gap: 8px;
 
   border: 1px solid #dce7f1;
-  border-radius: 10px;
+  border-radius: 999px;
 
-  background: #f7fbff;
+  background: linear-gradient(180deg, #ffffff, #f4f9ff);
+  box-shadow: 0 1px 2px rgba(23, 105, 170, .06);
 }
 
-.block-directory-total span {
-  color: #64748b;
+.block-directory-total-icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #1769aa;
+  color: #fff;
 
   font-size: 11px;
-  font-weight: 600;
 }
 
-.block-directory-total strong {
-  color: #1769aa;
+.block-directory-total-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
 
-  font-size: 20px;
-  line-height: 1;
+.block-directory-total-text strong {
+  color: #172b4d;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.block-directory-total-text span {
+  color: #64748b;
+
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
 }
 
 /* ============================================================
@@ -117,18 +142,20 @@
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 
   gap: 10px;
 
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .block-directory-search {
   position: relative;
 
-  flex: 1;
-
-  max-width: 520px;
+  flex: 1 1 180px;
+  max-width: 240px;
+  min-width: 130px;
 }
 
 .block-directory-search svg {
@@ -139,32 +166,34 @@
 
   transform: translateY(-50%);
 
-  color: #64748b;
+  color: #1769aa;
 
-  font-size: 13px;
+  font-size: 11px;
 
   pointer-events: none;
 }
 
 .block-directory-search input {
   width: 100%;
-  height: 38px;
+  height: 32px;
 
   box-sizing: border-box;
 
-  padding: 0 12px 0 35px;
+  padding: 0 26px 0 32px;
 
   border: 1px solid #dbe3ec;
-  border-radius: 8px;
+  border-radius: 999px;
 
   background: #fff;
 
   color: #334155;
 
   font-family: inherit;
-  font-size: 12px;
+  font-size: 11px;
 
   outline: none;
+
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
 
   transition:
     border-color .2s ease,
@@ -179,7 +208,53 @@
   border-color: #5a9bd0;
 
   box-shadow:
-    0 0 0 3px rgba(23, 105, 170, .08);
+    0 0 0 3px rgba(23, 105, 170, .1);
+}
+
+.block-directory-search-clear {
+  position: absolute;
+
+  right: 8px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 16px;
+  height: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #e2e8f0;
+  color: #64748b;
+
+  font-size: 7px;
+
+  cursor: pointer;
+}
+
+.block-directory-search-clear:hover {
+  background: #cbd5e1;
+  color: #334155;
+}
+
+/* ============================================================
+   SORT + VIEW TOGGLE GROUP — pinned to the right
+   ============================================================ */
+
+.block-directory-toolbar-right {
+  display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+
+  gap: 10px;
+
+  margin-left: auto;
 }
 
 /* ============================================================
@@ -191,21 +266,22 @@
 }
 
 .block-directory-sort select {
-  min-width: 145px;
-  height: 38px;
+  min-width: 0;
+  width: 74px;
+  height: 30px;
 
-  padding: 0 10px;
+  padding: 0 4px 0 8px;
 
   box-sizing: border-box;
 
   border: 1px solid #dbe3ec;
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: #fff;
   color: #334155;
 
   font-family: inherit;
-  font-size: 12px;
+  font-size: 10px;
 
   outline: none;
 
@@ -235,8 +311,8 @@
 }
 
 .block-directory-view-toggle button {
-  width: 40px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
 
   display: flex;
   align-items: center;
@@ -249,7 +325,7 @@
   background: #fff;
   color: #64748b;
 
-  font-size: 12px;
+  font-size: 10px;
 
   cursor: pointer;
 
@@ -377,7 +453,7 @@
 
   display: block;
 
-  object-fit: cover;
+  object-fit: contain;
 
   transition:
     transform .3s ease;
@@ -636,7 +712,7 @@
    ============================================================ */
 
 .block-directory-grid.list-view {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -845,6 +921,15 @@
   color: #fff;
 }
 
+/* Without this, hovering the already-active page number made its text
+   the same blue as its background (hover sets text color, .active sets
+   background color, and hover's higher specificity was winning) — the
+   number effectively vanished. This keeps it white on hover too. */
+.block-directory-pagination button.active:hover {
+  color: #fff;
+  border-color: #1769aa;
+}
+
 .block-directory-pagination button:disabled {
   opacity: .45;
   cursor: not-allowed;
@@ -1050,29 +1135,41 @@
 @media (max-width: 760px) {
   .block-directory-header {
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
   .block-directory-total {
-    width: 100%;
+    width: auto;
+    align-self: flex-end;
     box-sizing: border-box;
   }
 
   .block-directory-toolbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    margin-bottom: 12px;
   }
 
   .block-directory-search {
-    flex-basis: 100%;
+    flex: 1 1 auto;
     max-width: none;
+    min-width: 60px;
+  }
+
+  .block-directory-toolbar-right {
+    margin-left: 0;
+    width: auto;
+    flex-shrink: 0;
+    justify-content: flex-end;
   }
 
   .block-directory-sort {
-    flex: 1;
+    flex: 0 0 auto;
   }
 
   .block-directory-sort select {
-    width: 100%;
+    width: 68px;
+    padding: 0 3px 0 7px;
   }
 
   .block-directory-grid {
@@ -1098,6 +1195,10 @@
 
   .block-directory-description {
     font-size: 8px;
+  }
+
+  .block-directory-grid.list-view {
+    grid-template-columns: 1fr;
   }
 
   /* List view: image keeps rounded corners but shrinks a bit */
@@ -1152,8 +1253,65 @@
   }
 
   .block-directory-view-toggle button {
-    width: 36px;
-    height: 36px;
+    width: 26px;
+    height: 26px;
+    font-size: 8px;
+  }
+
+  .block-directory-total {
+    min-width: 0;
+    padding: 4px 9px 4px 4px;
+    gap: 6px;
+  }
+
+  .block-directory-total-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+
+  .block-directory-total-text span {
+    font-size: 7px;
+  }
+
+  .block-directory-total-text strong {
+    font-size: 12px;
+  }
+
+  .block-directory-search {
+    flex: 1 1 auto;
+    min-width: 50px;
+    max-width: none;
+  }
+
+  .block-directory-search input {
+    height: 26px;
+    font-size: 9px;
+    padding: 0 20px 0 24px;
+  }
+
+  .block-directory-search svg {
+    font-size: 9px;
+    left: 7px;
+  }
+
+  .block-directory-search-clear {
+    right: 6px;
+    width: 13px;
+    height: 13px;
+    font-size: 6px;
+  }
+
+  .block-directory-toolbar-right {
+    gap: 5px;
+  }
+
+  .block-directory-sort select {
+    min-width: 0;
+    width: 58px;
+    height: 26px;
+    font-size: 9px;
+    padding: 0 2px 0 5px;
   }
 
   .block-directory-grid {
@@ -1245,6 +1403,10 @@
   .block-directory-pagination button {
     width: 31px;
     height: 31px;
+  }
+
+  .block-directory-grid.list-view {
+    grid-template-columns: 1fr;
   }
 
   /* List view: stack image on top, body below, still one clean
