@@ -73,6 +73,73 @@ const BUILDINGS = [
     location: { lat: 28.468003, lng: 77.024534 },
     aliases: ['ignou study centre', 'ignou'],
   },
+  // --- Added from the second GPS photo batch (2026-08-31 / 2026-09-02) ---
+  {
+    code: 'JCBOSE',
+    name: 'J.C. Bose Block',
+    description: 'J.C. Bose Block — houses the Admin Office and Principal Office.',
+    // averaged from 3 photos (block signage, Admin Office plaque, Principal Office plaque) — all within ~20m of each other
+    location: { lat: 28.466023, lng: 77.023567 },
+    aliases: ['jc bose block', 'j.c. bose block', 'admin office'],
+  },
+  {
+    code: 'PRINCIPALOFFICE',
+    name: 'Principal Office',
+    description: 'Principal Office, J.C. Bose Block.',
+    location: { lat: 28.465957, lng: 77.023499 },
+    aliases: ['principal office', 'principle office'],
+  },
+  {
+    code: 'ADMCOUNTER',
+    name: 'Admission & Fee Counters',
+    description: 'Stream-wise admission/fee counters (BA Pass, BA Hons & PG, BBA/BCA, B.Com, B.Tech, Scholarships).',
+    // averaged from 2 photos of the same counter wing
+    location: { lat: 28.4658, lng: 77.023848 },
+    aliases: ['admission counters', 'fee counters', 'scholarships fees'],
+  },
+  {
+    code: 'CHANAKYA',
+    name: 'Chanakya Block',
+    description: 'Chanakya Block — new teaching block.',
+    // averaged from 2 photos of the same entrance
+    location: { lat: 28.465998, lng: 77.023983 },
+    aliases: ['chanakya block'],
+  },
+  {
+    code: 'OLDSCI',
+    name: 'Old Science Block',
+    description: 'Old Science Block.',
+    location: { lat: 28.466704, lng: 77.024961 },
+    aliases: ['old science block'],
+  },
+  {
+    code: 'TAGORE',
+    name: 'Tagore Sports Auditorium',
+    description: 'Tagore Sports Auditorium.',
+    location: { lat: 28.466312, lng: 77.024233 },
+    aliases: ['tagore sports auditorium', 'tagore auditorium'],
+  },
+  {
+    code: 'CANTEEN',
+    name: 'College Canteen',
+    description: 'Joginder Kapoor Canteen.',
+    location: { lat: 28.467574, lng: 77.024882 },
+    aliases: ['college canteen', 'joginder kapoor canteen'],
+  },
+  {
+    code: 'DRONA',
+    name: 'Dronacharya Statue',
+    description: 'Dronacharya statue, in the garden.',
+    location: { lat: 28.46662, lng: 77.02421 },
+    aliases: ['dronacharya statue', 'dronacharya murti'],
+  },
+  {
+    code: 'SCBGATE',
+    name: 'Subhash Chandra Bose Gate',
+    description: 'Subhash Chandra Bose memorial gate.',
+    location: { lat: 28.46701, lng: 77.024159 },
+    aliases: ['subhash chandra bose gate', 'subhas chandra bose gate', 'netaji gate'],
+  },
 ];
 
 function escapeRegex(str) {
@@ -114,7 +181,7 @@ async function run() {
     }
   }
 
-  console.log('\nDone. All 8 buildings are now pinned with their exact coordinates.');
+  console.log(`\nDone. All ${BUILDINGS.length} buildings are now pinned with their exact coordinates.`);
   await mongoose.disconnect();
 }
 
