@@ -4,6 +4,7 @@ import About from '../pages/About';
 import BlockDirectory from '../pages/BlockDirectory';
 import BlockDetail from '../pages/BlockDetail';
 import DepartmentDirectory from '../pages/DepartmentDirectory';
+import RoomDirectory from '../pages/RoomDirectory';
 import FacultyDirectory from '../pages/FacultyDirectory';
 import RoomDetail from '../pages/RoomDetail';
 import SearchResults from '../pages/SearchResults';
@@ -18,6 +19,7 @@ export default function AppRoutes() {
       <Route path="/blocks" element={<BlockDirectory />} />
       <Route path="/blocks/:id" element={<BlockDetail />} />
       <Route path="/departments" element={<DepartmentDirectory />} />
+      <Route path="/rooms" element={<RoomDirectory />} />
       <Route path="/faculty" element={<FacultyDirectory />} />
       <Route path="/map" element={<Map />} />
       <Route path="/rooms/:id" element={<RoomDetail />} />
