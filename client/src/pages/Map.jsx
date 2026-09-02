@@ -12,32 +12,35 @@ function Map() {
   const [startY, setStartY] = useState(0);
   const [lastTouchDistance, setLastTouchDistance] = useState(0);
   const [lastTap, setLastTap] = useState(0);
-  const [controlsBottom, setControlsBottom] = useState('1rem');
   const mapContainerRef = useRef(null);
-  const controlsRef = useRef(null);
 
-  // Handle scroll to adjust controls position
+  // Size the map block to exactly (viewport height - navbar height) so
+  // the whole map — header, toggle, legend, map area, and any
+  // error/status banner inside it — is fully visible on first load
+  // without scrolling, on any device. The page itself still scrolls
+  // normally below that, so the footer stays reachable.
   useEffect(() => {
-    const handleScroll = () => {
-      if (controlsRef.current) {
-        const footer = document.querySelector('.footer');
-        if (footer) {
-          const footerRect = footer.getBoundingClientRect();
-          const controlsRect = controlsRef.current.getBoundingClientRect();
-          
-          // If controls are above footer, adjust position
-          if (footerRect.top < controlsRect.bottom + 20) {
-            const newBottom = window.innerHeight - footerRect.top + 10;
-            setControlsBottom(`${newBottom}px`);
-          } else {
-            setControlsBottom('1rem');
-          }
-        }
-      }
-    };
+    const navbarEl = document.querySelector('.navbar');
+    const root = document.documentElement;
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const updateNavbarHeight = () => {
+      const h = navbarEl ? navbarEl.getBoundingClientRect().height : 68;
+      root.style.setProperty('--app-navbar-h', `${h}px`);
+    };
+    updateNavbarHeight();
+
+    let observer;
+    if (navbarEl && 'ResizeObserver' in window) {
+      observer = new ResizeObserver(updateNavbarHeight);
+      observer.observe(navbarEl);
+    } else {
+      window.addEventListener('resize', updateNavbarHeight);
+    }
+
+    return () => {
+      if (observer) observer.disconnect();
+      else window.removeEventListener('resize', updateNavbarHeight);
+    };
   }, []);
 
   const handleZoomIn = () => {
@@ -158,11 +161,11 @@ function Map() {
       </div>
 
       {view === 'interactive' ? (
-        <div style={{ flex: 1, minHeight: 0 }}>
+        <div className="map-area-frame">
           <CampusLeafletMap />
         </div>
       ) : (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="map-area-frame map-area-frame--image">
         {/* Map Viewer */}
         <div
           ref={mapContainerRef}
@@ -177,11 +180,7 @@ function Map() {
           onTouchEnd={handleTouchEnd}
         >
           {/* Floating Controls */}
-          <div 
-            ref={controlsRef}
-            className="map-floating-controls"
-            style={{ bottom: controlsBottom }}
-          >
+          <div className="map-floating-controls">
             <button
               onClick={handleZoomIn}
               className="map-float-btn zoom-in-btn"

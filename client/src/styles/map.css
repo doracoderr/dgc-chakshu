@@ -12,30 +12,64 @@
   --muted: #667085;
 }
 
-/* Map Container */
+/* The map block is sized to exactly fill the first screen (viewport
+   height minus the navbar) so the whole map — header, toggle, legend,
+   map area, and any error/status banner — is visible on load without
+   scrolling, on any device. The page still scrolls normally past it,
+   so the footer stays reachable below. --app-navbar-h is set from JS
+   in Map.jsx to the navbar's real (responsive) height. */
 .map-wrapper {
-  position: relative;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - var(--app-navbar-h, 68px) - 1.5rem);
   display: flex;
   flex-direction: column;
   background: var(--bg);
 }
 
-/* Header Section */
+/* Prefer dvh where supported — accounts for the mobile browser's
+   address bar so the map isn't taller than what's actually visible. */
+@supports (height: 100dvh) {
+  .map-wrapper {
+    height: calc(100dvh - var(--app-navbar-h, 68px) - 1.5rem);
+  }
+}
+
+/* Frame around the map itself — pulls it in from both edges and gives
+   it a little breathing room top/bottom, instead of running edge to
+   edge. Purely cosmetic padding; the map area still fills whatever
+   height is left, so it never causes scrolling on its own. */
+.map-area-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0.75rem 2.5rem 1.5rem;
+}
+
+.map-area-frame--image {
+  overflow: hidden;
+}
+
+/* Header Section — kept slim so the map itself gets the room */
 .map-header {
   background: var(--surface);
   border-bottom: 1px solid #E2E8F0;
-  padding: 1.5rem;
-  text-align: center;
+  padding: 0.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
 }
 
 .map-header h1 {
   margin: 0;
-  font-size: 1.875rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 /* Map Viewer */
@@ -167,19 +201,20 @@
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 0.75rem;
+  margin: 0;
 }
 
 .map-toggle-btn {
   border: 1px solid var(--secondary);
   background: var(--surface);
   color: var(--secondary);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  padding: 0.45rem 0.9rem;
+  padding: 0.32rem 0.7rem;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .map-toggle-btn:hover {
@@ -191,11 +226,48 @@
   color: #FFFFFF;
 }
 
+.campus-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem 1rem;
+  padding: 0.3rem 0.6rem;
+  margin: 0;
+  background: #EAF3FA;
+  border-bottom: 1px solid #D3E6F5;
+  border-radius: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.campus-marker-thumb-mini {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 1.5px solid #FFFFFF;
+  box-shadow: 0 0 0 1px var(--secondary);
+  vertical-align: middle;
+  margin-right: 0.15rem;
+}
+
+@media (max-width: 600px) {
+  .campus-map-legend {
+    justify-content: flex-start;
+    font-size: 0.68rem;
+    gap: 0.3rem 0.7rem;
+  }
+}
+
 /* Leaflet Interactive Map */
 .leaflet-map-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -203,10 +275,10 @@
 .leaflet-map-container-outer {
   position: relative;
   width: 100%;
-  /* Big, comfortable map area on both phone and PC instead of a tiny
-     squeezed strip between the header and footer. */
-  height: min(75vh, 720px);
-  min-height: 420px;
+  /* Fills whatever space is left in the locked viewport instead of a
+     fixed vh value — guarantees it never overflows the screen. */
+  flex: 1;
+  min-height: 0;
   border-radius: 0.5rem;
   overflow: hidden;
 }
@@ -216,30 +288,165 @@
   height: 100%;
 }
 
-.campus-locate-btn {
-  position: absolute;
-  left: 0.75rem;
-  bottom: 0.75rem;
-  z-index: 650;
+.campus-locate-control {
+  margin-top: 8px !important;
+}
 
-  border: none;
-  background: var(--secondary);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.55rem 0.9rem;
+.campus-locate-control-btn {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: #FFFFFF;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.campus-locate-control-btn:hover {
+  background: #f4f4f4;
+}
+
+.campus-location-banner {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  z-index: 650;
+  max-width: min(92%, 480px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #E2E8F0;
+  border-radius: 0.6rem;
+  padding: 0.55rem 1.9rem 0.55rem 0.9rem;
+  box-shadow: 0 4px 14px rgba(18, 59, 93, 0.18);
+
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.campus-location-banner > .campus-banner-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.5rem;
+  margin-left: 0;
+}
+
+.campus-location-banner strong {
+  color: var(--primary);
+}
+
+.campus-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.campus-banner-actions button {
+  border: 1px solid var(--secondary);
+  background: #EAF3FA;
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.32rem 0.6rem;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(18, 59, 93, 0.35);
 }
 
-.campus-locate-btn:hover:not(:disabled) {
+.campus-banner-actions button:hover {
+  background: var(--secondary);
+  color: #fff;
+}
+
+.campus-banner-close {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+  margin-left: auto;
+}
+
+.campus-banner-close:hover {
+  color: var(--primary);
+}
+
+.campus-building-picker {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  z-index: 660;
+  width: min(92%, 320px);
+  max-height: 55%;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.6rem;
+  box-shadow: 0 4px 14px rgba(18, 59, 93, 0.22);
+  overflow: hidden;
+}
+
+.campus-building-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
   background: var(--primary);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
-.campus-locate-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.campus-building-picker-header button {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.campus-building-picker ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem;
+  overflow-y: auto;
+}
+
+.campus-building-picker li + li {
+  border-top: 1px solid #EEF2F7;
+}
+
+.campus-building-picker button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0.5rem 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 0.35rem;
+}
+
+.campus-building-picker li button:hover {
+  background: #EAF3FA;
+  color: var(--primary);
 }
 
 .user-location-dot {
@@ -288,12 +495,12 @@
 
 .campus-marker-thumb {
   display: block;
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background-size: cover;
   background-position: center;
-  border: 2.5px solid #FFFFFF;
+  border: 3px solid #FFFFFF;
   box-shadow: 0 2px 8px rgba(18, 59, 93, 0.4);
   cursor: pointer;
 }
@@ -306,13 +513,22 @@
   width: min(220px, 60vw);
 }
 
+.campus-popup-img-wrap {
+  width: calc(100% + 1.7rem);
+  height: 130px;
+  margin: -0.6rem -0.85rem 0.5rem;
+  background: #eef2f7;
+  border-radius: 0.375rem 0.375rem 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .campus-popup-img {
   width: 100%;
-  height: 110px;
-  object-fit: cover;
-  border-radius: 0.375rem 0.375rem 0 0;
-  margin: -0.6rem -0.85rem 0.5rem;
-  width: calc(100% + 1.7rem);
+  height: 100%;
+  object-fit: contain;
 }
 
 .campus-popup-body {
@@ -379,6 +595,22 @@
   color: #fff;
 }
 
+.campus-popup-route-info {
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0.55rem;
+  background: #EAF3FA;
+  border: 1px solid #CFE3F2;
+  border-radius: 0.375rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1.35;
+}
+
+.campus-popup-route-info[hidden] {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .map-view-toggle {
     flex-direction: column;
@@ -392,11 +624,13 @@
 
 @media (max-width: 768px) {
   .map-header {
-    padding: 1rem;
+    padding: 0.5rem 0.75rem;
+    gap: 0.4rem 0.6rem;
   }
 
   .map-header h1 {
-    font-size: 1.5rem;
+    font-size: 1rem;
+    width: 100%;
   }
 
   .map-floating-controls {
@@ -421,15 +655,34 @@
     padding: 0.75rem;
     font-size: 0.7rem;
   }
+
+  .map-area-frame {
+    padding: 0.5rem 1.25rem 1rem;
+  }
 }
 
 @media (max-width: 480px) {
   .map-header {
-    padding: 0.875rem;
+    padding: 0.45rem 0.6rem;
   }
 
   .map-header h1 {
-    font-size: 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .map-toggle-btn {
+    font-size: 0.7rem;
+    padding: 0.28rem 0.55rem;
+  }
+
+  .campus-map-legend {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
+    gap: 0.2rem 0.6rem;
+  }
+
+  .map-area-frame {
+    padding: 0.5rem 0.85rem 0.85rem;
   }
 
   .map-floating-controls {
@@ -453,12 +706,6 @@
   .map-info {
     padding: 0.65rem;
     font-size: 0.65rem;
-  }
-
-  .leaflet-map-container-outer {
-    height: min(65vh, 520px);
-    min-height: 340px;
-    border-radius: 0;
   }
 
   .campus-locate-btn {
@@ -491,12 +738,23 @@
 
 /* Map Error Message */
 .map-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   color: #EF4444;
-  font-size: 0.85rem;
-  padding: 1rem;
+  font-size: 0.8rem;
+  padding: 0.6rem 0.7rem;
   background: #FEE2E2;
   border-left: 4px solid #EF4444;
   border-radius: 0.375rem;
-  margin-top: 1rem;
-  text-align: center;
+  text-align: left;
+}
+
+.map-error-msg .campus-banner-close {
+  color: #EF4444;
+  margin-left: auto;
+}
+
+.map-error-msg .campus-banner-close:hover {
+  color: #991B1B;
 }
