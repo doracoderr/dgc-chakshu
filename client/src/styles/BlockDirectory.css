@@ -1,0 +1,1339 @@
+/* ============================================================
+   BLOCK DIRECTORY - USER VIEW
+   PROFESSIONAL / 5-PER-ROW GRID / REDESIGNED LIST VIEW
+   ============================================================ */
+
+.block-directory-page {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 28px 20px 55px;
+  box-sizing: border-box;
+  color: #172b4d;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.block-directory-header {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.block-directory-title {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+  min-width: 0;
+}
+
+.block-directory-title-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eaf3ff;
+  color: #1769aa;
+
+  font-size: 18px;
+}
+
+.block-directory-title h1 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.block-directory-title p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* ============================================================
+   TOTAL BLOCKS
+   ============================================================ */
+
+.block-directory-total {
+  min-width: 145px;
+
+  padding: 11px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border: 1px solid #dce7f1;
+  border-radius: 10px;
+
+  background: #f7fbff;
+}
+
+.block-directory-total span {
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.block-directory-total strong {
+  color: #1769aa;
+
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+
+.block-directory-toolbar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.block-directory-search {
+  position: relative;
+
+  flex: 1;
+
+  max-width: 520px;
+}
+
+.block-directory-search svg {
+  position: absolute;
+
+  left: 12px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+.block-directory-search input {
+  width: 100%;
+  height: 38px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px 0 35px;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+
+  background: #fff;
+
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 12px;
+
+  outline: none;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.block-directory-search input::placeholder {
+  color: #94a3b8;
+}
+
+.block-directory-search input:focus {
+  border-color: #5a9bd0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 105, 170, .08);
+}
+
+/* ============================================================
+   SORT
+   ============================================================ */
+
+.block-directory-sort {
+  flex-shrink: 0;
+}
+
+.block-directory-sort select {
+  min-width: 145px;
+  height: 38px;
+
+  padding: 0 10px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+
+  background: #fff;
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 12px;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+.block-directory-sort select:focus {
+  border-color: #5a9bd0;
+}
+
+/* ============================================================
+   GRID / LIST TOGGLE
+   ============================================================ */
+
+.block-directory-view-toggle {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+
+  background: #fff;
+}
+
+.block-directory-view-toggle button {
+  width: 40px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+
+  background: #fff;
+  color: #64748b;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition:
+    background .2s ease,
+    color .2s ease;
+}
+
+.block-directory-view-toggle button + button {
+  border-left: 1px solid #dbe3ec;
+}
+
+.block-directory-view-toggle button:hover {
+  color: #1769aa;
+}
+
+.block-directory-view-toggle button.active {
+  background: #1769aa;
+  color: #fff;
+}
+
+/* ============================================================
+   MAIN GRID
+   Fixed 5-per-row on desktop (no leftover side space), stepping
+   down cleanly at each breakpoint instead of auto-fit, so the
+   row always looks intentional and full-width.
+   ============================================================ */
+
+.block-directory-grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  gap: 16px;
+
+  align-items: stretch;
+}
+
+/* ============================================================
+   CARD LINK
+   ============================================================ */
+
+.block-directory-card-link {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  display: flex;
+
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ============================================================
+   CARD (grid view)
+   ============================================================ */
+
+.block-directory-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  height: 300px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  background: #fff;
+
+  border: 1px solid #e6ebf1;
+  border-radius: 12px;
+
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, .04),
+    0 1px 3px rgba(16, 24, 40, .04);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.block-directory-card-link:hover
+.block-directory-card {
+  transform: translateY(-3px);
+  border-color: #d6e4f0;
+
+  box-shadow:
+    0 10px 22px rgba(16, 24, 40, .09),
+    0 2px 6px rgba(16, 24, 40, .06);
+}
+
+/* ============================================================
+   CARD IMAGE
+   ============================================================ */
+
+.block-directory-card-image {
+  position: relative;
+
+  width: 100%;
+  height: 125px;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  background: #eef2f7;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.block-directory-card-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition:
+    transform .3s ease;
+}
+
+.block-directory-card-link:hover
+.block-directory-card-image img {
+  transform: scale(1.04);
+}
+
+/* ============================================================
+   IMAGE PLACEHOLDER
+   ============================================================ */
+
+.block-directory-image-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8fafc;
+
+  color: #1769aa;
+
+  font-size: 32px;
+}
+
+/* ============================================================
+   CODE BADGE
+   ============================================================ */
+
+.block-directory-code {
+  position: absolute;
+
+  left: 8px;
+  top: 8px;
+
+  min-width: 24px;
+  height: 21px;
+
+  padding: 0 7px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 5px;
+
+  background: #1769aa;
+  color: #fff;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .2px;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .18);
+
+  z-index: 2;
+}
+
+/* ============================================================
+   CARD BODY
+   ============================================================ */
+
+.block-directory-card-body {
+  width: 100%;
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   CARD TITLE
+   ============================================================ */
+
+.block-directory-card-body h2 {
+  width: 100%;
+  min-width: 0;
+
+  height: 34px;
+  min-height: 34px;
+
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 700;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+/* ============================================================
+   DESCRIPTION
+   ============================================================ */
+
+.block-directory-description {
+  width: 100%;
+
+  height: 27px;
+  min-height: 27px;
+
+  margin: 4px 0 6px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  line-height: 1.4;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+/* ============================================================
+   META
+   ============================================================ */
+
+.block-directory-meta {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 4px;
+
+  margin-top: auto;
+
+  padding: 7px 0;
+
+  border-top: 1px solid #edf1f5;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.block-directory-meta-item {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+}
+
+.block-directory-meta-item > svg {
+  flex-shrink: 0;
+
+  color: #1769aa;
+
+  font-size: 10px;
+}
+
+.block-directory-meta-item div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.block-directory-meta-item strong {
+  min-width: 0;
+
+  color: #334155;
+
+  font-size: 9px;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.block-directory-meta-item span {
+  color: #64748b;
+
+  font-size: 7px;
+
+  white-space: nowrap;
+}
+
+/* ============================================================
+   VIEW DETAILS BUTTON (grid view — full width)
+   ============================================================ */
+
+.block-directory-view {
+  width: 100%;
+  height: 28px;
+
+  flex-shrink: 0;
+
+  margin-top: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #1769aa;
+  border-radius: 6px;
+
+  background: #1769aa;
+  color: #fff;
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .2px;
+
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.block-directory-view svg {
+  font-size: 8px;
+}
+
+.block-directory-card-link:hover
+.block-directory-view {
+  background: #12588e;
+  border-color: #12588e;
+}
+
+/* ============================================================
+   LIST VIEW
+   Fully redesigned: rounded image on the left, title + description
+   at top-right, and a single bottom row that holds the meta info
+   plus a compact pill "View Details" button side by side.
+   ============================================================ */
+
+.block-directory-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.block-directory-grid.list-view
+.block-directory-card {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 168px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+
+  gap: 16px;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  overflow: visible;
+}
+
+.block-directory-grid.list-view
+.block-directory-card-link:hover
+.block-directory-card {
+  transform: translateY(-2px);
+}
+
+/* Rounded image, fixed width, sits fully inside the card padding */
+
+.block-directory-grid.list-view
+.block-directory-card-image {
+  width: 220px;
+  height: auto;
+  min-height: 140px;
+
+  flex: 0 0 220px;
+
+  border-radius: 10px;
+}
+
+.block-directory-grid.list-view
+.block-directory-card-image img {
+  border-radius: 10px;
+}
+
+/* Body becomes a grid: title/description on top, meta + button
+   share one row at the bottom — no extra markup needed since each
+   child is placed by name via grid-area. */
+
+.block-directory-grid.list-view
+.block-directory-card-body {
+  width: auto;
+  min-width: 0;
+
+  flex: 1 1 auto;
+
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "title  title"
+    "desc   desc"
+    ".      ."
+    "meta   button";
+
+  column-gap: 18px;
+  row-gap: 4px;
+
+  padding: 2px 2px 2px 0;
+}
+
+.block-directory-grid.list-view
+.block-directory-card-body h2 {
+  grid-area: title;
+
+  height: auto;
+  min-height: 0;
+
+  font-size: 15px;
+  -webkit-line-clamp: 2;
+}
+
+.block-directory-grid.list-view
+.block-directory-description {
+  grid-area: desc;
+
+  height: auto;
+  min-height: 0;
+
+  margin: 2px 0 0;
+
+  font-size: 11.5px;
+  -webkit-line-clamp: 2;
+}
+
+/* Meta becomes a compact inline row (not a bordered block) that
+   sits flush with the pill button on the same baseline. */
+
+.block-directory-grid.list-view
+.block-directory-meta {
+  grid-area: meta;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin-top: 0;
+
+  padding: 0;
+
+  border: none;
+}
+
+.block-directory-grid.list-view
+.block-directory-meta-item {
+  flex: 0 0 auto;
+}
+
+.block-directory-grid.list-view
+.block-directory-meta-item strong {
+  font-size: 11px;
+}
+
+.block-directory-grid.list-view
+.block-directory-meta-item span {
+  font-size: 9px;
+}
+
+/* Compact pill button, right-aligned on the bottom row */
+
+.block-directory-grid.list-view
+.block-directory-view {
+  grid-area: button;
+
+  align-self: center;
+  justify-self: end;
+
+  width: auto;
+  height: 32px;
+
+  margin-top: 0;
+  padding: 0 18px;
+
+  border-radius: 999px;
+
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.block-directory-grid.list-view
+.block-directory-view svg {
+  font-size: 9px;
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.block-directory-pagination {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  margin-top: 24px;
+}
+
+.block-directory-pagination button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 7px;
+
+  background: #fff;
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.block-directory-pagination button:hover:not(:disabled) {
+  border-color: #1769aa;
+  color: #1769aa;
+}
+
+.block-directory-pagination button.active {
+  background: #1769aa;
+  border-color: #1769aa;
+  color: #fff;
+}
+
+.block-directory-pagination button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   RESULT COUNT
+   ============================================================ */
+
+.block-directory-result-count {
+  margin-top: 12px;
+
+  text-align: center;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.block-directory-empty {
+  min-height: 260px;
+
+  padding: 30px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+
+  background: #fff;
+}
+
+.block-directory-empty > svg {
+  margin-bottom: 10px;
+
+  color: #1769aa;
+
+  font-size: 32px;
+}
+
+.block-directory-empty h2 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 17px;
+}
+
+.block-directory-empty p {
+  max-width: 420px;
+
+  margin: 6px 0 0;
+
+  color: #64748b;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.block-directory-empty.error-state > svg {
+  color: #ef4444;
+}
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.block-directory-loading {
+  min-height: 320px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.block-directory-loading > svg {
+  margin-bottom: 10px;
+
+  color: #1769aa;
+
+  font-size: 30px;
+
+  animation:
+    block-directory-pulse
+    1.2s ease-in-out
+    infinite;
+}
+
+.block-directory-loading h2 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 17px;
+}
+
+.block-directory-loading p {
+  margin: 6px 0 0;
+
+  color: #64748b;
+
+  font-size: 11px;
+}
+
+@keyframes block-directory-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: .65;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   LARGE DESKTOP (1400px+) — 5 per row
+   ============================================================ */
+
+@media (min-width: 1400px) {
+  .block-directory-page {
+    max-width: 100%;
+    padding: 28px 24px 55px;
+  }
+
+  .block-directory-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .block-directory-card {
+    height: 310px;
+  }
+
+  .block-directory-card-image {
+    height: 130px;
+  }
+}
+
+/* ============================================================
+   DESKTOP / SMALL DESKTOP (1100px - 1400px) — still 5 per row
+   ============================================================ */
+
+@media (min-width: 1100px) and (max-width: 1399px) {
+  .block-directory-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+/* ============================================================
+   TABLET (up to 1100px) — 4 per row
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .block-directory-page {
+    max-width: 100%;
+    padding: 26px 20px 45px;
+  }
+
+  .block-directory-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .block-directory-card {
+    height: 285px;
+  }
+
+  .block-directory-card-image {
+    height: 115px;
+  }
+
+  .block-directory-card-body h2 {
+    font-size: 12px;
+  }
+
+  .block-directory-description {
+    font-size: 9px;
+  }
+}
+
+/* ============================================================
+   SMALL TABLET (up to 760px) — 3 per row
+   ============================================================ */
+
+@media (max-width: 760px) {
+  .block-directory-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .block-directory-total {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .block-directory-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .block-directory-search {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .block-directory-sort {
+    flex: 1;
+  }
+
+  .block-directory-sort select {
+    width: 100%;
+  }
+
+  .block-directory-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .block-directory-card {
+    height: 265px;
+  }
+
+  .block-directory-card-image {
+    height: 100px;
+  }
+
+  .block-directory-card-body {
+    padding: 8px;
+  }
+
+  .block-directory-card-body h2 {
+    font-size: 11px;
+  }
+
+  .block-directory-description {
+    font-size: 8px;
+  }
+
+  /* List view: image keeps rounded corners but shrinks a bit */
+
+  .block-directory-grid.list-view
+  .block-directory-card {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-card-image {
+    width: 150px;
+    flex-basis: 150px;
+    min-height: 130px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-card-body h2 {
+    font-size: 13px;
+  }
+}
+
+/* ============================================================
+   MOBILE (up to 480px) — 2 per row, list view stacks
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .block-directory-page {
+    padding: 18px 10px 35px;
+  }
+
+  .block-directory-title {
+    gap: 9px;
+  }
+
+  .block-directory-title-icon {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+  }
+
+  .block-directory-title h1 {
+    font-size: 22px;
+  }
+
+  .block-directory-title p {
+    font-size: 10px;
+  }
+
+  .block-directory-view-toggle button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .block-directory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .block-directory-card {
+    height: 240px;
+    min-height: 240px;
+
+    border-radius: 10px;
+  }
+
+  .block-directory-card-image {
+    height: 90px;
+  }
+
+  .block-directory-card-body {
+    padding: 7px;
+  }
+
+  .block-directory-card-body h2 {
+    height: 27px;
+    min-height: 27px;
+
+    font-size: 10px;
+  }
+
+  .block-directory-description {
+    height: 23px;
+    min-height: 23px;
+
+    margin: 3px 0 5px;
+
+    font-size: 7.5px;
+  }
+
+  .block-directory-meta {
+    padding: 5px 0;
+    gap: 2px;
+  }
+
+  .block-directory-meta-item {
+    gap: 2px;
+  }
+
+  .block-directory-meta-item > svg {
+    font-size: 7px;
+  }
+
+  .block-directory-meta-item strong {
+    font-size: 7px;
+  }
+
+  .block-directory-meta-item span {
+    font-size: 5.5px;
+  }
+
+  .block-directory-view {
+    height: 24px;
+
+    margin-top: 6px;
+
+    font-size: 7px;
+  }
+
+  .block-directory-view svg {
+    font-size: 7px;
+  }
+
+  .block-directory-code {
+    left: 5px;
+    top: 5px;
+
+    min-width: 20px;
+    height: 19px;
+
+    padding: 0 5px;
+
+    font-size: 7px;
+  }
+
+  .block-directory-pagination {
+    gap: 5px;
+    margin-top: 18px;
+  }
+
+  .block-directory-pagination button {
+    width: 31px;
+    height: 31px;
+  }
+
+  /* List view: stack image on top, body below, still one clean
+     bottom row for meta + pill button */
+
+  .block-directory-grid.list-view
+  .block-directory-card {
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-card-image {
+    width: 100%;
+    flex-basis: auto;
+    height: 130px;
+    min-height: 130px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-card-body {
+    grid-template-columns: 1fr auto;
+    row-gap: 6px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-meta {
+    gap: 10px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-view {
+    height: 28px;
+    padding: 0 14px;
+    font-size: 9px;
+  }
+}
+
+/* ============================================================
+   VERY SMALL MOBILE (up to 360px) — 2 per row, tighter
+   ============================================================ */
+
+@media (max-width: 360px) {
+  .block-directory-page {
+    padding: 16px 8px 30px;
+  }
+
+  .block-directory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .block-directory-card {
+    height: 220px;
+    min-height: 220px;
+  }
+
+  .block-directory-card-image {
+    height: 80px;
+  }
+
+  .block-directory-card-body {
+    padding: 6px;
+  }
+
+  .block-directory-card-body h2 {
+    font-size: 9.5px;
+  }
+
+  .block-directory-description {
+    font-size: 7px;
+  }
+
+  .block-directory-meta-item strong {
+    font-size: 6.5px;
+  }
+
+  .block-directory-meta-item span {
+    font-size: 5px;
+  }
+
+  .block-directory-view {
+    height: 22px;
+    font-size: 6.5px;
+  }
+
+  .block-directory-grid.list-view
+  .block-directory-meta {
+    gap: 8px;
+  }
+}
