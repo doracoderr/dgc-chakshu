@@ -1,0 +1,2042 @@
+/* ============================================================
+   DEPARTMENT DIRECTORY
+   USER VIEW - COMPACT / PROFESSIONAL / RESPONSIVE
+   ============================================================ */
+
+
+.page.department-directory-page {
+  width: 100% !important;
+  max-width: 1300px !important;
+  margin: 0 auto !important;
+
+  padding: 30px 3% 55px !important;
+
+  box-sizing: border-box;
+
+  color: #172b4d;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.department-directory-header {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 20px;
+}
+
+.department-directory-title {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.department-directory-title-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eaf3ff;
+  color: #1769aa;
+
+  font-size: 18px;
+}
+
+.department-directory-title h1 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.department-directory-title p {
+  margin: 4px 0 0;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   TOTAL
+   ============================================================ */
+
+.department-directory-total {
+  min-width: 155px;
+
+  padding: 10px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  border: 1px solid #dbe7f1;
+  border-radius: 9px;
+
+  background: #f7fbff;
+}
+
+.department-directory-total span {
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.department-directory-total strong {
+  color: #1769aa;
+
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+
+.department-directory-toolbar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+.department-directory-search {
+  position: relative;
+
+  flex: 1 1 420px;
+
+  max-width: 520px;
+}
+
+.department-directory-search > svg {
+  position: absolute;
+
+  left: 12px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+.department-directory-search input {
+  width: 100%;
+  height: 38px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px 0 35px;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 7px;
+
+  background: #fff;
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 11px;
+
+  outline: none;
+}
+
+.department-directory-search input:focus {
+  border-color: #1769aa;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 105, 170, .07);
+}
+
+/* ============================================================
+   SORT
+   ============================================================ */
+
+.department-directory-sort {
+  flex-shrink: 0;
+}
+
+.department-directory-sort select {
+  width: 145px;
+  height: 38px;
+
+  box-sizing: border-box;
+
+  padding: 0 10px;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 7px;
+
+  background: #fff;
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 11px;
+
+  cursor: pointer;
+  outline: none;
+}
+
+/* ============================================================
+   VIEW TOGGLE
+   ============================================================ */
+
+.department-directory-view-toggle {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 7px;
+
+  background: #fff;
+}
+
+.department-directory-view-toggle button {
+  width: 40px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: #fff;
+  color: #64748b;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.department-directory-view-toggle button + button {
+  border-left: 1px solid #dbe3ec;
+}
+
+.department-directory-view-toggle button.active {
+  background: #1769aa;
+  color: #fff;
+}
+
+/* ============================================================
+   CATEGORY FILTER
+   ============================================================ */
+
+.department-directory-category-filter {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.department-directory-category-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.department-directory-category-filter button {
+  flex-shrink: 0;
+
+  height: 34px;
+
+  padding: 0 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 18px;
+
+  background: #fff;
+  color: #334155;
+
+  font-family: inherit;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    color .2s ease;
+}
+
+.department-directory-category-filter button:hover {
+  border-color: #b7d3e9;
+  color: #1769aa;
+}
+
+.department-directory-category-filter button span {
+  display: inline-flex;
+  align-items: center;
+
+  font-size: 10px;
+}
+
+.department-directory-category-filter button.active {
+  background: #1769aa;
+  border-color: #1769aa;
+
+  color: #fff;
+}
+
+/* ============================================================
+   CATEGORY COLORS
+   ============================================================ */
+
+.department-directory-category-filter
+.department-category-computer-science.active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.department-directory-category-filter
+.department-category-science.active {
+  background: #7c3aed;
+  border-color: #7c3aed;
+}
+
+.department-directory-category-filter
+.department-category-arts.active {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.department-directory-category-filter
+.department-category-commerce.active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.department-directory-category-filter
+.department-category-other.active {
+  background: #64748b;
+  border-color: #64748b;
+}
+
+/* ============================================================
+   DEPARTMENT GRID
+   DESKTOP = 5 CARDS
+   ============================================================ */
+
+.department-directory-grid {
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* ============================================================
+   CARD LINK
+   ============================================================ */
+
+.department-directory-card-link {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================
+   CARD
+   SAME SIZE IN SAME ROW
+   ============================================================ */
+
+.department-directory-card {
+  width: 100%;
+  min-width: 0;
+
+  height: 300px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+  box-sizing: border-box;
+
+  background: #fff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+
+  box-shadow:
+    0 2px 7px rgba(18, 59, 93, .06);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.department-directory-card-link:hover
+.department-directory-card {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 7px 18px rgba(18, 59, 93, .10);
+}
+
+/* ============================================================
+   IMAGE
+   ============================================================ */
+
+.department-directory-card-image {
+  width: 100%;
+  height: 105px;
+  flex-shrink: 0;
+
+  position: relative;
+  overflow: hidden;
+
+  background: #eef2f7;
+}
+
+.department-directory-card-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+/* ============================================================
+   IMAGE PLACEHOLDER
+   ============================================================ */
+
+.department-directory-image-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8fafc;
+
+  color: #1769aa;
+
+  font-size: 32px;
+}
+
+/* ============================================================
+   CATEGORY ICON
+   ============================================================ */
+
+.department-directory-category-icon {
+  position: absolute;
+
+  left: 10px;
+  bottom: -16px;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 4px solid #fff;
+  border-radius: 10px;
+
+  background: #1769aa;
+  color: #fff;
+
+  font-size: 15px;
+
+  z-index: 3;
+
+  box-shadow:
+    0 3px 10px rgba(18, 59, 93, .12);
+}
+
+/* ============================================================
+   CATEGORY ICON COLORS
+   ============================================================ */
+
+.department-category-computer-science
+.department-directory-category-icon {
+  background: #aaa017;
+}
+
+.department-category-science
+.department-directory-category-icon {
+  background: #7c3aed;
+}
+
+.department-category-arts
+.department-directory-category-icon {
+  background: #10b981;
+}
+
+.department-category-commerce
+.department-directory-category-icon {
+  background: #f59e0b;
+}
+
+.department-category-other
+.department-directory-category-icon {
+  background: #64748b;
+}
+
+/* ============================================================
+   BODY
+   ============================================================ */
+
+.department-directory-card-body {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px 9px 8px;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   HEADING
+   ============================================================ */
+
+.department-directory-card-heading {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 5px;
+}
+
+.department-directory-card-heading h2 {
+  height: 30px;
+  min-height: 30px;
+
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 1.25;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+.department-directory-code {
+  flex-shrink: 0;
+
+  max-width: 50px;
+
+  padding: 4px 5px;
+
+  border-radius: 4px;
+
+  background: #eef6ff;
+  color: #1769aa;
+
+  font-size: 7px;
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   DESCRIPTION
+   ============================================================ */
+
+.department-directory-description {
+  height: 25px;
+  min-height: 25px;
+
+  margin: 4px 0 5px;
+
+  font-size: 8px;
+  line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+/* ============================================================
+   META
+   ============================================================ */
+
+.department-directory-meta {
+  margin-top: auto;
+
+  padding: 6px 0;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 3px;
+
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.department-directory-meta-item {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+}
+
+.department-directory-meta-item > svg {
+  flex-shrink: 0;
+
+  color: #1769aa;
+
+  font-size: 9px;
+}
+
+.department-directory-meta-item div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.department-directory-meta-item strong {
+  min-width: 0;
+
+  color: #334155;
+
+  font-size: 8px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.department-directory-meta-item span {
+  color: #64748b;
+
+  font-size: 6.5px;
+
+  white-space: nowrap;
+}
+
+/* ============================================================
+   STATS
+   ============================================================ */
+
+.department-directory-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 3px;
+
+  margin-top: 4px;
+}
+
+.department-directory-stats > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 2px;
+
+  text-align: center;
+}
+
+.department-directory-stats > div > svg {
+  color: #1769aa;
+
+  font-size: 8px;
+}
+
+.department-directory-stats strong {
+  color: #172b4d;
+
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.department-directory-stats span {
+  color: #64748b;
+
+  font-size: 6px;
+  line-height: 1.1;
+
+  white-space: nowrap;
+}
+
+/* ============================================================
+   VIEW DETAILS
+   ============================================================ */
+
+.department-directory-view {
+  width: 100%;
+  height: 25px;
+
+  margin-top: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  border-radius: 4px;
+  border: 1px solid #1769aa;
+
+  background: #1769aa;
+  color: #fff;
+
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.department-directory-view svg {
+  font-size: 7px;
+
+  transition:
+    transform .2s ease;
+}
+
+.department-directory-card-link:hover
+.department-directory-view svg {
+  transform: translateX(2px);
+}
+
+.department-directory-view.disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+/* ============================================================
+   LIST VIEW
+   SAME STRUCTURE / FEEL AS BLOCK DIRECTORY
+   ============================================================ */
+
+.department-directory-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.department-directory-grid.list-view
+.department-directory-card-link {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  display: flex;
+}
+
+/* ============================================================
+   LIST CARD
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-card {
+  position: relative;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  height: 168px;
+  min-height: 168px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+
+  gap: 16px;
+
+  padding: 14px;
+
+  box-sizing: border-box;
+
+  overflow: visible;
+
+  background: #fff;
+
+  border: 1px solid #e6ebf1;
+  border-radius: 14px;
+
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, .04),
+    0 1px 3px rgba(16, 24, 40, .04);
+}
+
+.department-directory-grid.list-view
+.department-directory-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #d6e4f0;
+
+  box-shadow:
+    0 10px 22px rgba(16, 24, 40, .09),
+    0 2px 6px rgba(16, 24, 40, .06);
+}
+
+/* ============================================================
+   LIST IMAGE
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-card-image {
+  position: relative;
+
+  width: 220px;
+  height: auto;
+  min-height: 140px;
+
+  flex: 0 0 220px;
+
+  overflow: hidden;
+
+  background: #eef2f7;
+
+  border-radius: 10px;
+}
+
+.department-directory-grid.list-view
+.department-directory-card-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 10px;
+}
+
+/* ============================================================
+   LIST CATEGORY ICON
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-category-icon {
+  left: 10px;
+  bottom: 10px;
+
+  width: 38px;
+  height: 38px;
+
+  border-width: 3px;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+}
+
+/* ============================================================
+   LIST BODY
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-card-body {
+  width: auto;
+  min-width: 0;
+
+  flex: 1 1 auto;
+
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  grid-template-rows:
+    auto
+    auto
+    1fr
+    auto;
+
+  grid-template-areas:
+    "title title"
+    "desc  desc"
+    ".     ."
+    "meta  button";
+
+  column-gap: 18px;
+  row-gap: 4px;
+
+  padding: 2px 2px 2px 0;
+}
+
+/* ============================================================
+   LIST TITLE
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-card-heading {
+  grid-area: title;
+
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 8px;
+}
+
+.department-directory-grid.list-view
+.department-directory-card-heading h2 {
+  flex: 1;
+
+  width: auto;
+  min-width: 0;
+
+  height: auto;
+  min-height: 0;
+
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+/* ============================================================
+   LIST CODE
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-code {
+  flex-shrink: 0;
+
+  max-width: 65px;
+
+  padding: 4px 7px;
+
+  border-radius: 5px;
+
+  font-size: 8px;
+}
+
+/* ============================================================
+   LIST DESCRIPTION
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-description {
+  grid-area: desc;
+
+  width: 100%;
+
+  height: auto;
+  min-height: 0;
+
+  margin: 2px 0 0;
+
+  color: #64748b;
+
+  font-size: 11.5px;
+  line-height: 1.45;
+
+  -webkit-line-clamp: 2;
+}
+
+/* ============================================================
+   LIST META
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-meta {
+  grid-area: meta;
+
+  width: auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin: 0;
+
+  padding: 0;
+
+  border: none;
+}
+
+.department-directory-grid.list-view
+.department-directory-meta-item {
+  flex: 0 0 auto;
+
+  gap: 5px;
+}
+
+.department-directory-grid.list-view
+.department-directory-meta-item > svg {
+  font-size: 10px;
+}
+
+.department-directory-grid.list-view
+.department-directory-meta-item strong {
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+.department-directory-grid.list-view
+.department-directory-meta-item span {
+  font-size: 9px;
+}
+
+/* ============================================================
+   LIST STATS
+   Hide extra stats in compact list view, same philosophy as
+   BlockDirectory's redesigned list view.
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-stats {
+  display: none;
+}
+
+/* ============================================================
+   LIST VIEW DETAILS
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-view {
+  grid-area: button;
+
+  align-self: center;
+  justify-self: end;
+
+  width: auto;
+  height: 32px;
+
+  margin: 0;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border-radius: 999px;
+
+  font-size: 10.5px;
+
+  white-space: nowrap;
+}
+
+.department-directory-grid.list-view
+.department-directory-view svg {
+  font-size: 9px;
+}
+
+/* ============================================================
+   LIST DISABLED BUTTON
+   ============================================================ */
+
+.department-directory-grid.list-view
+.department-directory-view.disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.department-directory-pagination {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  margin-top: 22px;
+}
+
+.department-directory-pagination button {
+  width: 33px;
+  height: 33px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 6px;
+
+  background: #fff;
+  color: #334155;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.department-directory-pagination button:hover:not(:disabled) {
+  border-color: #1769aa;
+  color: #1769aa;
+}
+
+.department-directory-pagination button.active {
+  background: #1769aa;
+  border-color: #1769aa;
+  color: #fff;
+}
+
+.department-directory-pagination button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   RESULT COUNT
+   ============================================================ */
+
+.department-directory-result-count {
+  margin-top: 10px;
+
+  text-align: center;
+
+  color: #94a3b8;
+
+  font-size: 8px;
+}
+
+/* ============================================================
+   EMPTY
+   ============================================================ */
+
+.department-directory-empty {
+  min-height: 240px;
+
+  padding: 30px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 9px;
+
+  background: #fff;
+}
+
+.department-directory-empty > svg {
+  margin-bottom: 9px;
+
+  color: #1769aa;
+
+  font-size: 30px;
+}
+
+.department-directory-empty h2 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 16px;
+}
+
+.department-directory-empty p {
+  max-width: 400px;
+
+  margin: 6px 0 0;
+
+  color: #64748b;
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.department-directory-empty.error-state > svg {
+  color: #ef4444;
+}
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.department-directory-loading {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.department-directory-loading > svg {
+  margin-bottom: 9px;
+
+  color: #1769aa;
+
+  font-size: 28px;
+
+  animation:
+    department-directory-pulse
+    1.2s ease-in-out
+    infinite;
+}
+
+.department-directory-loading h2 {
+  margin: 0;
+
+  color: #172b4d;
+
+  font-size: 16px;
+}
+
+.department-directory-loading p {
+  margin: 6px 0 0;
+
+  color: #64748b;
+
+  font-size: 10px;
+}
+
+@keyframes department-directory-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: .65;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   BOTTOM HIGHLIGHTS
+   ============================================================ */
+
+.department-directory-highlights {
+  width: 100%;
+
+  margin-top: 28px;
+
+  padding: 16px 18px;
+
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 20px;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+
+  background: #fff;
+}
+
+.department-highlight-item {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.department-highlight-icon {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 15px;
+}
+
+.department-highlight-icon.blue {
+  background: #eaf3ff;
+  color: #1769aa;
+}
+
+.department-highlight-icon.green {
+  background: #e8f8f2;
+  color: #0e9f6e;
+}
+
+.department-highlight-icon.purple {
+  background: #f0eaff;
+  color: #7c3aed;
+}
+
+.department-highlight-icon.red {
+  background: #fff0f0;
+  color: #ef4444;
+}
+
+.department-highlight-item > div:last-child {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.department-highlight-item strong {
+  color: #1769aa;
+
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.department-highlight-item span {
+  margin-top: 3px;
+
+  color: #64748b;
+
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+  .page.department-directory-page {
+    max-width: 100% !important;
+
+    padding: 25px 20px 45px !important;
+  }
+
+  .department-directory-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .department-directory-card {
+    height: 350px;
+  }
+
+  .department-directory-card-image {
+    height: 125px;
+  }
+
+  /* LIST */
+
+  .department-directory-grid.list-view
+  .department-directory-card {
+    height: 160px;
+    min-height: 160px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-image {
+    width: 195px;
+
+    flex-basis: 195px;
+  }
+
+  /* highlights */
+
+  .department-directory-highlights {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+  }
+}
+
+/* ============================================================
+   SMALL TABLET
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+  .page.department-directory-page {
+    padding: 22px 14px 40px !important;
+  }
+
+  .department-directory-header {
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .department-directory-total {
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+
+  .department-directory-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .department-directory-search {
+    flex-basis: 100%;
+
+    max-width: none;
+  }
+
+  .department-directory-sort {
+    flex: 1;
+  }
+
+  .department-directory-sort select {
+    width: 100%;
+  }
+
+  .department-directory-view-toggle {
+    flex-shrink: 0;
+  }
+
+  .department-directory-category-filter {
+    flex-basis: 100%;
+
+    width: 100%;
+  }
+
+  .department-directory-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .department-directory-card {
+    height: 325px;
+  }
+
+  .department-directory-card-image {
+    height: 115px;
+  }
+
+  .department-directory-card-body {
+    padding: 21px 8px 8px;
+  }
+
+  .department-directory-card-heading h2 {
+    font-size: 11px;
+  }
+
+  .department-directory-description {
+    font-size: 8px;
+  }
+
+  .department-directory-category-icon {
+    width: 36px;
+    height: 36px;
+
+    left: 8px;
+    bottom: -15px;
+
+    border-width: 3px;
+
+    font-size: 13px;
+  }
+
+  /* ==========================================================
+     LIST VIEW - SMALL TABLET
+     ========================================================== */
+
+  .department-directory-grid.list-view {
+    gap: 10px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card {
+    height: 145px;
+    min-height: 145px;
+
+    padding: 10px;
+
+    gap: 12px;
+
+    border-radius: 12px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-image {
+    width: 150px;
+
+    flex-basis: 150px;
+
+    min-height: 125px;
+
+    border-radius: 9px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-body {
+    grid-template-columns:
+      1fr auto;
+
+    column-gap: 12px;
+
+    padding: 1px 1px 1px 0;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-heading h2 {
+    font-size: 13px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-description {
+    width: 100%;
+
+    font-size: 9px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta {
+    gap: 10px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta-item strong {
+    font-size: 8px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta-item span {
+    font-size: 6px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-view {
+    height: 28px;
+
+    padding: 0 13px;
+
+    font-size: 8px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-category-icon {
+    width: 34px;
+    height: 34px;
+
+    left: 7px;
+    bottom: 7px;
+
+    font-size: 12px;
+  }
+
+  /* highlights */
+
+  .department-directory-highlights {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+  .page.department-directory-page {
+    padding: 18px 10px 32px !important;
+  }
+
+  .department-directory-title {
+    gap: 8px;
+  }
+
+  .department-directory-title-icon {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+  }
+
+  .department-directory-title h1 {
+    font-size: 21px;
+  }
+
+  .department-directory-title p {
+    font-size: 9px;
+  }
+
+  .department-directory-toolbar {
+    gap: 7px;
+  }
+
+  .department-directory-view-toggle button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .department-directory-category-filter {
+    gap: 5px;
+
+    overflow-x: auto;
+  }
+
+  .department-directory-category-filter button {
+    height: 30px;
+
+    padding: 0 9px;
+
+    font-size: 8px;
+  }
+
+  /* ==========================================================
+     GRID VIEW MOBILE
+     ========================================================== */
+
+  .department-directory-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 7px;
+  }
+
+  .department-directory-card {
+    height: 285px;
+
+    border-radius: 7px;
+  }
+
+  .department-directory-card-image {
+    height: 95px;
+  }
+
+  .department-directory-card-body {
+    padding: 21px 7px 7px;
+  }
+
+  .department-directory-card-heading h2 {
+    height: 27px;
+    min-height: 27px;
+
+    font-size: 10px;
+  }
+
+  .department-directory-code {
+    max-width: 38px;
+
+    padding: 3px 4px;
+
+    font-size: 6px;
+  }
+
+  .department-directory-description {
+    height: 23px;
+    min-height: 23px;
+
+    font-size: 7px;
+  }
+
+  .department-directory-category-icon {
+    width: 33px;
+    height: 33px;
+
+    left: 6px;
+    bottom: -14px;
+
+    border-width: 3px;
+
+    font-size: 11px;
+  }
+
+  .department-directory-meta {
+    padding: 5px 0;
+
+    gap: 2px;
+  }
+
+  .department-directory-meta-item {
+    gap: 2px;
+  }
+
+  .department-directory-meta-item > svg {
+    font-size: 7px;
+  }
+
+  .department-directory-meta-item strong {
+    font-size: 6.5px;
+  }
+
+  .department-directory-meta-item span {
+    font-size: 5px;
+  }
+
+  .department-directory-stats {
+    gap: 2px;
+  }
+
+  .department-directory-stats strong {
+    font-size: 6px;
+  }
+
+  .department-directory-stats span {
+    font-size: 4.8px;
+  }
+
+  .department-directory-stats > div > svg {
+    font-size: 6px;
+  }
+
+  .department-directory-view {
+    height: 23px;
+
+    font-size: 6.5px;
+  }
+
+  /* ==========================================================
+     LIST VIEW MOBILE
+     ========================================================== */
+
+  .department-directory-grid.list-view {
+    gap: 8px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card {
+    width: 100%;
+
+    height: auto;
+    min-height: 135px;
+
+    padding: 9px;
+
+    display: flex;
+    flex-direction: row;
+
+    gap: 10px;
+
+    border-radius: 10px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-image {
+    width: 105px;
+
+    flex: 0 0 105px;
+
+    height: 117px;
+    min-height: 117px;
+
+    border-radius: 8px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-body {
+    width: auto;
+    min-width: 0;
+
+    flex: 1;
+
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    grid-template-rows:
+      auto
+      auto
+      1fr
+      auto;
+
+    grid-template-areas:
+      "title title"
+      "desc desc"
+      ". ."
+      "meta button";
+
+    column-gap: 7px;
+
+    padding: 1px 0;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-heading h2 {
+    height: auto;
+    min-height: 0;
+
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-code {
+    max-width: 38px;
+
+    padding: 3px 4px;
+
+    font-size: 6px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-description {
+    width: 100%;
+
+    height: auto;
+    min-height: 0;
+
+    margin: 2px 0 0;
+
+    font-size: 7px;
+    line-height: 1.35;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta {
+    width: 100%;
+
+    display: flex;
+
+    gap: 7px;
+
+    margin: 0;
+
+    padding: 0;
+
+    border: none;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta-item {
+    gap: 2px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta-item > svg {
+    font-size: 6px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta-item strong {
+    font-size: 5.5px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-meta-item span {
+    font-size: 4.5px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-view {
+    width: auto;
+
+    height: 23px;
+
+    padding: 0 9px;
+
+    font-size: 6px;
+
+    border-radius: 999px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-category-icon {
+    width: 29px;
+    height: 29px;
+
+    left: 5px;
+    bottom: 6px;
+
+    border-width: 2px;
+
+    font-size: 10px;
+  }
+
+  /* ==========================================================
+     HIGHLIGHTS MOBILE
+     ========================================================== */
+
+  .department-directory-highlights {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+
+    padding: 12px;
+  }
+
+  .department-highlight-item {
+    width: 100%;
+
+    gap: 10px;
+
+    padding: 8px;
+
+    box-sizing: border-box;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+  }
+
+  .department-highlight-icon {
+    width: 34px;
+    height: 34px;
+
+    font-size: 13px;
+  }
+
+  .department-highlight-item strong {
+    font-size: 10px;
+  }
+
+  .department-highlight-item span {
+    font-size: 7px;
+  }
+
+  /* pagination */
+
+  .department-directory-pagination {
+    gap: 5px;
+
+    margin-top: 18px;
+  }
+
+  .department-directory-pagination button {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* ============================================================
+   VERY SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 360px) {
+
+  .page.department-directory-page {
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+
+  .department-directory-grid {
+    gap: 6px;
+  }
+
+  .department-directory-card {
+    height: 270px;
+  }
+
+  .department-directory-card-image {
+    height: 88px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card {
+    min-height: 125px;
+
+    padding: 8px;
+
+    gap: 8px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-card-image {
+    width: 95px;
+
+    flex-basis: 95px;
+
+    height: 109px;
+    min-height: 109px;
+  }
+
+  .department-directory-grid.list-view
+  .department-directory-view {
+    height: 21px;
+
+    padding: 0 7px;
+
+    font-size: 5.5px;
+  }
+}
