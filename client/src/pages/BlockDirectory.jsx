@@ -12,6 +12,7 @@ import {
   FaList,
   FaChevronLeft,
   FaChevronRight,
+  FaTimes,
 } from 'react-icons/fa';
 
 import api from '../api/axios';
@@ -151,6 +152,11 @@ export default function BlockDirectory() {
     );
 
     setCurrentPage(nextPage);
+
+    // Jump back to the top of the page whenever the block page changes —
+    // without this, you'd land on page 2 still scrolled down at the
+    // footer, which looks broken on both desktop and mobile.
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   /* ============================================================
@@ -225,13 +231,19 @@ export default function BlockDirectory() {
         </div>
 
         <div className="block-directory-total">
-          <span>
-            Total Blocks
+          <span className="block-directory-total-icon">
+            <FaLayerGroup />
           </span>
 
-          <strong>
-            {blocks.length}
-          </strong>
+          <div className="block-directory-total-text">
+            <strong>
+              {blocks.length}
+            </strong>
+
+            <span>
+              Total Blocks
+            </span>
+          </div>
         </div>
       </div>
 
@@ -253,61 +265,72 @@ export default function BlockDirectory() {
               setSearch(e.target.value)
             }
           />
+
+          {search && (
+            <button
+              type="button"
+              className="block-directory-search-clear"
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+            >
+              <FaTimes />
+            </button>
+          )}
         </div>
 
-        {/* SORT */}
+        {/* SORT + VIEW TOGGLE — grouped together on the right */}
 
-        <div className="block-directory-sort">
-          <select
-            value={sortBy}
-            onChange={(e) =>
-              setSortBy(e.target.value)
-            }
-          >
-            <option value="az">
-              Sort by: A - Z
-            </option>
+        <div className="block-directory-toolbar-right">
+          <div className="block-directory-sort">
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                setSortBy(e.target.value)
+              }
+            >
+              <option value="az">
+                A - Z
+              </option>
 
-            <option value="za">
-              Sort by: Z - A
-            </option>
-          </select>
-        </div>
+              <option value="za">
+                Z - A
+              </option>
+            </select>
+          </div>
 
-        {/* VIEW TOGGLE */}
+          <div className="block-directory-view-toggle">
+            <button
+              type="button"
+              className={
+                viewMode === 'grid'
+                  ? 'active'
+                  : ''
+              }
+              onClick={() =>
+                setViewMode('grid')
+              }
+              aria-label="Grid view"
+              title="Grid view"
+            >
+              <FaTh />
+            </button>
 
-        <div className="block-directory-view-toggle">
-          <button
-            type="button"
-            className={
-              viewMode === 'grid'
-                ? 'active'
-                : ''
-            }
-            onClick={() =>
-              setViewMode('grid')
-            }
-            aria-label="Grid view"
-            title="Grid view"
-          >
-            <FaTh />
-          </button>
-
-          <button
-            type="button"
-            className={
-              viewMode === 'list'
-                ? 'active'
-                : ''
-            }
-            onClick={() =>
-              setViewMode('list')
-            }
-            aria-label="List view"
-            title="List view"
-          >
-            <FaList />
-          </button>
+            <button
+              type="button"
+              className={
+                viewMode === 'list'
+                  ? 'active'
+                  : ''
+              }
+              onClick={() =>
+                setViewMode('list')
+              }
+              aria-label="List view"
+              title="List view"
+            >
+              <FaList />
+            </button>
+          </div>
         </div>
       </div>
 

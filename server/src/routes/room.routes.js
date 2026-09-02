@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const adminAuth = require('../middleware/adminAuth');
-const { getRoomsByBlock, getRoomById, getAllRoomsAdmin, createRoom, updateRoom, deleteRoom } = require('../controllers/room.controller');
+const { getAllRooms, getRoomsByBlock, getRoomById, getAllRoomsAdmin, createRoom, updateRoom, deleteRoom } = require('../controllers/room.controller');
 
+router.get('/', getAllRooms);
 router.get('/block/:blockId', getRoomsByBlock);
 router.get('/admin/all', adminAuth, getAllRoomsAdmin);
 router.get('/:id', getRoomById);

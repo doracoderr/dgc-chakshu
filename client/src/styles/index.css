@@ -1035,6 +1035,29 @@ main {
   object-fit: cover;
 }
 
+.location-card-image {
+  width: 100%;
+  height: 130px;
+}
+
+.location-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.location-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F1F5F9;
+  color: #94A3B8;
+  font-size: 2rem;
+}
+
 .location-card-body {
   padding: 0.85rem 1rem;
 }
@@ -1048,6 +1071,14 @@ main {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.location-card-description {
+  margin-top: 0.35rem !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .error {

@@ -500,6 +500,11 @@ function BlockForm({
       const payload = {
         ...rest,
 
+        floorCount:
+          rest.floorCount === ''
+            ? 1
+            : Number(rest.floorCount),
+
         location:
           lat !== '' &&
           lng !== ''
@@ -669,6 +674,9 @@ function BlockForm({
       <div className="admin-field">
         <label>
           Total Floors <span>*</span>
+          <span className="admin-field-hint">
+            (count includes Ground Floor as 0)
+          </span>
         </label>
 
         <input
@@ -678,9 +686,7 @@ function BlockForm({
           onChange={(e) =>
             update(
               'floorCount',
-              Number(
-                e.target.value
-              )
+              e.target.value
             )
           }
           required
@@ -772,7 +778,7 @@ function DepartmentForm({
       getBlockId(initial),
 
     floorNumber:
-      initial?.floorNumber ?? 0,
+      initial?.floorNumber ?? '',
 
     hodName:
       initial?.hodName || '',
@@ -816,7 +822,9 @@ function DepartmentForm({
           form.blockId || undefined,
 
         floorNumber:
-          Number(form.floorNumber),
+          form.floorNumber === ''
+            ? 0
+            : Number(form.floorNumber),
 
         hodName:
           form.hodName,
@@ -993,6 +1001,9 @@ function DepartmentForm({
       <div className="admin-field">
         <label>
           Floor Number
+          <span className="admin-field-hint">
+            (0 = Ground Floor)
+          </span>
         </label>
 
         <input
@@ -1003,9 +1014,7 @@ function DepartmentForm({
           onChange={(e) =>
             update(
               'floorNumber',
-              Number(
-                e.target.value
-              )
+              e.target.value
             )
           }
         />
@@ -1095,6 +1104,19 @@ function RoomForm({
 }) {
   const isEdit = Boolean(initial?._id);
 
+  const STANDARD_ROOM_TYPES = [
+    'classroom',
+    'lab',
+    'office',
+    'facility',
+  ];
+
+  const isCustomType =
+    initial?.type &&
+    !STANDARD_ROOM_TYPES.includes(
+      initial.type
+    );
+
   const [form, setForm] = useState({
     name:
       initial?.name || '',
@@ -1102,10 +1124,14 @@ function RoomForm({
     roomNumber:
       initial?.roomNumber || '',
 
-    type:
-      ['classroom', 'lab', 'office', 'facility', 'other'].includes(initial?.type)
-        ? initial.type
-        : 'classroom',
+    type: isCustomType
+      ? 'other'
+      : initial?.type ||
+        'classroom',
+
+    customType: isCustomType
+      ? initial.type
+      : '',
 
     description:
       initial?.description || '',
@@ -1117,7 +1143,7 @@ function RoomForm({
       getBlockId(initial),
 
     floorNumber:
-      initial?.floorNumber ?? 0,
+      initial?.floorNumber ?? '',
 
     capacity:
       initial?.capacity ?? '',
@@ -1151,7 +1177,11 @@ function RoomForm({
         roomNumber:
           form.roomNumber,
 
-        type: form.type,
+        type:
+          form.type === 'other'
+            ? form.customType.trim() ||
+              'Other'
+            : form.type,
 
         description:
           form.description,
@@ -1164,7 +1194,9 @@ function RoomForm({
           form.blockId || undefined,
 
         floorNumber:
-          Number(form.floorNumber),
+          form.floorNumber === ''
+            ? 0
+            : Number(form.floorNumber),
 
         capacity:
           form.capacity === ''
@@ -1290,6 +1322,23 @@ function RoomForm({
             <option value="facility">Facility</option>
             <option value="other">Other</option>
           </select>
+
+          {form.type === 'other' && (
+            <input
+              type="text"
+              placeholder="Type custom room type"
+              value={form.customType}
+              onChange={(e) =>
+                update(
+                  'customType',
+                  e.target.value
+                )
+              }
+              style={{
+                marginTop: '6px',
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -1328,20 +1377,22 @@ function RoomForm({
         <div className="admin-field">
           <label>
             Floor Number
+            <span className="admin-field-hint">
+              (0 = Ground Floor)
+            </span>
           </label>
 
           <input
             type="number"
             min="0"
+            placeholder="0 = Ground Floor"
             value={
               form.floorNumber
             }
             onChange={(e) =>
               update(
                 'floorNumber',
-                Number(
-                  e.target.value
-                )
+                e.target.value
               )
             }
           />
@@ -2093,59 +2144,62 @@ function EntityCard({
           </div>
 
           <div className="block-admin-meta">
-            <div className="block-meta-item">
-              <span>
-                <FaBuilding />
-              </span>
+            {block && (
+              <div className="block-meta-item">
+                <span>
+                  <FaBuilding />
+                </span>
 
-              <div>
-                <strong>
-                  {getName(block) ||
-                    '—'}
-                </strong>
+                <div>
+                  <strong>
+                    {getName(block)}
+                  </strong>
 
-                <small>
-                  Block
-                </small>
+                  <small>
+                    Block
+                  </small>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="block-meta-item">
-              <span>
-                <FaLayerGroup />
-              </span>
+            {item.floorNumber != null && (
+              <div className="block-meta-item">
+                <span>
+                  <FaLayerGroup />
+                </span>
 
-              <div>
-                <strong>
-                  {item.floorNumber ===
-                  0
-                    ? 'G'
-                    : item.floorNumber ??
-                      '—'}
-                </strong>
+                <div>
+                  <strong>
+                    {item.floorNumber ===
+                    0
+                      ? 'G'
+                      : item.floorNumber}
+                  </strong>
 
-                <small>
-                  Floor
-                </small>
+                  <small>
+                    Floor
+                  </small>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="block-meta-item">
-              <span>
-                <FaUserTie />
-              </span>
+            {item.hodName && (
+              <div className="block-meta-item">
+                <span>
+                  <FaUserTie />
+                </span>
 
-              <div>
-                <strong>
-                  {item.hodName ||
-                    '—'}
-                </strong>
+                <div>
+                  <strong>
+                    {item.hodName}
+                  </strong>
 
-                <small>
-                  HOD
-                </small>
+                  <small>
+                    HOD
+                  </small>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <EntityActions
@@ -2203,56 +2257,59 @@ function EntityCard({
           </div>
 
           <div className="block-admin-meta">
-            <div className="block-meta-item">
-              <span>
-                <FaDoorOpen />
-              </span>
+            {item.roomNumber && (
+              <div className="block-meta-item">
+                <span>
+                  <FaDoorOpen />
+                </span>
 
-              <div>
-                <strong>
-                  {item.roomNumber ||
-                    '—'}
-                </strong>
+                <div>
+                  <strong>
+                    {item.roomNumber}
+                  </strong>
 
-                <small>
-                  Room No.
-                </small>
+                  <small>
+                    Room No.
+                  </small>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="block-meta-item">
-              <span>
-                <FaBuilding />
-              </span>
+            {block && (
+              <div className="block-meta-item">
+                <span>
+                  <FaBuilding />
+                </span>
 
-              <div>
-                <strong>
-                  {getName(block) ||
-                    '—'}
-                </strong>
+                <div>
+                  <strong>
+                    {getName(block)}
+                  </strong>
 
-                <small>
-                  Block
-                </small>
+                  <small>
+                    Block
+                  </small>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="block-meta-item">
-              <span>
-                <FaLayerGroup />
-              </span>
+            {item.floorNumber != null && (
+              <div className="block-meta-item">
+                <span>
+                  <FaLayerGroup />
+                </span>
 
-              <div>
-                <strong>
-                  {item.floorNumber ?? 
-                    '—'}
-                </strong>
+                <div>
+                  <strong>
+                    {item.floorNumber}
+                  </strong>
 
-                <small>
-                  Floor
-                </small>
+                  <small>
+                    Floor
+                  </small>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="block-meta-item">
               <span>
@@ -2331,24 +2388,25 @@ function EntityCard({
         </div>
 
         <div className="block-admin-meta">
-          <div className="block-meta-item">
-            <span>
-              <FaChalkboardTeacher />
-            </span>
+          {department && (
+            <div className="block-meta-item">
+              <span>
+                <FaChalkboardTeacher />
+              </span>
 
-            <div>
-              <strong>
-                {getName(
-                  department
-                ) ||
-                  '—'}
-              </strong>
+              <div>
+                <strong>
+                  {getName(
+                    department
+                  )}
+                </strong>
 
-              <small>
-                Department
-              </small>
+                <small>
+                  Department
+                </small>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="block-meta-item">
             <span>
@@ -3510,24 +3568,24 @@ export default function Admin() {
                         </div>
                       </div>
 
-                      <div className="block-meta-item">
-                        <span>
-                          <FaMapMarkerAlt />
-                        </span>
+                      {block.location?.lat !=
+                        null && (
+                        <div className="block-meta-item">
+                          <span>
+                            <FaMapMarkerAlt />
+                          </span>
 
-                        <div>
-                          <strong>
-                            {block.location?.lat !=
-                              null
-                              ? 'Yes'
-                              : '—'}
-                          </strong>
+                          <div>
+                            <strong>
+                              Yes
+                            </strong>
 
-                          <small>
-                            Location
-                          </small>
+                            <small>
+                              Location
+                            </small>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     <EntityActions
