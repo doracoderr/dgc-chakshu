@@ -160,6 +160,7 @@ export default function Navbar() {
         <Link to="/map" onClick={closeMenu}>Map</Link>
         <Link to="/blocks" onClick={closeMenu}>Blocks</Link>
         <Link to="/departments" onClick={closeMenu}>Departments</Link>
+        <Link to="/rooms" onClick={closeMenu}>Rooms</Link>
         <Link to="/faculty" onClick={closeMenu}>Faculty</Link>
         <Link to="/about" onClick={closeMenu}>About</Link>
       </div>
