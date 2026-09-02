@@ -1,60 +1,592 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api/axios';
-import LocationCard from '../components/LocationCard';
 
-function floorLabel(floorNumber) {
-  if (floorNumber == null) return '';
-  return floorNumber === 0 ? 'Ground floor' : `Floor ${floorNumber}`;
-}
+import {
+  FaBuilding,
+  FaSearch,
+  FaLayerGroup,
+  FaMapMarkerAlt,
+  FaArrowRight,
+  FaTh,
+  FaList,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+} from 'react-icons/fa';
+
+import api from '../api/axios';
+import '../styles/DepartmentDirectory.css';
+
+const DEPARTMENTS_PER_PAGE = 10;
 
 export default function DepartmentDirectory() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('az');
+
+  const [viewMode, setViewMode] = useState('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  /* ============================================================
+     LOAD DEPARTMENTS
+     ============================================================ */
+
   useEffect(() => {
+    let mounted = true;
+
     api
       .get('/departments')
-      .then((res) => setDepartments(res.data.data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (!mounted) return;
+
+        setDepartments(res.data.data || []);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            'Failed to load departments'
+        );
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  if (loading) return <p className="page">Loading departments...</p>;
-  if (error) return <p className="page error">Error: {error}</p>;
+  /* ============================================================
+     RESET PAGE WHEN SEARCH / SORT CHANGES
+     ============================================================ */
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, sortBy]);
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+
+  const getFloorLabel = (department) => {
+    if (department.floorNumber == null) {
+      return '—';
+    }
+
+    return department.floorNumber === 0
+      ? 'Ground'
+      : department.floorNumber;
+  };
+
+  const getBlockName = (department) => {
+    return department.blockId?.name || '—';
+  };
+
+  const hasLocation = (department) => {
+    return (
+      department.location?.lat != null &&
+      department.location?.lng != null
+    );
+  };
+
+  /* ============================================================
+     FILTER + SORT
+     ============================================================ */
+
+  const filteredDepartments = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    const result = departments.filter((department) => {
+      if (!query) return true;
+
+      return [
+        department.name,
+        department.code,
+        department.hodName,
+        department.description,
+        department.blockId?.name,
+        getFloorLabel(department),
+        hasLocation(department) ? 'yes' : 'no',
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(query);
+    });
+
+    result.sort((a, b) => {
+      const nameA = a.hodName || a.name || '';
+      const nameB = b.hodName || b.name || '';
+
+      if (sortBy === 'za') {
+        return nameB.localeCompare(nameA);
+      }
+
+      return nameA.localeCompare(nameB);
+    });
+
+    return result;
+  }, [departments, search, sortBy]);
+
+  /* ============================================================
+     PAGINATION
+     ============================================================ */
+
+  const totalPages = Math.ceil(
+    filteredDepartments.length / DEPARTMENTS_PER_PAGE
+  );
+
+  const safeCurrentPage =
+    totalPages > 0
+      ? Math.min(currentPage, totalPages)
+      : 1;
+
+  const paginatedDepartments = filteredDepartments.slice(
+    (safeCurrentPage - 1) * DEPARTMENTS_PER_PAGE,
+    safeCurrentPage * DEPARTMENTS_PER_PAGE
+  );
+
+  const goToPage = (page) => {
+    const nextPage = Math.max(
+      1,
+      Math.min(page, totalPages || 1)
+    );
+
+    setCurrentPage(nextPage);
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  /* ============================================================
+     LOADING
+     ============================================================ */
+
+  if (loading) {
+    return (
+      <div className="page department-directory-page">
+        <div className="department-directory-loading">
+          <FaBuilding />
+
+          <h2>
+            Loading Departments...
+          </h2>
+
+          <p>
+            Please wait while departments are loaded.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ============================================================
+     ERROR
+     ============================================================ */
+
+  if (error) {
+    return (
+      <div className="page department-directory-page">
+        <div className="department-directory-empty error-state">
+          <FaBuilding />
+
+          <h2>
+            Unable to load departments
+          </h2>
+
+          <p>
+            {error}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ============================================================
+     PAGE
+     ============================================================ */
 
   return (
-    <div className="page">
-      <h1>Departments</h1>
-      <div className="card-grid">
-        {departments.length === 0 && <p>No departments added yet.</p>}
-        {departments.map((dept) => {
-          const blockName = dept.blockId?.name;
-          const subtitleParts = [];
-          if (blockName) subtitleParts.push(blockName);
-          const floor = floorLabel(dept.floorNumber);
-          if (floor) subtitleParts.push(floor);
-          if (dept.hodName) subtitleParts.push(`HOD: ${dept.hodName}`);
+    <div className="page department-directory-page">
+      {/* ======================================================
+          HEADER
+         ====================================================== */}
 
-          const card = (
-            <LocationCard
-              title={dept.name}
-              subtitle={subtitleParts.join(' · ')}
-              description={dept.description}
-              image={dept.coverImage}
-            />
-          );
+      <div className="department-directory-header">
+        <div className="department-directory-title">
+          <div className="department-directory-title-icon">
+            <FaBuilding />
+          </div>
 
-          return dept.blockId?._id ? (
-            <Link to={`/blocks/${dept.blockId._id}`} key={dept._id} className="home-block-link">
-              {card}
-            </Link>
-          ) : (
-            <div key={dept._id}>{card}</div>
-          );
-        })}
+          <div>
+            <h1>
+              Departments
+            </h1>
+
+            <p>
+              Explore all departments across the campus.
+            </p>
+          </div>
+        </div>
+
+        <div className="department-directory-total">
+          <span className="department-directory-total-icon">
+            <FaLayerGroup />
+          </span>
+
+          <div className="department-directory-total-text">
+            <strong>
+              {departments.length}
+            </strong>
+
+            <span>
+              Total Departments
+            </span>
+          </div>
+        </div>
       </div>
+
+      {/* ======================================================
+          TOOLBAR
+         ====================================================== */}
+
+      <div className="department-directory-toolbar">
+        {/* SEARCH */}
+
+        <div className="department-directory-search">
+          <FaSearch />
+
+          <input
+            type="text"
+            placeholder="Search departments..."
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+          />
+
+          {search && (
+            <button
+              type="button"
+              className="department-directory-search-clear"
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+            >
+              <FaTimes />
+            </button>
+          )}
+        </div>
+
+        {/* SORT + VIEW TOGGLE */}
+
+        <div className="department-directory-toolbar-right">
+          <div className="department-directory-sort">
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                setSortBy(e.target.value)
+              }
+            >
+              <option value="az">
+                A - Z
+              </option>
+
+              <option value="za">
+                Z - A
+              </option>
+            </select>
+          </div>
+
+          <div className="department-directory-view-toggle">
+            <button
+              type="button"
+              className={
+                viewMode === 'grid'
+                  ? 'active'
+                  : ''
+              }
+              onClick={() =>
+                setViewMode('grid')
+              }
+              aria-label="Grid view"
+              title="Grid view"
+            >
+              <FaTh />
+            </button>
+
+            <button
+              type="button"
+              className={
+                viewMode === 'list'
+                  ? 'active'
+                  : ''
+              }
+              onClick={() =>
+                setViewMode('list')
+              }
+              aria-label="List view"
+              title="List view"
+            >
+              <FaList />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ======================================================
+          DEPARTMENTS
+         ====================================================== */}
+
+      {filteredDepartments.length === 0 ? (
+        <div className="department-directory-empty">
+          <FaBuilding />
+
+          <h2>
+            {search
+              ? 'No departments found'
+              : 'No departments available'}
+          </h2>
+
+          <p>
+            {search
+              ? 'Try searching with a different department or HOD name.'
+              : 'No campus departments have been added yet.'}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* ==================================================
+              GRID / LIST
+             ================================================== */}
+
+          <div
+            className={
+              viewMode === 'grid'
+                ? 'department-directory-grid'
+                : 'department-directory-grid list-view'
+            }
+          >
+            {paginatedDepartments.map(
+              (department) => (
+                <Link
+                  to={
+                    department.blockId?._id
+                      ? `/blocks/${department.blockId._id}`
+                      : '#'
+                  }
+                  key={department._id}
+                  className="department-directory-card-link"
+                  onClick={(e) => {
+                    if (!department.blockId?._id) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  <article className="department-directory-card">
+                    {/* IMAGE */}
+
+                    <div className="department-directory-card-image">
+                      {department.coverImage ? (
+                        <img
+                          src={department.coverImage}
+                          alt={
+                            department.hodName ||
+                            'Department'
+                          }
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="department-directory-image-placeholder">
+                          <FaBuilding />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* BODY */}
+
+                    <div className="department-directory-card-body">
+                      {/* HOD NAME */}
+
+                      <h2>
+                        {department.hodName ||
+                          'HOD Not Assigned'}
+                      </h2>
+
+                      {/* DESCRIPTION */}
+
+                      <p className="department-directory-description">
+                        {department.description ||
+                          'No description available.'}
+                      </p>
+
+                      {/* META */}
+
+                      <div className="department-directory-meta">
+                        {/* FLOOR */}
+
+                        <div className="department-directory-meta-item">
+                          <FaLayerGroup />
+
+                          <div>
+                            <strong>
+                              {getFloorLabel(
+                                department
+                              )}
+                            </strong>
+
+                            <span>
+                              Floor
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* BLOCK */}
+
+                        <div className="department-directory-meta-item">
+                          <FaBuilding />
+
+                          <div>
+                            <strong>
+                              {getBlockName(
+                                department
+                              )}
+                            </strong>
+
+                            <span>
+                              Block
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* LOCATION */}
+
+                        <div className="department-directory-meta-item">
+                          <FaMapMarkerAlt />
+
+                          <div>
+                            <strong>
+                              {hasLocation(
+                                department
+                              )
+                                ? 'Yes'
+                                : '—'}
+                            </strong>
+
+                            <span>
+                              Location
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* VIEW DETAILS */}
+
+                      <div
+                        className={
+                          department.blockId?._id
+                            ? 'department-directory-view'
+                            : 'department-directory-view disabled'
+                        }
+                      >
+                        <span>
+                          View Details
+                        </span>
+
+                        <FaArrowRight />
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              )
+            )}
+          </div>
+
+          {/* ==================================================
+              PAGINATION
+             ================================================== */}
+
+          {totalPages > 1 && (
+            <div className="department-directory-pagination">
+              <button
+                type="button"
+                disabled={safeCurrentPage === 1}
+                onClick={() =>
+                  goToPage(
+                    safeCurrentPage - 1
+                  )
+                }
+                aria-label="Previous page"
+              >
+                <FaChevronLeft />
+              </button>
+
+              {Array.from(
+                {
+                  length: totalPages,
+                },
+                (_, index) =>
+                  index + 1
+              ).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  className={
+                    safeCurrentPage === page
+                      ? 'active'
+                      : ''
+                  }
+                  onClick={() =>
+                    goToPage(page)
+                  }
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                disabled={
+                  safeCurrentPage ===
+                  totalPages
+                }
+                onClick={() =>
+                  goToPage(
+                    safeCurrentPage + 1
+                  )
+                }
+                aria-label="Next page"
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ======================================================
+          RESULT COUNT
+         ====================================================== */}
+
+      {filteredDepartments.length > 0 && (
+        <div className="department-directory-result-count">
+          Showing{' '}
+          {paginatedDepartments.length}{' '}
+          of{' '}
+          {filteredDepartments.length}{' '}
+          departments
+        </div>
+      )}
     </div>
   );
 }
