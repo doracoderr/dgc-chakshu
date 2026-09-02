@@ -910,6 +910,12 @@
   color: #ef4444;
 }
 
+.admin-field label span.admin-field-hint {
+  color: #94a3b8;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
 .admin-field input,
 .admin-field textarea,
 .admin-url-input {
