@@ -355,15 +355,19 @@ main {
    ========================= */
 
 .page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  min-height: 60vh;
+  min-height: calc(100vh - 64px);
+    width: 100%;
+    box-sizing: border-box;
+    background: #f8fafc;
+    padding: 28px 7%;
+    color: #172b4d;
 }
 
 .home-page {
+
   text-align: center;
 }
+
 
 
 /* =========================
