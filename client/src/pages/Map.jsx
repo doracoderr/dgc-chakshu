@@ -13,6 +13,7 @@ function Map() {
   const [lastTouchDistance, setLastTouchDistance] = useState(0);
   const [lastTap, setLastTap] = useState(0);
   const mapContainerRef = useRef(null);
+  const imgRef = useRef(null);
 
   // Size the map block to exactly (viewport height - navbar height) so
   // the whole map — header, toggle, legend, map area, and any
@@ -43,12 +44,47 @@ function Map() {
     };
   }, []);
 
+  // How far the image can be panned at a given zoom level before its
+  // edge would pull in from the container edge and show blank space.
+  // Image is centered (transform-origin: center) inside a flex-centered
+  // container, so the max offset in each direction is simply half the
+  // overflow between the scaled image and the container.
+  const getMaxPan = (zoomVal) => {
+    const container = mapContainerRef.current;
+    const img = imgRef.current;
+    if (!container || !img) return { maxX: 0, maxY: 0 };
+    const containerRect = container.getBoundingClientRect();
+    const scaledWidth = img.offsetWidth * zoomVal;
+    const scaledHeight = img.offsetHeight * zoomVal;
+    return {
+      maxX: Math.max(0, (scaledWidth - containerRect.width) / 2),
+      maxY: Math.max(0, (scaledHeight - containerRect.height) / 2),
+    };
+  };
+
+  const clamp = (val, max) => Math.min(Math.max(val, -max), max);
+
+  // Sets pan, clamped so the image can never be dragged/zoomed to reveal
+  // blank space past its own edge.
+  const applyPan = (x, y, zoomVal) => {
+    const { maxX, maxY } = getMaxPan(zoomVal);
+    setPanX(clamp(x, maxX));
+    setPanY(clamp(y, maxY));
+  };
+
+  const applyZoom = (nextZoom) => {
+    const clamped = Math.min(Math.max(nextZoom, 1), 3);
+    setZoom(clamped);
+    applyPan(panX, panY, clamped);
+    return clamped;
+  };
+
   const handleZoomIn = () => {
-    setZoom(prev => Math.min(prev + 0.25, 3));
+    applyZoom(zoom + 0.25);
   };
 
   const handleZoomOut = () => {
-    setZoom(prev => Math.max(prev - 0.25, 1));
+    applyZoom(zoom - 0.25);
   };
 
   const handleReset = () => {
@@ -60,10 +96,18 @@ function Map() {
   // Double click zoom
   const handleDoubleClick = () => {
     if (zoom < 2) {
-      setZoom(2);
+      applyZoom(2);
     } else {
       handleReset();
     }
+  };
+
+  // Ctrl/Cmd + scroll to zoom, same convention as the interactive map —
+  // plain scroll is left alone so it scrolls the page normally.
+  const handleWheel = (e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    applyZoom(zoom + (e.deltaY < 0 ? 0.25 : -0.25));
   };
 
   // Get touch distance for pinch
@@ -84,8 +128,7 @@ function Map() {
 
   const handleMouseMove = (e) => {
     if (isPanning && zoom > 1) {
-      setPanX(e.clientX - startX);
-      setPanY(e.clientY - startY);
+      applyPan(e.clientX - startX, e.clientY - startY, zoom);
     }
   };
 
@@ -111,13 +154,12 @@ function Map() {
       const currentDistance = getTouchDistance(e.touches);
       if (lastTouchDistance > 0) {
         const scale = currentDistance / lastTouchDistance;
-        setZoom(prev => Math.max(1, Math.min(prev * scale, 3)));
+        applyZoom(zoom * scale);
       }
       setLastTouchDistance(currentDistance);
     } else if (e.touches.length === 1 && isPanning && zoom > 1) {
       // Pan
-      setPanX(e.touches[0].clientX - startX);
-      setPanY(e.touches[0].clientY - startY);
+      applyPan(e.touches[0].clientX - startX, e.touches[0].clientY - startY, zoom);
     }
   };
 
@@ -131,7 +173,7 @@ function Map() {
       if (zoom >= 2) {
         handleReset();
       } else {
-        setZoom(prev => Math.min(prev + 0.5, 3));
+        applyZoom(zoom + 0.5);
       }
     }
     setLastTap(now);
@@ -178,28 +220,43 @@ function Map() {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onWheel={handleWheel}
         >
-          {/* Floating Controls */}
-          <div className="map-floating-controls">
+          {/* Floating Controls — pinned to the map itself (not the
+              viewport), so they never drift toward the footer while the
+              page scrolls. onDoubleClick here stops a fast double-click
+              on a button from also bubbling up as a native "dblclick" on
+              the map and triggering handleDoubleClick's zoom-to-2. */}
+          <div className="map-floating-controls" onDoubleClick={(e) => e.stopPropagation()}>
+            <div className="map-zoom-control">
+              <button
+                type="button"
+                onClick={handleZoomIn}
+                disabled={zoom >= 3}
+                className="map-zoom-btn zoom-in-btn"
+                title="Zoom in"
+                aria-label="Zoom in"
+              >
+                +
+              </button>
+              <div className="map-zoom-divider" />
+              <button
+                type="button"
+                onClick={handleZoomOut}
+                disabled={zoom <= 1}
+                className="map-zoom-btn zoom-out-btn"
+                title="Zoom out"
+                aria-label="Zoom out"
+              >
+                −
+              </button>
+            </div>
             <button
-              onClick={handleZoomIn}
-              className="map-float-btn zoom-in-btn"
-              title="Zoom In"
-            >
-              +
-            </button>
-            <button
-              onClick={handleZoomOut}
-              disabled={zoom <= 1}
-              className="map-float-btn zoom-out-btn"
-              title="Zoom Out"
-            >
-              −
-            </button>
-            <button
+              type="button"
               onClick={handleReset}
-              className="map-float-btn reset-btn"
-              title="Reset View"
+              className="map-reset-btn"
+              title="Reset view"
+              aria-label="Reset view"
             >
               ⟲
             </button>
@@ -217,6 +274,7 @@ function Map() {
             }}
           >
             <img
+              ref={imgRef}
               src="/map.png"
               alt="DGC Campus Layout"
               draggable={false}
@@ -228,9 +286,9 @@ function Map() {
         <div className="map-info">
           <p>
             {zoom > 1 ? (
-              <>🖱️ Drag to pan • 🔄 Double-click to reset • Mobile: Pinch/Swipe • Double-tap to reset</>
+              <>🖱️ Drag to pan • 🔄 Double-click to reset • Ctrl + scroll to zoom • Mobile: Pinch/Swipe • Double-tap to reset</>
             ) : (
-              <>🖱️ Double-click to zoom • 👆 Pinch on mobile • Double-tap to zoom</>
+              <>🖱️ Double-click or Ctrl + scroll to zoom • 👆 Pinch on mobile • Double-tap to zoom</>
             )}
           </p>
         </div>
