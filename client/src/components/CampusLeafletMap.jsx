@@ -214,11 +214,22 @@ const LocateControl = L.Control.extend({
       L.DomEvent.preventDefault(e);
       if (this.options.onClick) this.options.onClick();
     });
+    this._container = container;
     this._btn = btn;
     return container;
   },
   setLoading(isLoading) {
-    if (this._btn) this._btn.innerHTML = isLoading ? '⏳' : '📍';
+    if (this._btn && !this._active) this._btn.innerHTML = isLoading ? '⏳' : '📍';
+  },
+  // Toggled on once live tracking starts (Google Maps-style filled/blue
+  // state), and off again on a second click that turns tracking off.
+  setActive(isActive) {
+    this._active = isActive;
+    if (this._btn) this._btn.innerHTML = isActive ? '🔵' : '📍';
+    if (this._container) {
+      this._btn.title = isActive ? 'Stop sharing my location' : 'Show my current location';
+      L.DomUtil[isActive ? 'addClass' : 'removeClass'](this._container, 'campus-locate-control--active');
+    }
   },
 });
 
@@ -230,6 +241,8 @@ export default function CampusLeafletMap() {
   const routeLayerRef = useRef(null);
   const locateControlRef = useRef(null);
   const userPosRef = useRef(null);
+  const watchIdRef = useRef(null);
+  const [liveTracking, setLiveTracking] = useState(false);
 
   const [entities, setEntities] = useState([]); // merged blocks + departments
   const [loading, setLoading] = useState(true);
@@ -421,6 +434,17 @@ export default function CampusLeafletMap() {
     };
     mapContainerEl.addEventListener('wheel', handleWheelZoom, { passive: false });
 
+    // Mobile: Leaflet's touch handling grabs ALL touch gestures on the
+    // map by default (touch-action: none), including a plain vertical
+    // swipe — so scrolling down never reaches the page/footer, it just
+    // pans (or pinch-zooms) the map instead. Restrict native touch
+    // handling to vertical panning so a one-finger vertical swipe
+    // scrolls the PAGE like normal; horizontal one-finger drag and
+    // two-finger pinch-zoom still work and are handled by Leaflet.
+    // Same "let the page scroll unless you're deliberately zooming/
+    // panning" convention as the wheel handling above.
+    mapContainerEl.style.touchAction = 'pan-y';
+
     const locateControl = new LocateControl({
       onClick: () => handleLocate(),
     });
@@ -475,31 +499,64 @@ export default function CampusLeafletMap() {
     return () => {
       window.removeEventListener('resize', handleResize);
       mapContainerEl.removeEventListener('wheel', handleWheelZoom);
+      if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
       map.remove();
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // "My location" — asks for GPS, drops a blue dot, centers the map,
-  // works out the nearest building, and warns if the user is far away.
-  // Accepts an optional callback to run once we have a position (used by
-  // the Directions button to chain straight into routing).
+  // Turns off live tracking (Google Maps-style second click on the pin):
+  // stops watching GPS, removes the blue dot, and resets the button.
+  const stopLiveTracking = () => {
+    if (watchIdRef.current != null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    const map = mapRef.current;
+    if (userMarkerRef.current && map) {
+      map.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+    setLiveTracking(false);
+    setLocating(false);
+    setUserPos(null);
+    userPosRef.current = null;
+    setLocationNote(null);
+    setNearest(null);
+    locateControlRef.current?.setActive(false);
+  };
+
+  // "My location" — like Google Maps: first click asks for GPS, drops a
+  // live blue dot that keeps updating, centers the map once, and works
+  // out the nearest building. A second click on the same button turns it
+  // back off. Accepts an optional callback to run once we have a first
+  // fix (used by the Directions button to chain straight into routing).
   const handleLocate = (onDone) => {
     if (!navigator.geolocation) {
       setError('Location is not supported on this device/browser.');
       return;
     }
+
+    if (liveTracking) {
+      stopLiveTracking();
+      return;
+    }
+
     setLocating(true);
     locateControlRef.current?.setLoading(true);
-    navigator.geolocation.getCurrentPosition(
+    let gotFirstFix = false;
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         const map = mapRef.current;
         const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setUserPos(coords);
         userPosRef.current = coords;
         setLocating(false);
+        setLiveTracking(true);
         locateControlRef.current?.setLoading(false);
+        locateControlRef.current?.setActive(true);
 
         if (map) {
           if (userMarkerRef.current) {
@@ -512,7 +569,12 @@ export default function CampusLeafletMap() {
               .addTo(map)
               .bindPopup('You are here');
           }
-          map.setView([coords.lat, coords.lng], Math.max(map.getZoom(), MIN_ZOOM + 1));
+          // Only recenter on the very first fix — later updates just
+          // move the dot, so panning/zooming while tracking isn't
+          // fought over.
+          if (!gotFirstFix) {
+            map.setView([coords.lat, coords.lng], Math.max(map.getZoom(), MIN_ZOOM + 1));
+          }
         }
 
         // Far from campus? Just say so, simply.
@@ -523,14 +585,18 @@ export default function CampusLeafletMap() {
           setLocationNote(null);
         }
 
-        onDone?.();
+        if (!gotFirstFix) {
+          gotFirstFix = true;
+          onDone?.();
+        }
       },
       () => {
         setLocating(false);
         locateControlRef.current?.setLoading(false);
+        stopLiveTracking();
         setError('Could not get your location. Please allow location access and try again.');
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
     );
   };
 
