@@ -1,0 +1,199 @@
+/* =========================
+   STATIC CONTENT PAGES
+   Used by: About, Credits, Privacy Policy, Terms & Conditions
+   ========================= */
+
+.about-page {
+  text-align: left;
+}
+
+.about-hero {
+  text-align: center;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.about-hero h1 {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 16px 0 0;
+}
+
+.about-hero .subtitle {
+  max-width: 620px;
+  margin: 16px auto 0;
+}
+
+.about-section {
+  margin-top: 32px;
+}
+
+.about-section h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 16px;
+}
+
+.about-section p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  margin: 0;
+}
+
+.about-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.about-feature-card {
+  background: var(--surface);
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(18, 59, 93, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.about-feature-card:hover {
+  box-shadow: 0 4px 14px rgba(18, 59, 93, 0.12);
+  transform: translateY(-2px);
+}
+
+.about-feature-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.about-feature-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--secondary);
+  margin: 0 0 8px;
+}
+
+.about-feature-card p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Contributor cards on the Credits page */
+
+.contributor-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contributor-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 32px;
+  margin: 0 0 16px;
+}
+
+.contributor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contributor-role {
+  color: var(--accent);
+  font-weight: 600;
+  margin: 0 0 8px !important;
+}
+
+/* Contributor social icons on the Credits page */
+.contributor-socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.contributor-socials a {
+  color: var(--muted);
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.contributor-socials a:hover {
+  color: var(--accent);
+}
+
+.about-trust {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--bg);
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.about-trust-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #FFFFFF;
+  font-size: 20px;
+}
+
+.about-trust h2 {
+  font-size: 20px;
+}
+
+.about-trust p {
+  margin-top: 8px;
+}
+
+.about-team {
+  border-top: 1px solid #E2E8F0;
+  padding-top: 32px;
+}
+
+.about-cta {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .about-hero h1 {
+    font-size: 28px;
+  }
+
+  .about-trust {
+    flex-direction: column;
+  }
+}
