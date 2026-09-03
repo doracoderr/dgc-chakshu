@@ -38,13 +38,6 @@ const BUILDINGS = [
     aliases: ['department of english', 'english department'],
   },
   {
-    code: 'LIB',
-    name: 'Library & Information Centre',
-    description: 'Swami... Library & Information Centre.',
-    location: { lat: 28.466343, lng: 77.023316 },
-    aliases: ['library', 'library & information centre', 'library and information centre'],
-  },
-  {
     code: 'ARTS',
     name: 'Arts Block',
     description: 'Arts Block.',
@@ -132,6 +125,7 @@ const BUILDINGS = [
     description: 'Dronacharya statue, in the garden.',
     location: { lat: 28.46662, lng: 77.02421 },
     aliases: ['dronacharya statue', 'dronacharya murti'],
+    category: 'landmark',
   },
   {
     code: 'SCBGATE',
@@ -139,6 +133,7 @@ const BUILDINGS = [
     description: 'Subhash Chandra Bose memorial gate.',
     location: { lat: 28.46701, lng: 77.024159 },
     aliases: ['subhash chandra bose gate', 'subhas chandra bose gate', 'netaji gate'],
+    category: 'landmark',
   },
 ];
 
@@ -167,6 +162,7 @@ async function run() {
       existing.name = b.name;
       existing.description = existing.description || b.description;
       existing.location = b.location;
+      existing.category = b.category || 'building';
       await existing.save();
       console.log(`Updated: ${b.name}  ->  lat ${b.location.lat}, lng ${b.location.lng}`);
     } else {
@@ -176,6 +172,7 @@ async function run() {
         description: b.description,
         location: b.location,
         floorCount: 1,
+        category: b.category || 'building',
       });
       console.log(`Created: ${b.name}  ->  lat ${b.location.lat}, lng ${b.location.lng}`);
     }
