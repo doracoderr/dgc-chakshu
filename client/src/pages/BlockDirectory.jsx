@@ -43,7 +43,7 @@ export default function BlockDirectory() {
       .then((res) => {
         if (!mounted) return;
 
-        setBlocks(res.data.data || []);
+        setBlocks((res.data.data || []).filter((b) => b.category !== 'landmark'));
       })
       .catch((err) => {
         if (!mounted) return;

@@ -464,6 +464,9 @@ function BlockForm({
     floorCount:
       initial?.floorCount ?? 1,
 
+    category:
+      initial?.category || 'building',
+
     lat:
       initial?.location?.lat ?? '',
 
@@ -561,6 +564,7 @@ function BlockForm({
           description: '',
           coverImage: '',
           floorCount: 1,
+          category: 'building',
           lat: '',
           lng: '',
         });
@@ -691,6 +695,26 @@ function BlockForm({
           }
           required
         />
+      </div>
+
+      <div className="admin-field">
+        <label>Type</label>
+
+        <select
+          value={form.category}
+          onChange={(e) =>
+            update(
+              'category',
+              e.target.value
+            )
+          }
+        >
+          <option value="building">Building (has floors/rooms)</option>
+          <option value="landmark">Landmark (statue, gate, monument — map marker only)</option>
+        </select>
+        <p className="admin-hint">
+          Landmarks show on the map but aren't listed as buildings and don't need floor/room data.
+        </p>
       </div>
 
       <div className="admin-field-row">
