@@ -5,7 +5,9 @@ import {
   FaChalkboardTeacher,
   FaSearch,
   FaUserShield,
+  FaBook,
 } from 'react-icons/fa';
+import '../styles/pages.css';
 
 const features = [
   {
@@ -86,7 +88,8 @@ export default function About() {
       <section className="about-section about-team">
         <h2>Built by students, for students</h2>
         <p>
-          DGC Chakshu is designed and developed by the{' '}
+          DGC Chakshu was conceptualized and founded by{' '}
+          <strong>Abhishek Prasad</strong>, and is developed under the{' '}
           <strong>DGC Tech Army Club</strong>, Department of Computer
           Science, Dronacharya Government College, Gurugram — as a
           real, evolving project maintained by the club's own members.
@@ -98,6 +101,30 @@ export default function About() {
           <Link to="/blocks" className="btn-secondary">
             Browse blocks
           </Link>
+        </div>
+      </section>
+
+      <section className="about-section about-trust">
+        <div className="about-trust-icon">
+          <FaBook />
+        </div>
+        <div>
+          <h2>More student resources</h2>
+          <p>
+            Need study material too? <strong>University Notes</strong>{' '}
+            is a free resource for notes, question papers, and exam prep
+            material across university courses — handy alongside DGC
+            Chakshu.
+          </p>
+          <a
+            href="https://universitynotes.co.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary"
+            style={{ marginTop: '0.8rem', display: 'inline-block' }}
+          >
+            Visit University Notes
+          </a>
         </div>
       </section>
     </div>
