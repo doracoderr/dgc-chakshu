@@ -168,10 +168,16 @@ function thumbnailIcon(photoUrl) {
 function popupCard(entity) {
   const el = document.createElement('div');
   el.className = 'campus-marker-popup';
+  const typeLabel =
+    entity.type === 'department'
+      ? 'Department'
+      : entity.category === 'landmark'
+      ? 'Landmark'
+      : 'Building';
   el.innerHTML = `
     ${entity.photoUrl ? `<div class="campus-popup-img-wrap"><img class="campus-popup-img" src="${entity.photoUrl}" alt="${escapeHtml(entity.name)}" /></div>` : ''}
     <div class="campus-popup-body">
-      <span class="campus-popup-type">${entity.type === 'department' ? 'Department' : 'Building'}</span>
+      <span class="campus-popup-type">${typeLabel}</span>
       <strong>${escapeHtml(entity.name)}</strong>
       ${entity.description ? `<p>${escapeHtml(entity.description)}</p>` : ''}
       <div class="campus-popup-actions">
@@ -257,6 +263,7 @@ export default function CampusLeafletMap() {
         const blocks = (blocksRes.data.data || []).map((b) => ({
           id: b._id,
           type: 'block',
+          category: b.category || 'building',
           name: b.name,
           description: b.description,
           photoUrl: b.coverImage,
