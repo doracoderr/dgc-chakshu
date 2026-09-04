@@ -669,6 +669,55 @@ main {
 
 
 /* =========================
+   LANDMARK / FACILITY / AMENITY DETAIL
+   (statues, gates, canteen, washrooms, Principal Office, etc — no
+   floors/rooms. Contained card instead of a full-width single column,
+   so desktop doesn't show a large empty area next to a narrow photo.)
+   ========================= */
+
+.landmark-detail-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+  max-width: 920px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.landmark-detail-media {
+  flex: 1 1 320px;
+  max-width: 400px;
+}
+
+.landmark-detail-media img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.landmark-detail-info {
+  flex: 1 1 280px;
+  min-width: 240px;
+}
+
+.landmark-detail-info h1 {
+  margin: 8px 0 4px;
+}
+
+@media (max-width: 640px) {
+  .landmark-detail-card {
+    padding: 16px;
+    gap: 20px;
+  }
+}
+
+
+/* =========================
    BLOCK DETAIL (FLOOR-WISE)
    ========================= */
 
@@ -1135,5 +1184,3 @@ main {
 
 
 /* Footer styles moved to styles/footer.css */
-
-

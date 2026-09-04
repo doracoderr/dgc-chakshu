@@ -113,6 +113,57 @@ export default function BlockDetail() {
   if (error) return <p className="page error">Error: {error}</p>;
   if (!block) return <p className="page">Block not found.</p>;
 
+  if (block.category && block.category !== 'building') {
+    const typeLabel =
+      block.category === 'facility'
+        ? 'Facility'
+        : block.category === 'amenity'
+        ? 'Amenity'
+        : 'Landmark';
+
+    const parentBlockName =
+      block.parentBlockId?.name || block.parentBlockId;
+
+    return (
+      <div className="page block-detail">
+        <div className="landmark-detail-card">
+          {block.coverImage && (
+            <div className="landmark-detail-media">
+              <img src={block.coverImage} alt={block.name} />
+            </div>
+          )}
+
+          <div className="landmark-detail-info">
+            <span className="room-detail-badge room-detail-type">{typeLabel}</span>
+            <h1>{block.name}</h1>
+            {block.description && <p className="subtitle">{block.description}</p>}
+
+            {(parentBlockName || block.floorNumber != null) && (
+              <div className="room-detail-meta">
+                {parentBlockName && (
+                  <span className="room-detail-badge">Block: {parentBlockName}</span>
+                )}
+                {block.floorNumber != null && (
+                  <span className="room-detail-badge">
+                    {block.floorNumber === 0 ? 'Ground Floor' : `Floor ${block.floorNumber}`}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {block.location?.lat != null && (
+              <div className="about-cta">
+                <Link to={`/map?to=${block._id}`} className="btn-secondary">
+                  🧭 Get Directions
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const roomsOnFloor = rooms.filter((r) => r.floorNumber === activeFloor);
   const deptsOnFloor = departments.filter((d) => d.floorNumber === activeFloor);
 
