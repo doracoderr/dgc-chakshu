@@ -2,7 +2,7 @@ const Block = require('../models/Block');
 
 exports.getAllBlocks = async (req, res, next) => {
   try {
-    const blocks = await Block.find();
+    const blocks = await Block.find().populate('parentBlockId', 'name code category');
     res.json({ success: true, message: 'OK', data: blocks });
   } catch (err) {
     next(err);
@@ -11,7 +11,7 @@ exports.getAllBlocks = async (req, res, next) => {
 
 exports.getBlockById = async (req, res, next) => {
   try {
-    const block = await Block.findById(req.params.id);
+    const block = await Block.findById(req.params.id).populate('parentBlockId', 'name code category');
     if (!block) {
       return res.status(404).json({ success: false, message: 'Block not found', error: { code: 'NOT_FOUND' } });
     }

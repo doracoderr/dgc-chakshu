@@ -47,9 +47,10 @@ const BUILDINGS = [
   {
     code: 'RKHALL',
     name: 'R.K. Hall',
-    description: 'R.K. Hall — seminar hall / auditorium.',
+    description: 'R.K. Hall — seminar hall / auditorium, used for programs and conferences.',
     location: { lat: 28.466532, lng: 77.023125 },
     aliases: ['r.k. hall', 'rk hall'],
+    category: 'facility',
   },
   {
     code: 'APJ',
@@ -70,17 +71,30 @@ const BUILDINGS = [
   {
     code: 'JCBOSE',
     name: 'J.C. Bose Block',
-    description: 'J.C. Bose Block — houses the Admin Office and Principal Office.',
-    // averaged from 3 photos (block signage, Admin Office plaque, Principal Office plaque) — all within ~20m of each other
+    description: 'J.C. Bose Block.',
+    // averaged from 3 photos (block signage) — Admin Office / Principal
+    // Office are in the separate Admin Block, not this one.
     location: { lat: 28.466023, lng: 77.023567 },
-    aliases: ['jc bose block', 'j.c. bose block', 'admin office'],
+    aliases: ['jc bose block', 'j.c. bose block'],
   },
   {
     code: 'PRINCIPALOFFICE',
     name: 'Principal Office',
-    description: 'Principal Office, J.C. Bose Block.',
+    description: 'Principal Office, Admin Block.',
     location: { lat: 28.465957, lng: 77.023499 },
     aliases: ['principal office', 'principle office'],
+    category: 'facility',
+    parentCode: 'ADMINBLOCK',
+  },
+  {
+    code: 'ADMINBLOCK',
+    name: 'Admin Block',
+    description: 'Admin Block.',
+    // TEMP: placed a small offset away from Principal Office's point so
+    // the two markers don't sit exactly on top of each other. Replace
+    // with the real GPS reading for Admin Block once available.
+    location: { lat: 28.46614, lng: 77.02370 },
+    aliases: ['admin block', 'administration block', 'admin office'],
   },
   {
     code: 'ADMCOUNTER',
@@ -89,6 +103,8 @@ const BUILDINGS = [
     // averaged from 2 photos of the same counter wing
     location: { lat: 28.4658, lng: 77.023848 },
     aliases: ['admission counters', 'fee counters', 'scholarships fees'],
+    category: 'facility',
+    parentCode: 'ADMINBLOCK',
   },
   {
     code: 'CHANAKYA',
@@ -111,6 +127,7 @@ const BUILDINGS = [
     description: 'Tagore Sports Auditorium.',
     location: { lat: 28.466312, lng: 77.024233 },
     aliases: ['tagore sports auditorium', 'tagore auditorium'],
+    category: 'facility',
   },
   {
     code: 'CANTEEN',
@@ -118,6 +135,7 @@ const BUILDINGS = [
     description: 'Joginder Kapoor Canteen.',
     location: { lat: 28.467574, lng: 77.024882 },
     aliases: ['college canteen', 'joginder kapoor canteen'],
+    category: 'facility',
   },
   {
     code: 'DRONA',
@@ -179,6 +197,26 @@ async function run() {
   }
 
   console.log(`\nDone. All ${BUILDINGS.length} buildings are now pinned with their exact coordinates.`);
+
+  // Second pass: wire up parentCode -> parentBlockId now that every
+  // building above (including any parent, e.g. Admin Block) is
+  // guaranteed to exist. Doing this in a separate pass avoids relying
+  // on array order — a child can list a parentCode that appears later
+  // in BUILDINGS and it will still resolve correctly.
+  const withParent = BUILDINGS.filter((b) => b.parentCode);
+  if (withParent.length) {
+    console.log(`\nLinking ${withParent.length} entr${withParent.length === 1 ? 'y' : 'ies'} to their parent block...`);
+    for (const b of withParent) {
+      const parent = await Block.findOne({ code: b.parentCode });
+      if (!parent) {
+        console.log(`  Skipped: ${b.name} — parent block "${b.parentCode}" not found.`);
+        continue;
+      }
+      await Block.updateOne({ code: b.code }, { parentBlockId: parent._id });
+      console.log(`  Linked: ${b.name}  ->  ${parent.name}`);
+    }
+  }
+
   await mongoose.disconnect();
 }
 

@@ -36,6 +36,7 @@ import '../styles/admin.css';
 
 const TAB_CONFIG = [
   { key: 'Blocks', icon: <FaBuilding /> },
+  { key: 'Landmarks', icon: <FaMapMarkerAlt /> },
   { key: 'Departments', icon: <FaChalkboardTeacher /> },
   { key: 'Rooms', icon: <FaDoorOpen /> },
   { key: 'Faculty', icon: <FaUserTie /> },
@@ -464,9 +465,6 @@ function BlockForm({
     floorCount:
       initial?.floorCount ?? 1,
 
-    category:
-      initial?.category || 'building',
-
     lat:
       initial?.location?.lat ?? '',
 
@@ -502,6 +500,8 @@ function BlockForm({
 
       const payload = {
         ...rest,
+
+        category: 'building',
 
         floorCount:
           rest.floorCount === ''
@@ -564,7 +564,6 @@ function BlockForm({
           description: '',
           coverImage: '',
           floorCount: 1,
-          category: 'building',
           lat: '',
           lng: '',
         });
@@ -697,26 +696,6 @@ function BlockForm({
         />
       </div>
 
-      <div className="admin-field">
-        <label>Type</label>
-
-        <select
-          value={form.category}
-          onChange={(e) =>
-            update(
-              'category',
-              e.target.value
-            )
-          }
-        >
-          <option value="building">Building (has floors/rooms)</option>
-          <option value="landmark">Landmark (statue, gate, monument — map marker only)</option>
-        </select>
-        <p className="admin-hint">
-          Landmarks show on the map but aren't listed as buildings and don't need floor/room data.
-        </p>
-      </div>
-
       <div className="admin-field-row">
         <div className="admin-field">
           <label>Latitude</label>
@@ -766,6 +745,348 @@ function BlockForm({
         onCancel={onCancel}
         updateText="Update Block"
         createText="Save Block"
+      />
+    </form>
+  );
+}
+
+/* ============================================================
+   LANDMARK FORM
+   (statues, gates, monuments — map marker only, no floors/rooms)
+   ============================================================ */
+
+function LandmarkForm({
+  initial,
+  blocks,
+  onSaved,
+  onCancel,
+  adminKey,
+  notify,
+}) {
+  const isEdit = Boolean(initial?._id);
+
+  const [form, setForm] = useState({
+    _id:
+      initial?._id || generateId(),
+
+    name:
+      initial?.name || '',
+
+    code:
+      initial?.code || '',
+
+    category:
+      initial?.category &&
+      initial.category !== 'building'
+        ? initial.category
+        : 'landmark',
+
+    coverImage:
+      initial?.coverImage || '',
+
+    lat:
+      initial?.location?.lat ?? '',
+
+    lng:
+      initial?.location?.lng ?? '',
+
+    parentBlockId:
+      getBlockId({ blockId: initial?.parentBlockId }),
+
+    floorNumber:
+      initial?.floorNumber ?? '',
+  });
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const update = (
+    field,
+    value
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+
+    setSaving(true);
+
+    try {
+      const {
+        lat,
+        lng,
+        _id,
+        ...rest
+      } = form;
+
+      const payload = {
+        ...rest,
+        floorCount: 1,
+
+        location:
+          lat !== '' &&
+          lng !== ''
+            ? {
+                lat: Number(lat),
+                lng: Number(lng),
+              }
+            : undefined,
+
+        parentBlockId:
+          rest.parentBlockId || undefined,
+
+        floorNumber:
+          rest.floorNumber === ''
+            ? undefined
+            : Number(rest.floorNumber),
+      };
+
+      if (isEdit) {
+        await api.put(
+          `/blocks/${initial._id}`,
+          payload,
+          {
+            headers: {
+              'x-admin-key':
+                adminKey,
+            },
+          }
+        );
+
+        notify(
+          'success',
+          `"${form.name}" landmark updated.`
+        );
+      } else {
+        await api.post(
+          '/blocks',
+          payload,
+          {
+            headers: {
+              'x-admin-key':
+                adminKey,
+            },
+          }
+        );
+
+        notify(
+          'success',
+          `"${form.name}" landmark added.`
+        );
+      }
+
+      await onSaved();
+
+      if (isEdit) {
+        onCancel();
+      } else {
+        setForm({
+          _id: generateId(),
+          name: '',
+          code: '',
+          category: 'landmark',
+          coverImage: '',
+          lat: '',
+          lng: '',
+          parentBlockId: '',
+          floorNumber: '',
+        });
+      }
+    } catch (err) {
+      notify(
+        'error',
+        err.response?.data?.message ||
+          'Failed to save landmark'
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form
+      className="admin-form"
+      onSubmit={submit}
+    >
+      <div className="admin-field">
+        <label>
+          Landmark Name <span>*</span>
+        </label>
+
+        <input
+          type="text"
+          placeholder="e.g. Subhash Chandra Bose Gate"
+          value={form.name}
+          onChange={(e) =>
+            update(
+              'name',
+              e.target.value
+            )
+          }
+          required
+        />
+      </div>
+
+      <div className="admin-field">
+        <label>Type</label>
+
+        <select
+          value={form.category}
+          onChange={(e) =>
+            update(
+              'category',
+              e.target.value
+            )
+          }
+        >
+          <option value="landmark">Landmark (statue, gate, monument)</option>
+          <option value="facility">Facility (canteen, hall — no floors)</option>
+          <option value="amenity">Amenity (washroom, water point)</option>
+        </select>
+      </div>
+
+      <div className="admin-field-row">
+        <AdminSelect
+          label="Located in Block"
+          value={form.parentBlockId}
+          onChange={(value) =>
+            update('parentBlockId', value)
+          }
+          options={blocks}
+          placeholder="Not inside a block"
+        />
+
+        <div className="admin-field">
+          <label>
+            Floor Number
+            <span className="admin-field-hint">
+              (0 = Ground Floor)
+            </span>
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            placeholder="Leave blank if unknown"
+            value={form.floorNumber}
+            onChange={(e) =>
+              update('floorNumber', e.target.value)
+            }
+          />
+        </div>
+      </div>
+      <p className="admin-hint">
+        Optional — use this when this marker physically sits inside a real block (e.g. Principal Office inside Admin Block), so its detail page can say so.
+      </p>
+
+      <div className="admin-field">
+        <label>
+          Code <span>*</span>
+        </label>
+
+        <div className="admin-field-row" style={{ gap: '8px' }}>
+          <input
+            type="text"
+            placeholder="e.g. SCBGATE"
+            value={form.code}
+            onChange={(e) =>
+              update(
+                'code',
+                e.target.value
+              )
+            }
+            required
+            readOnly={isEdit}
+            title={isEdit ? 'Code is locked once a landmark is created, so it always stays the same.' : undefined}
+          />
+
+          {!isEdit && (
+            <button
+              type="button"
+              className="btn-secondary"
+              title="Suggest a code from the landmark name"
+              onClick={() =>
+                update(
+                  'code',
+                  generateCodeFromName(form.name)
+                )
+              }
+              disabled={!form.name.trim()}
+            >
+              Generate
+            </button>
+          )}
+        </div>
+        {isEdit && <p className="admin-hint">Code is permanent and can't be changed after creation.</p>}
+      </div>
+
+      <ImageUploadField
+        label="Photo"
+        value={form.coverImage}
+        onChange={(url) =>
+          update(
+            'coverImage',
+            url
+          )
+        }
+        adminKey={adminKey}
+        type="block"
+        identifier={form._id}
+      />
+
+      <div className="admin-field-row">
+        <div className="admin-field">
+          <label>Latitude</label>
+
+          <input
+            type="number"
+            step="any"
+            placeholder="Latitude"
+            value={form.lat}
+            onChange={(e) =>
+              update(
+                'lat',
+                e.target.value
+              )
+            }
+          />
+        </div>
+
+        <div className="admin-field">
+          <label>Longitude</label>
+
+          <input
+            type="number"
+            step="any"
+            placeholder="Longitude"
+            value={form.lng}
+            onChange={(e) =>
+              update(
+                'lng',
+                e.target.value
+              )
+            }
+          />
+        </div>
+      </div>
+
+      <GeoLocateButton
+        onLocate={(lat, lng) => {
+          update('lat', lat);
+          update('lng', lng);
+        }}
+      />
+
+      <FormActions
+        isEdit={isEdit}
+        saving={saving}
+        onCancel={onCancel}
+        updateText="Update Landmark"
+        createText="Save Landmark"
       />
     </form>
   );
@@ -1869,7 +2190,7 @@ function EntityViewModal({
             </h2>
 
             <p>
-              {type} details
+              {type === 'Landmarks' ? 'Landmark' : type} details
             </p>
           </div>
 
@@ -1937,6 +2258,35 @@ function EntityViewModal({
                       ? 'Location data available'
                       : '—'
                   }
+                </span>
+              </div>
+            </>
+          )}
+
+          {type === 'Landmarks' && (
+            <>
+              <p>
+                Code:{' '}
+                <strong>
+                  {item.code ||
+                    '—'}
+                </strong>
+              </p>
+
+              {(item.parentBlockId || item.floorNumber != null) && (
+                <p>
+                  <strong>Located in:</strong>{' '}
+                  {getName(item.parentBlockId) || 'Unassigned block'}
+                  {item.floorNumber != null &&
+                    ` — ${item.floorNumber === 0 ? 'Ground Floor' : `Floor ${item.floorNumber}`}`}
+                </p>
+              )}
+
+              <div className="modal-meta">
+                <span>
+                  {item.location?.lat != null
+                    ? 'Location set'
+                    : 'No location yet'}
                 </span>
               </div>
             </>
@@ -2684,12 +3034,31 @@ export default function Admin() {
   }, [tab]);
 
   /* ==========================================================
+     SPLIT BLOCKS COLLECTION: BUILDINGS vs LANDMARKS
+     Both live in the same Block model (category field), but the
+     admin panel manages them as two separate tabs.
+     ========================================================== */
+
+  const buildingBlocks = useMemo(
+    () => blocks.filter((b) => b.category !== 'landmark'),
+    [blocks]
+  );
+
+  const landmarkBlocks = useMemo(
+    () => blocks.filter((b) => b.category && b.category !== 'building'),
+    [blocks]
+  );
+
+  /* ==========================================================
      DATA FOR CURRENT TAB
      ========================================================== */
 
   const currentItems = useMemo(() => {
     if (tab === 'Blocks')
-      return blocks;
+      return buildingBlocks;
+
+    if (tab === 'Landmarks')
+      return landmarkBlocks;
 
     if (tab === 'Departments')
       return departments;
@@ -2700,7 +3069,8 @@ export default function Admin() {
     return faculty;
   }, [
     tab,
-    blocks,
+    buildingBlocks,
+    landmarkBlocks,
     departments,
     rooms,
     faculty,
@@ -2720,7 +3090,7 @@ export default function Admin() {
       (item) => {
         let searchable = '';
 
-        if (tab === 'Blocks') {
+        if (tab === 'Blocks' || tab === 'Landmarks') {
           searchable = [
             item.name,
             item.code,
@@ -2806,7 +3176,8 @@ export default function Admin() {
         let matchesFilter = true;
 
         if (
-          tab === 'Blocks'
+          tab === 'Blocks' ||
+          tab === 'Landmarks'
         ) {
           const hasLocation =
             item.location?.lat !=
@@ -3026,6 +3397,22 @@ export default function Admin() {
       return 'All Blocks';
     }
 
+    if (tab === 'Landmarks') {
+      if (
+        filter ===
+        'location'
+      )
+        return 'With Location';
+
+      if (
+        filter ===
+        'no-location'
+      )
+        return 'Without Location';
+
+      return 'All Landmarks';
+    }
+
     if (
       tab ===
       'Departments'
@@ -3076,7 +3463,10 @@ export default function Admin() {
 
   const counts = {
     Blocks:
-      blocks.length,
+      buildingBlocks.length,
+
+    Landmarks:
+      landmarkBlocks.length,
 
     Departments:
       departments.length,
@@ -3203,6 +3593,10 @@ export default function Admin() {
                 'Manage campus buildings and their floor information.'}
 
               {tab ===
+                'Landmarks' &&
+                'Manage statues, gates and other map markers that aren\'t buildings.'}
+
+              {tab ===
                 'Departments' &&
                 'Manage departments, HODs and department locations.'}
 
@@ -3230,6 +3624,9 @@ export default function Admin() {
               {tab ===
               'Blocks'
                 ? 'Block'
+                : tab ===
+                  'Landmarks'
+                ? 'Landmark'
                 : tab ===
                   'Departments'
                 ? 'Department'
@@ -3298,6 +3695,9 @@ export default function Admin() {
                   'Blocks'
                     ? 'All Blocks'
                     : tab ===
+                      'Landmarks'
+                    ? 'All Landmarks'
+                    : tab ===
                       'Departments'
                     ? 'All Departments'
                     : tab ===
@@ -3306,8 +3706,10 @@ export default function Admin() {
                     : 'All Faculty'}
                 </button>
 
-                {tab ===
-                  'Blocks' && (
+                {(tab ===
+                  'Blocks' ||
+                  tab ===
+                  'Landmarks') && (
                   <>
                     <button
                       type="button"
@@ -3445,6 +3847,9 @@ export default function Admin() {
                 'Blocks' ? (
                   <FaBuilding />
                 ) : tab ===
+                  'Landmarks' ? (
+                  <FaMapMarkerAlt />
+                ) : tab ===
                   'Departments' ? (
                   <FaChalkboardTeacher />
                 ) : tab ===
@@ -3485,6 +3890,9 @@ export default function Admin() {
                     {tab ===
                     'Blocks'
                       ? 'Block'
+                      : tab ===
+                        'Landmarks'
+                      ? 'Landmark'
                       : tab ===
                         'Departments'
                       ? 'Department'
@@ -3638,6 +4046,120 @@ export default function Admin() {
                 </div>
               )
             )
+          ) : tab ===
+            'Landmarks' ? (
+            /* ==================================================
+               LANDMARK CARDS
+               ================================================== */
+
+            filteredItems.map(
+              (landmark) => (
+                <div
+                  className="block-admin-card"
+                  key={
+                    landmark._id
+                  }
+                >
+                  <div className="block-admin-image">
+                    {landmark.coverImage ? (
+                      <img
+                        src={
+                          landmark.coverImage
+                        }
+                        alt={
+                          landmark.name
+                        }
+                      />
+                    ) : (
+                      <div className="block-admin-image-placeholder">
+                        <FaMapMarkerAlt />
+                      </div>
+                    )}
+
+                    <span className="block-code-badge">
+                      {landmark.code ||
+                        '—'}
+                    </span>
+                  </div>
+
+                  <div className="block-admin-card-body">
+                    <div className="block-admin-title-row">
+                      <div>
+                        <h3>
+                          {
+                            landmark.name
+                          }
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="block-admin-meta">
+                      <div className="block-meta-item">
+                        <span>
+                          <FaMapMarkerAlt />
+                        </span>
+
+                        <div>
+                          <strong>
+                            {landmark.category === 'facility'
+                              ? 'Facility'
+                              : landmark.category === 'amenity'
+                              ? 'Amenity'
+                              : 'Landmark'}
+                          </strong>
+
+                          <small>
+                            Type
+                          </small>
+                        </div>
+                      </div>
+
+                      {landmark.location?.lat !=
+                        null && (
+                        <div className="block-meta-item">
+                          <span>
+                            <FaMapMarkerAlt />
+                          </span>
+
+                          <div>
+                            <strong>
+                              Yes
+                            </strong>
+
+                            <small>
+                              Location
+                            </small>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <EntityActions
+                      onView={() =>
+                        setViewingItem(
+                          {
+                            type: 'Landmarks',
+                            item: landmark,
+                          }
+                        )
+                      }
+                      onEdit={() =>
+                        openEdit(
+                          landmark
+                        )
+                      }
+                      onDelete={() =>
+                        handleDelete(
+                          'blocks',
+                          landmark._id,
+                          landmark.name
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+              )
+            )
           ) : (
             /* ==================================================
                DEPARTMENT / ROOM / FACULTY CARDS
@@ -3720,6 +4242,9 @@ export default function Admin() {
                         'Blocks'
                           ? 'Block'
                           : tab ===
+                            'Landmarks'
+                          ? 'Landmark'
+                          : tab ===
                             'Departments'
                           ? 'Department'
                           : tab ===
@@ -3731,6 +4256,9 @@ export default function Admin() {
                         tab ===
                         'Blocks'
                           ? 'Block'
+                          : tab ===
+                            'Landmarks'
+                          ? 'Landmark'
                           : tab ===
                             'Departments'
                           ? 'Department'
@@ -3801,6 +4329,43 @@ export default function Admin() {
               />
             )}
 
+            {/* LANDMARK */}
+
+            {tab ===
+              'Landmarks' && (
+              <LandmarkForm
+                key={
+                  editingItem.__new
+                    ? 'new-landmark'
+                    : editingItem._id
+                }
+                initial={
+                  editingItem.__new
+                    ? null
+                    : editingItem
+                }
+                blocks={
+                  buildingBlocks
+                }
+                adminKey={
+                  key
+                }
+                notify={
+                  notify
+                }
+                onSaved={() =>
+                  loadAll(
+                    key
+                  )
+                }
+                onCancel={() =>
+                  setEditingItem(
+                    null
+                  )
+                }
+              />
+            )}
+
             {/* DEPARTMENT */}
 
             {tab ===
@@ -3817,7 +4382,7 @@ export default function Admin() {
                     : editingItem
                 }
                 blocks={
-                  blocks
+                  buildingBlocks
                 }
                 adminKey={
                   key
@@ -3854,7 +4419,7 @@ export default function Admin() {
                     : editingItem
                 }
                 blocks={
-                  blocks
+                  buildingBlocks
                 }
                 adminKey={
                   key
