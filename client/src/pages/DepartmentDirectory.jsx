@@ -49,8 +49,8 @@ export default function DepartmentDirectory() {
 
         setError(
           err.response?.data?.message ||
-            err.message ||
-            'Failed to load departments'
+          err.message ||
+          'Failed to load departments'
         );
       })
       .finally(() => {
@@ -416,6 +416,12 @@ export default function DepartmentDirectory() {
                     {/* BODY */}
 
                     <div className="department-directory-card-body">
+                      {/* DEPARTMENT NAME */}
+
+                      <div className="department-directory-department-name">
+                        {department.name || 'Department Name'}
+                      </div>
+
                       {/* HOD NAME */}
 
                       <h2>
@@ -500,7 +506,9 @@ export default function DepartmentDirectory() {
                         }
                       >
                         <span>
-                          View Details
+                          {department.blockId?._id
+                            ? 'View Details'
+                            : 'Details Available Soon'}
                         </span>
 
                         <FaArrowRight />
