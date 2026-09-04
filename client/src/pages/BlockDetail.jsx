@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import Breadcrumb from '../components/Breadcrumb';
+import ShareButton from '../components/ShareButton';
+import DetailSkeleton from '../components/DetailSkeleton';
+import Lightbox from '../components/Lightbox';
 
 const TYPE_COLORS = {
   classroom: '#1F6FAE',
@@ -10,7 +14,7 @@ const TYPE_COLORS = {
   other: '#94A3B8',
 };
 
-function FloorBlueprint({ rooms }) {
+function FloorBlueprint({ rooms, onRoomClick }) {
   const cols = Math.max(1, Math.min(4, Math.ceil(Math.sqrt(rooms.length || 1))));
   const rows = Math.max(1, Math.ceil(rooms.length / cols));
   const cellW = 180;
@@ -35,7 +39,11 @@ function FloorBlueprint({ rooms }) {
         const y = padding + row * (cellH + gap);
         const color = TYPE_COLORS[room.type] || TYPE_COLORS.other;
         return (
-          <g key={room._id}>
+          <g
+            key={room._id}
+            onClick={() => onRoomClick?.(room)}
+            style={{ cursor: 'pointer' }}
+          >
             <rect
               x={x}
               y={y}
@@ -78,8 +86,11 @@ export default function BlockDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeFloor, setActiveFloor] = useState(null);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
       api.get(`/blocks/${id}`),
       api.get(`/rooms/block/${id}`),
@@ -109,7 +120,7 @@ export default function BlockDetail() {
     }
   }, [floors, activeFloor]);
 
-  if (loading) return <p className="page">Loading block...</p>;
+  if (loading) return <DetailSkeleton />;
   if (error) return <p className="page error">Error: {error}</p>;
   if (!block) return <p className="page">Block not found.</p>;
 
@@ -126,10 +137,26 @@ export default function BlockDetail() {
 
     return (
       <div className="page block-detail">
+        <div className="detail-toolbar">
+          <Breadcrumb
+            items={[
+              { label: 'Home', to: '/' },
+              { label: 'Blocks', to: '/blocks' },
+              { label: block.name },
+            ]}
+          />
+          <ShareButton title={block.name} />
+        </div>
+
         <div className="landmark-detail-card">
           {block.coverImage && (
             <div className="landmark-detail-media">
-              <img src={block.coverImage} alt={block.name} />
+              <img
+                src={block.coverImage}
+                alt={block.name}
+                className="zoomable-image"
+                onClick={() => setLightboxSrc(block.coverImage)}
+              />
             </div>
           )}
 
@@ -160,6 +187,8 @@ export default function BlockDetail() {
             )}
           </div>
         </div>
+
+        <Lightbox src={lightboxSrc} alt={block.name} onClose={() => setLightboxSrc(null)} />
       </div>
     );
   }
@@ -169,27 +198,52 @@ export default function BlockDetail() {
 
   return (
     <div className="page block-detail">
+      <div className="detail-toolbar">
+        <Breadcrumb
+          items={[
+            { label: 'Home', to: '/' },
+            { label: 'Blocks', to: '/blocks' },
+            { label: block.name },
+          ]}
+        />
+        <ShareButton title={block.name} />
+      </div>
+
       <h1>{block.name}</h1>
       {block.description && <p className="subtitle">{block.description}</p>}
 
+      {block.location?.lat != null && (
+        <div className="about-cta" style={{ margin: '12px 0' }}>
+          <Link to={`/map?to=${block._id}`} className="btn-secondary">
+            🧭 Get Directions
+          </Link>
+        </div>
+      )}
+
       <div className="floor-tabs">
-        {floors.map((f) => (
-          <button
-            key={f}
-            type="button"
-            className={`floor-tab ${activeFloor === f ? 'active' : ''}`}
-            onClick={() => setActiveFloor(f)}
-          >
-            {floorLabel(f)}
-          </button>
-        ))}
+        {floors.map((f) => {
+          const countOnFloor = rooms.filter((r) => r.floorNumber === f).length;
+          return (
+            <button
+              key={f}
+              type="button"
+              className={`floor-tab ${activeFloor === f ? 'active' : ''}`}
+              onClick={() => setActiveFloor(f)}
+            >
+              {floorLabel(f)}
+              {countOnFloor > 0 && <span className="floor-tab-count">{countOnFloor}</span>}
+            </button>
+          );
+        })}
       </div>
 
       {deptsOnFloor.length > 0 && (
         <div className="floor-dept-banner">
           <span className="floor-dept-banner-label">On this floor:</span>
           {deptsOnFloor.map((d) => (
-            <span key={d._id} className="floor-dept-chip">{d.name}</span>
+            <Link key={d._id} to={`/departments/${d._id}`} className="floor-dept-chip chip-link">
+              {d.name}
+            </Link>
           ))}
         </div>
       )}
@@ -198,7 +252,10 @@ export default function BlockDetail() {
         {roomsOnFloor.length === 0 ? (
           <p className="subtitle">No rooms added on this floor yet.</p>
         ) : (
-          <FloorBlueprint rooms={roomsOnFloor} />
+          <FloorBlueprint
+            rooms={roomsOnFloor}
+            onRoomClick={(room) => navigate(`/rooms/${room._id}`)}
+          />
         )}
       </div>
 
