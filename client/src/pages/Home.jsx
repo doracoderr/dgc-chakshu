@@ -25,7 +25,7 @@ export default function Home() {
   useEffect(() => {
     api
       .get('/blocks')
-      .then((res) => setBlocks((res.data.data || []).filter((b) => b.category !== 'landmark')))
+      .then((res) => setBlocks((res.data.data || []).filter((b) => !b.category || b.category === 'building')))
       .catch(() => setBlocks([]))
       .finally(() => setLoadingBlocks(false));
 

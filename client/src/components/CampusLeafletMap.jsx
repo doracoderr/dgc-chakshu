@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import api from '../api/axios';
@@ -165,6 +165,10 @@ function thumbnailIcon(photoUrl) {
   });
 }
 
+// Category -> human label shown in the popup card. Anything other than
+// 'building' (landmark / facility / amenity) is a non-teaching marker —
+// statues, gates, canteen, washrooms, etc — and gets its own label
+// instead of being mislabeled "Building".
 function popupCard(entity) {
   const el = document.createElement('div');
   el.className = 'campus-marker-popup';
@@ -173,6 +177,10 @@ function popupCard(entity) {
       ? 'Department'
       : entity.category === 'landmark'
       ? 'Landmark'
+      : entity.category === 'facility'
+      ? 'Facility'
+      : entity.category === 'amenity'
+      ? 'Amenity'
       : 'Building';
   el.innerHTML = `
     ${entity.photoUrl ? `<div class="campus-popup-img-wrap"><img class="campus-popup-img" src="${entity.photoUrl}" alt="${escapeHtml(entity.name)}" /></div>` : ''}
@@ -255,7 +263,9 @@ export default function CampusLeafletMap() {
   const [farNotice, setFarNotice] = useState(null); // { entity, distanceText } — shown instead of auto-routing
   const [pickerOpen, setPickerOpen] = useState(false); // "pick your building" list
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const pendingDestRef = useRef(null);
+  const autoRoutedRef = useRef(null); // guards against re-triggering for the same ?to= id
 
   useEffect(() => {
     userPosRef.current = userPos;
@@ -740,6 +750,30 @@ export default function CampusLeafletMap() {
       markersRef.current = [];
     };
   }, [entities, navigate]);
+
+  // Deep link support: /map?to=<entityId> (used by the "Get Directions"
+  // button on a block/landmark detail page) auto-starts routing to that
+  // entity, the same as if the user had tapped Directions on its popup —
+  // all still through our own internal campus path network, never an
+  // external maps app.
+  useEffect(() => {
+    const targetId = searchParams.get('to');
+    if (!targetId || entities.length === 0) return;
+    if (autoRoutedRef.current === targetId) return; // already handled this id
+
+    const entity = entities.find((e) => e.id === targetId);
+    if (!entity || !entity.location) return;
+
+    autoRoutedRef.current = targetId;
+    requestDirections(entity);
+
+    // Drop the query param so a later manual refresh/back-nav doesn't
+    // silently re-trigger routing.
+    const next = new URLSearchParams(searchParams);
+    next.delete('to');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entities, searchParams]);
 
   const withLocationCount = entities.filter((e) => e.location?.lat != null && e.location?.lng != null).length;
 

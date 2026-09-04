@@ -13,6 +13,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaTimes,
+  FaChalkboardTeacher,
 } from 'react-icons/fa';
 
 import api from '../api/axios';
@@ -22,6 +23,8 @@ const BLOCKS_PER_PAGE = 10;
 
 export default function BlockDirectory() {
   const [blocks, setBlocks] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -38,12 +41,13 @@ export default function BlockDirectory() {
   useEffect(() => {
     let mounted = true;
 
-    api
-      .get('/blocks')
-      .then((res) => {
+    Promise.all([api.get('/blocks'), api.get('/departments'), api.get('/rooms')])
+      .then(([blocksRes, deptsRes, roomsRes]) => {
         if (!mounted) return;
 
-        setBlocks((res.data.data || []).filter((b) => b.category !== 'landmark'));
+        setBlocks((blocksRes.data.data || []).filter((b) => !b.category || b.category === 'building'));
+        setDepartments(deptsRes.data.data || []);
+        setRooms(roomsRes.data.data || []);
       })
       .catch((err) => {
         if (!mounted) return;
@@ -131,11 +135,15 @@ export default function BlockDirectory() {
      ============================================================ */
 
   const getRoomCount = (block) => {
-    return (
-      block.roomCount ??
-      block.roomsCount ??
-      0
-    );
+    return rooms.filter(
+      (room) => (room.blockId?._id || room.blockId) === block._id
+    ).length;
+  };
+
+  const getDeptCount = (block) => {
+    return departments.filter(
+      (dept) => (dept.blockId?._id || dept.blockId) === block._id
+    ).length;
   };
 
   const hasLocation = (block) => {
@@ -452,6 +460,26 @@ export default function BlockDirectory() {
                               ) === 1
                                 ? 'Room'
                                 : 'Rooms'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="block-directory-meta-item">
+                          <FaChalkboardTeacher />
+
+                          <div>
+                            <strong>
+                              {getDeptCount(
+                                block
+                              )}
+                            </strong>
+
+                            <span>
+                              {getDeptCount(
+                                block
+                              ) === 1
+                                ? 'Dept'
+                                : 'Depts'}
                             </span>
                           </div>
                         </div>
