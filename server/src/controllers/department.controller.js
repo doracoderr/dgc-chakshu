@@ -11,7 +11,7 @@ exports.getAllDepartments = async (req, res, next) => {
 
 exports.getDepartmentById = async (req, res, next) => {
   try {
-    const department = await Department.findById(req.params.id).populate('blockId', 'name code');
+    const department = await Department.findById(req.params.id).populate('blockId', 'name code location');
     if (!department) {
       return res.status(404).json({ success: false, message: 'Department not found', error: { code: 'NOT_FOUND' } });
     }
