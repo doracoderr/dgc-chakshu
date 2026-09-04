@@ -6,6 +6,7 @@ import {
   FaSearch,
   FaLayerGroup,
   FaMapMarkerAlt,
+  FaDoorOpen,
   FaArrowRight,
   FaTh,
   FaList,
@@ -21,6 +22,7 @@ const DEPARTMENTS_PER_PAGE = 10;
 
 export default function DepartmentDirectory() {
   const [departments, setDepartments] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,18 +33,20 @@ export default function DepartmentDirectory() {
   const [currentPage, setCurrentPage] = useState(1);
 
   /* ============================================================
-     LOAD DEPARTMENTS
+     LOAD DEPARTMENTS + ROOMS
+     (rooms are needed to look up each department's numbered room,
+     e.g. "Room 62" — a department only knows its block/floor)
      ============================================================ */
 
   useEffect(() => {
     let mounted = true;
 
-    api
-      .get('/departments')
-      .then((res) => {
+    Promise.all([api.get('/departments'), api.get('/rooms')])
+      .then(([deptRes, roomsRes]) => {
         if (!mounted) return;
 
-        setDepartments(res.data.data || []);
+        setDepartments(deptRes.data.data || []);
+        setRooms(roomsRes.data.data || []);
       })
       .catch((err) => {
         if (!mounted) return;
@@ -97,6 +101,22 @@ export default function DepartmentDirectory() {
     );
   };
 
+  // A department only stores which block/floor it's on — the actual
+  // numbered room (e.g. "Room 62") lives on the Room document that
+  // points back to it. Prefer an "office" room if there are several.
+  const getDeptRoom = (department) => {
+    const deptRooms = rooms.filter((room) => {
+      const roomDeptId = room.departmentId?._id || room.departmentId;
+      return roomDeptId === department._id;
+    });
+
+    if (deptRooms.length === 0) return null;
+
+    return (
+      deptRooms.find((room) => room.type === 'office') || deptRooms[0]
+    );
+  };
+
   /* ============================================================
      FILTER + SORT
      ============================================================ */
@@ -114,7 +134,7 @@ export default function DepartmentDirectory() {
         department.description,
         department.blockId?.name,
         getFloorLabel(department),
-        hasLocation(department) ? 'yes' : 'no',
+        getDeptRoom(department)?.roomNumber,
       ]
         .filter(Boolean)
         .join(' ')
@@ -134,7 +154,7 @@ export default function DepartmentDirectory() {
     });
 
     return result;
-  }, [departments, search, sortBy]);
+  }, [departments, rooms, search, sortBy]);
 
   /* ============================================================
      PAGINATION
@@ -378,20 +398,14 @@ export default function DepartmentDirectory() {
             }
           >
             {paginatedDepartments.map(
-              (department) => (
+              (department) => {
+                const deptRoom = getDeptRoom(department);
+
+                return (
                 <Link
-                  to={
-                    department.blockId?._id
-                      ? `/blocks/${department.blockId._id}`
-                      : '#'
-                  }
+                  to={`/departments/${department._id}`}
                   key={department._id}
                   className="department-directory-card-link"
-                  onClick={(e) => {
-                    if (!department.blockId?._id) {
-                      e.preventDefault();
-                    }
-                  }}
                 >
                   <article className="department-directory-card">
                     {/* IMAGE */}
@@ -475,48 +489,56 @@ export default function DepartmentDirectory() {
                           </div>
                         </div>
 
-                        {/* LOCATION */}
+                        {/* ROOM (falls back to LOCATION when the
+                            department has no numbered room on file) */}
 
-                        <div className="department-directory-meta-item">
-                          <FaMapMarkerAlt />
+                        {deptRoom ? (
+                          <div className="department-directory-meta-item">
+                            <FaDoorOpen />
 
-                          <div>
-                            <strong>
-                              {hasLocation(
-                                department
-                              )
-                                ? 'Yes'
-                                : '—'}
-                            </strong>
+                            <div>
+                              <strong>
+                                {deptRoom.roomNumber}
+                              </strong>
 
-                            <span>
-                              Location
-                            </span>
+                              <span>
+                                Room
+                              </span>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="department-directory-meta-item">
+                            <FaMapMarkerAlt />
+
+                            <div>
+                              <strong>
+                                {hasLocation(
+                                  department
+                                )
+                                  ? 'Yes'
+                                  : '—'}
+                              </strong>
+
+                              <span>
+                                Location
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* VIEW DETAILS */}
 
-                      <div
-                        className={
-                          department.blockId?._id
-                            ? 'department-directory-view'
-                            : 'department-directory-view disabled'
-                        }
-                      >
-                        <span>
-                          {department.blockId?._id
-                            ? 'View Details'
-                            : 'Details Available Soon'}
-                        </span>
+                      <div className="department-directory-view">
+                        <span>View Details</span>
 
                         <FaArrowRight />
                       </div>
                     </div>
                   </article>
                 </Link>
-              )
+                );
+              }
             )}
           </div>
 

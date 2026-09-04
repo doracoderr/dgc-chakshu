@@ -3,8 +3,12 @@
  * seed.js) and their faculty, then creates the 20 DGC departments from
  * Department_Details.pdf fresh. Faculty is NOT re-added.
  *
- * CS, Political Science and English are linked to the existing Block
- * documents created by seedCampusBuildings.js (matched by Block code).
+ * CS and Political Science share one Block document (CSDEPT) — they're
+ * both in the same building, Pol. Science on the ground floor and CS on
+ * the 1st floor. English and Psychology are linked to the Arts Block,
+ * since both departments are physically located inside it (not separate
+ * buildings). All linked by Block code, matched against Block documents
+ * already created by seedCampusBuildings.js.
  *
  * Usage:
  *   cd server
@@ -22,6 +26,7 @@ const DEPARTMENTS = [
     code: 'CS',
     name: 'Computer Science',
     blockCode: 'CSDEPT',
+    floorNumber: 1,
     hodName: '',
     description:
       'Broad theoretical background with a wide range of programming languages and paradigms. Students work on substantial programming and software development projects. Facilities include LCD projectors, computers, and internet for teaching-learning.',
@@ -78,7 +83,7 @@ const DEPARTMENTS = [
   {
     code: 'ENG',
     name: 'English',
-    blockCode: 'ENGDEPT',
+    blockCode: 'ARTS',
     hodName: '',
     description:
       'Compulsory subject in B.A./B.Sc. Pass and qualifying paper in Hons courses. Offers B.A. English Hons. English Language Lab available.',
@@ -142,7 +147,8 @@ const DEPARTMENTS = [
   {
     code: 'POLSCI',
     name: 'Political Science',
-    blockCode: 'POLSCI',
+    blockCode: 'CSDEPT', // shares the same building as Computer Science
+    floorNumber: 0,
     hodName: '',
     description:
       'Established in 1951, one of the oldest departments. Introduced M.A. Political Science in 2009. Ten assistant professors.',
@@ -150,6 +156,7 @@ const DEPARTMENTS = [
   {
     code: 'PSY',
     name: 'Psychology',
+    blockCode: 'ARTS',
     hodName: '',
     description:
       'Introduced in 1984. Runs four programs including job-oriented courses in guidance and counselling, with a guidance and counselling cell.',
@@ -189,6 +196,9 @@ async function run() {
     let block = null;
     if (d.blockCode) {
       block = await Block.findOne({ code: d.blockCode });
+      if (!block) {
+        console.log(`  Note: block "${d.blockCode}" not found — "${d.name}" will be created without a linked block.`);
+      }
     }
 
     await Department.create({
@@ -197,6 +207,7 @@ async function run() {
       description: d.description,
       hodName: d.hodName || undefined,
       blockId: block ? block._id : undefined,
+      floorNumber: d.floorNumber != null ? d.floorNumber : undefined,
     });
     deptCreated++;
     console.log(`Created: ${d.name}${block ? `  (linked to block ${d.blockCode})` : ''}`);

@@ -15,27 +15,29 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Block = require('../src/models/Block');
 
+// NOTE: Computer Science and Political Science used to be listed as two
+// separate buildings (CSDEPT / POLSCI), each pinned from its own GPS
+// photo. A ground-level photo of the actual entrance shows they are the
+// SAME building — Political Science is on the ground floor, Computer
+// Science is on the 1st floor, and the building nameplate carries both
+// department names. Merged into one Block below (kept the CSDEPT code
+// so existing department links don't break); the old POLSCI block is
+// removed at the end of run() if it still exists from a prior seed.
 const BUILDINGS = [
   {
     code: 'CSDEPT',
-    name: 'Department of Computer Science',
-    description: 'Department of Computer Science (1st floor).',
-    location: { lat: 28.466656, lng: 77.023505 },
-    aliases: ['computer science', 'dept. of computer science', 'department of computer science'],
-  },
-  {
-    code: 'POLSCI',
-    name: 'Department of Political Science',
-    description: 'राजनीति विज्ञान विभाग — Department of Political Science.',
-    location: { lat: 28.466533, lng: 77.023522 },
-    aliases: ['political science', 'rajniti vigyan vibhag', 'department of political science'],
-  },
-  {
-    code: 'ENGDEPT',
-    name: 'Department of English',
-    description: 'Department of English (Room 62).',
-    location: { lat: 28.466528, lng: 77.022994 },
-    aliases: ['department of english', 'english department'],
+    name: 'Department of Computer Science & Department of Political Science',
+    description:
+      'Shared building — Department of Computer Science (1st floor) and Department of Political Science / राजनीति विज्ञान विभाग (ground floor).',
+    location: { lat: 28.466655, lng: 77.023503 },
+    aliases: [
+      'computer science',
+      'dept. of computer science',
+      'department of computer science',
+      'political science',
+      'rajniti vigyan vibhag',
+      'department of political science',
+    ],
   },
   {
     code: 'ARTS',
@@ -178,6 +180,7 @@ async function run() {
 
     if (existing) {
       existing.name = b.name;
+      existing.code = b.code; // fix a stale/legacy code (e.g. from a manual Admin-panel entry) once matched by name
       existing.description = existing.description || b.description;
       existing.location = b.location;
       existing.category = b.category || 'building';
@@ -197,6 +200,22 @@ async function run() {
   }
 
   console.log(`\nDone. All ${BUILDINGS.length} buildings are now pinned with their exact coordinates.`);
+
+  // Political Science was merged into the CSDEPT block above (same
+  // building). If an old standalone POLSCI block still exists from a
+  // previous run, repoint anything still linked to it and remove it.
+  const oldPolSci = await Block.findOne({ code: 'POLSCI' });
+  if (oldPolSci) {
+    const mergedBlock = await Block.findOne({ code: 'CSDEPT' });
+    if (mergedBlock) {
+      const Department = require('../src/models/Department');
+      const Room = require('../src/models/Room');
+      await Department.updateMany({ blockId: oldPolSci._id }, { blockId: mergedBlock._id });
+      await Room.updateMany({ blockId: oldPolSci._id }, { blockId: mergedBlock._id });
+    }
+    await Block.deleteOne({ _id: oldPolSci._id });
+    console.log('Removed old standalone "POLSCI" block — merged into CSDEPT.');
+  }
 
   // Second pass: wire up parentCode -> parentBlockId now that every
   // building above (including any parent, e.g. Admin Block) is
