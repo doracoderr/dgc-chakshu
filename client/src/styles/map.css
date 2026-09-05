@@ -226,34 +226,54 @@
   margin: 0;
 }
 
-/* Interactive vs Image map toggle */
+/* Interactive vs Image map toggle — a Google-Maps-style segmented pill
+   (like the "Map / Satellite" switcher) rather than two loose outlined
+   buttons: one soft track, the selected side lifted with a gradient
+   fill and shadow so the active state reads at a glance. */
 .map-view-toggle {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.2rem;
   margin: 0;
+  background: #EEF3F8;
+  padding: 0.25rem;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 2px rgba(18, 59, 93, 0.08);
 }
 
 .map-toggle-btn {
-  border: 1px solid var(--secondary);
-  background: var(--surface);
-  color: var(--secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  background: transparent;
+  color: var(--muted);
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 0.32rem 0.7rem;
+  padding: 0.4rem 0.85rem;
   border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   white-space: nowrap;
 }
 
-.map-toggle-btn:hover {
-  background: #EAF3FA;
+.map-toggle-btn svg {
+  font-size: 0.9rem;
+}
+
+.map-toggle-btn:hover:not(.active) {
+  background: rgba(31, 111, 174, 0.1);
+  color: var(--secondary);
 }
 
 .map-toggle-btn.active {
-  background: var(--secondary);
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
   color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(18, 59, 93, 0.35);
+}
+
+.map-toggle-btn:active {
+  transform: scale(0.97);
 }
 
 .campus-map-legend {
@@ -318,26 +338,105 @@
   height: 100%;
 }
 
+/* Zoom-based decluttering of the base tiles (see CampusLeafletMap.jsx) —
+   dims/desaturates the tile layer's own baked-in labels and POI icons
+   at the default zoom so our building markers stand out, then eases
+   back to full clarity as the user zooms in. */
+.leaflet-tile-pane {
+  transition: filter 0.4s ease;
+}
+
+.leaflet-tile-pane.map-declutter-heavy {
+  filter: grayscale(70%) brightness(1.15) contrast(0.85) saturate(0.5);
+}
+
+.leaflet-tile-pane.map-declutter-medium {
+  filter: grayscale(35%) brightness(1.06) contrast(0.92) saturate(0.75);
+}
+
+/* Google-Maps-style +/- zoom control — overrides Leaflet's default
+   boxy, flush-square buttons with a floating rounded pill, subtle
+   shadow, and a hover/press feel that matches the rest of the UI. */
+.leaflet-touch .leaflet-bar,
+.leaflet-control-zoom {
+  border: none !important;
+  border-radius: 0.9rem !important;
+  box-shadow: 0 2px 6px rgba(18, 59, 93, 0.2), 0 1px 3px rgba(18, 59, 93, 0.14) !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  width: 2.4rem !important;
+  height: 2.4rem !important;
+  line-height: 2.4rem !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-size: 1.3rem !important;
+  font-weight: 500;
+  border: none !important;
+  transition: background-color 0.15s ease;
+}
+
+.leaflet-control-zoom a:first-child {
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #F1F5F9 !important;
+  color: var(--primary) !important;
+}
+
+.leaflet-control-zoom a.leaflet-disabled {
+  color: #CBD5E1 !important;
+  background: var(--surface) !important;
+}
+
+.leaflet-top.leaflet-right {
+  top: 0.75rem !important;
+  right: 0.75rem !important;
+}
+
+.leaflet-control-zoom + .campus-locate-control {
+  margin-top: 0.65rem !important;
+}
+
+/* Google-Maps-style circular "locate me" pin — floating white disc with
+   a soft shadow, sitting just below the zoom pill in the same corner
+   stack, exactly like the locate button in Google Maps. */
 .campus-locate-control {
-  margin-top: 8px !important;
+  margin: 0.65rem 0.75rem 0 0 !important;
 }
 
 .campus-locate-control-btn {
-  width: 34px !important;
-  height: 34px !important;
-  line-height: 34px !important;
+  width: 2.4rem !important;
+  height: 2.4rem !important;
+  line-height: 2.4rem !important;
   display: flex !important;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  background: #FFFFFF;
-  color: #333;
+  background: var(--surface);
+  color: #5F6368;
   cursor: pointer;
   text-decoration: none;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 6px rgba(18, 59, 93, 0.2), 0 1px 3px rgba(18, 59, 93, 0.14);
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 .campus-locate-control-btn:hover {
-  background: #f4f4f4;
+  background: #F1F5F9;
+  transform: scale(1.05);
+}
+
+/* While waiting on the GPS fix — the crosshair itself blinks, same as
+   the pulsing dot Google Maps shows while it's still locating you. */
+.campus-locate-control-btn--loading svg {
+  animation: campus-locate-blink 1s ease-in-out infinite;
+}
+
+@keyframes campus-locate-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
 }
 
 /* Active/live-tracking state — Google Maps style highlighted pin.
@@ -354,7 +453,7 @@
 .campus-location-banner {
   position: absolute;
   left: 50%;
-  bottom: 0.75rem;
+  top: 0.75rem;
   transform: translateX(-50%);
   z-index: 650;
   max-width: min(92%, 480px);
@@ -382,6 +481,32 @@
 
 .campus-location-banner strong {
   color: var(--primary);
+}
+
+/* Brief "Location turned on/off" pill — bottom-center, away from the
+   top status banner, and fades itself out on its own. */
+.campus-locate-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 0.9rem;
+  transform: translateX(-50%);
+  z-index: 650;
+  background: rgba(18, 59, 93, 0.92);
+  color: #FFFFFF;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(18, 59, 93, 0.28);
+  animation: campus-toast-fade 2.5s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes campus-toast-fade {
+  0% { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .campus-banner-actions {

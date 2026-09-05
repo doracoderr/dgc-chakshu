@@ -24,6 +24,7 @@ import {
   FaPhone,
   FaCheckCircle,
   FaClock,
+  FaUsers,
 } from 'react-icons/fa';
 
 import api from '../api/axios';
@@ -2680,6 +2681,24 @@ function EntityCard({
 
                   <small>
                     Floor
+                  </small>
+                </div>
+              </div>
+            )}
+
+            {item.capacity != null && (
+              <div className="block-meta-item">
+                <span>
+                  <FaUsers />
+                </span>
+
+                <div>
+                  <strong>
+                    {item.capacity}
+                  </strong>
+
+                  <small>
+                    Capacity
                   </small>
                 </div>
               </div>
