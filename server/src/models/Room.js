@@ -10,6 +10,7 @@ const roomSchema = new mongoose.Schema(
       type: String,
       default: 'classroom'
     },
+    capacity: { type: Number },
     departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
     coverImage: { type: String },
     photos: [{ type: String }],
@@ -23,4 +24,3 @@ const roomSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('Room', roomSchema);
-
