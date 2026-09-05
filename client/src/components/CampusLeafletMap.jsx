@@ -206,6 +206,18 @@ function userLocationIcon() {
   });
 }
 
+// Google Maps' own locate icon: an outer ring with a filled center dot
+// and four short tick marks — instantly recognisable as the "locate me"
+// crosshair. Rendered as SVG (not emoji) so it can be recoloured and
+// animated cleanly for the loading/active states.
+const LOCATE_ICON_SVG = `
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2"/>
+    <circle class="campus-locate-icon-dot" cx="12" cy="12" r="2.5" fill="currentColor"/>
+  </svg>
+`;
+
 // A small Leaflet control button, placed in the same corner stack as the
 // zoom +/- buttons (like the "locate me" icon next to zoom controls on
 // Google Maps).
@@ -216,7 +228,7 @@ const LocateControl = L.Control.extend({
     const btn = L.DomUtil.create('a', 'campus-locate-control-btn', container);
     btn.href = '#';
     btn.title = 'Show my current location';
-    btn.innerHTML = '📍';
+    btn.innerHTML = LOCATE_ICON_SVG;
     L.DomEvent.disableClickPropagation(container);
     L.DomEvent.on(btn, 'click', (e) => {
       L.DomEvent.preventDefault(e);
@@ -226,14 +238,15 @@ const LocateControl = L.Control.extend({
     this._btn = btn;
     return container;
   },
+  // While Leaflet is waiting on the GPS fix, the crosshair itself pulses
+  // (Google Maps blinks its dot the same way while it's still locating).
   setLoading(isLoading) {
-    if (this._btn && !this._active) this._btn.innerHTML = isLoading ? '⏳' : '📍';
+    if (this._btn) L.DomUtil[isLoading ? 'addClass' : 'removeClass'](this._btn, 'campus-locate-control-btn--loading');
   },
   // Toggled on once live tracking starts (Google Maps-style filled/blue
   // state), and off again on a second click that turns tracking off.
   setActive(isActive) {
     this._active = isActive;
-    if (this._btn) this._btn.innerHTML = isActive ? '🔵' : '📍';
     if (this._container) {
       this._btn.title = isActive ? 'Stop sharing my location' : 'Show my current location';
       L.DomUtil[isActive ? 'addClass' : 'removeClass'](this._container, 'campus-locate-control--active');
@@ -250,6 +263,14 @@ export default function CampusLeafletMap() {
   const locateControlRef = useRef(null);
   const userPosRef = useRef(null);
   const watchIdRef = useRef(null);
+  // Mirror liveTracking/locating in refs too. The locate button's click
+  // handler is wired up once, inside the map's one-time setup effect, so
+  // it always closes over that very first render's handleLocate — reading
+  // the `liveTracking`/`locating` STATE there would forever see their
+  // initial (false) values and a second click would never be recognised
+  // as "turn it off". Refs are mutable and always read fresh instead.
+  const liveTrackingRef = useRef(false);
+  const locatingRef = useRef(false);
   const [liveTracking, setLiveTracking] = useState(false);
 
   const [entities, setEntities] = useState([]); // merged blocks + departments
@@ -262,6 +283,8 @@ export default function CampusLeafletMap() {
   const [routeStatus, setRouteStatus] = useState(null); // text shown once a route is drawn
   const [farNotice, setFarNotice] = useState(null); // { entity, distanceText } — shown instead of auto-routing
   const [pickerOpen, setPickerOpen] = useState(false); // "pick your building" list
+  const [locateToast, setLocateToast] = useState(null); // brief "Location turned on/off" message
+  const toastTimerRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const pendingDestRef = useRef(null);
@@ -433,26 +456,27 @@ export default function CampusLeafletMap() {
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // Ctrl/Cmd + scroll to zoom; plain scroll is left alone so it scrolls
-    // the page instead of getting trapped by the map.
+    // Ctrl/Cmd + scroll zooms the map. A plain scroll used to fall
+    // through and scroll the whole PAGE instead — but since the map
+    // fills exactly one screen, that made the page scroll away from the
+    // navbar/header and left just the (same) map filling the window,
+    // looking like it had gone "fullscreen". Plain scroll over the map
+    // is now a no-op instead, so the map always stays pinned at its own
+    // fixed size; scroll from outside the map to reach the footer.
     const mapContainerEl = mapElRef.current;
     const handleWheelZoom = (e) => {
-      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
+      if (!e.ctrlKey && !e.metaKey) return;
       const delta = e.deltaY < 0 ? 1 : -1;
       map.setZoom(map.getZoom() + delta, { animate: true });
     };
     mapContainerEl.addEventListener('wheel', handleWheelZoom, { passive: false });
 
     // Mobile: Leaflet's touch handling grabs ALL touch gestures on the
-    // map by default (touch-action: none), including a plain vertical
-    // swipe — so scrolling down never reaches the page/footer, it just
-    // pans (or pinch-zooms) the map instead. Restrict native touch
-    // handling to vertical panning so a one-finger vertical swipe
-    // scrolls the PAGE like normal; horizontal one-finger drag and
-    // two-finger pinch-zoom still work and are handled by Leaflet.
-    // Same "let the page scroll unless you're deliberately zooming/
-    // panning" convention as the wheel handling above.
+    // map by default (touch-action: none). We still want one-finger
+    // vertical swipe to scroll the page (not pan the map) so the footer
+    // stays reachable on touch devices; horizontal drag and two-finger
+    // pinch-zoom stay handled by Leaflet.
     mapContainerEl.style.touchAction = 'pan-y';
 
     const locateControl = new LocateControl({
@@ -461,11 +485,33 @@ export default function CampusLeafletMap() {
     locateControl.addTo(map);
     locateControlRef.current = locateControl;
 
+    // Plain OpenStreetMap tiles — free, no API key required, unlike
+    // CARTO's raster basemaps which now need a key even for light use.
+    // Visual clutter (nearby hospitals/clinics etc. baked into the
+    // tiles) is instead toned down with a CSS filter below, based on
+    // zoom, so our own building markers stay the clear focus at the
+    // default zoom without depending on a third-party tile style.
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: MAX_ZOOM,
       maxNativeZoom: TILE_MAX_NATIVE_ZOOM,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
+
+    // Fade the base tiles' own labels/icons (hospitals, clinics, shops,
+    // etc.) at the default zoom so they don't compete with our building
+    // markers, then progressively bring them back to full clarity as
+    // the user zooms in — the same "more detail as you zoom" feel as
+    // Google Maps, without needing a different tile provider.
+    const tilePane = map.getPane('tilePane');
+    const updateTileDeclutter = () => {
+      if (!tilePane) return;
+      const z = map.getZoom();
+      tilePane.classList.remove('map-declutter-heavy', 'map-declutter-medium');
+      if (z <= MIN_ZOOM + 1) tilePane.classList.add('map-declutter-heavy');
+      else if (z <= MIN_ZOOM + 3) tilePane.classList.add('map-declutter-medium');
+    };
+    updateTileDeclutter();
+    map.on('zoomend', updateTileDeclutter);
 
     // Dev helper: click anywhere on the map to print its lat/lng in the
     // browser console — used to plot the points for src/data/campusPaths.js.
@@ -509,6 +555,8 @@ export default function CampusLeafletMap() {
     return () => {
       window.removeEventListener('resize', handleResize);
       mapContainerEl.removeEventListener('wheel', handleWheelZoom);
+      map.off('zoomend', updateTileDeclutter);
+      clearTimeout(toastTimerRef.current);
       if (watchIdRef.current != null) navigator.geolocation.clearWatch(watchIdRef.current);
       map.remove();
       mapRef.current = null;
@@ -516,9 +564,16 @@ export default function CampusLeafletMap() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Brief "Location turned on/off" pill, auto-dismissing on its own.
+  const showLocateToast = (msg) => {
+    clearTimeout(toastTimerRef.current);
+    setLocateToast(msg);
+    toastTimerRef.current = setTimeout(() => setLocateToast(null), 2500);
+  };
+
   // Turns off live tracking (Google Maps-style second click on the pin):
   // stops watching GPS, removes the blue dot, and resets the button.
-  const stopLiveTracking = () => {
+  const stopLiveTracking = ({ notify = false } = {}) => {
     if (watchIdRef.current != null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
@@ -528,13 +583,17 @@ export default function CampusLeafletMap() {
       map.removeLayer(userMarkerRef.current);
       userMarkerRef.current = null;
     }
+    liveTrackingRef.current = false;
+    locatingRef.current = false;
     setLiveTracking(false);
     setLocating(false);
     setUserPos(null);
     userPosRef.current = null;
     setLocationNote(null);
     setNearest(null);
+    locateControlRef.current?.setLoading(false);
     locateControlRef.current?.setActive(false);
+    if (notify) showLocateToast('📍 Location turned off');
   };
 
   // "My location" — like Google Maps: first click asks for GPS, drops a
@@ -548,12 +607,16 @@ export default function CampusLeafletMap() {
       return;
     }
 
-    if (liveTracking) {
-      stopLiveTracking();
+    // Second click while already tracking (or still waiting on the very
+    // first fix) turns it back off — same "tap again to stop" toggle as
+    // Google Maps' locate button.
+    if (liveTrackingRef.current || locatingRef.current) {
+      stopLiveTracking({ notify: true });
       return;
     }
 
     setLocating(true);
+    locatingRef.current = true;
     locateControlRef.current?.setLoading(true);
     let gotFirstFix = false;
 
@@ -564,7 +627,9 @@ export default function CampusLeafletMap() {
         setUserPos(coords);
         userPosRef.current = coords;
         setLocating(false);
+        locatingRef.current = false;
         setLiveTracking(true);
+        liveTrackingRef.current = true;
         locateControlRef.current?.setLoading(false);
         locateControlRef.current?.setActive(true);
 
@@ -590,18 +655,22 @@ export default function CampusLeafletMap() {
         // Far from campus? Just say so, simply.
         const distFromCampus = distanceKm(coords, { lat: CAMPUS_CENTER[0], lng: CAMPUS_CENTER[1] });
         if (distFromCampus > FAR_AWAY_KM) {
-          setLocationNote(`You're about ${formatDistance(distFromCampus)} away from DGC campus.`);
+          setLocationNote(
+            `📍 You're ${formatDistance(distFromCampus)} away from DGC campus. Come within 500 m of the college and I'll be able to guide you in! 🚶`
+          );
         } else {
           setLocationNote(null);
         }
 
         if (!gotFirstFix) {
           gotFirstFix = true;
+          showLocateToast('📍 Location turned on');
           onDone?.();
         }
       },
       () => {
         setLocating(false);
+        locatingRef.current = false;
         locateControlRef.current?.setLoading(false);
         stopLiveTracking();
         setError('Could not get your location. Please allow location access and try again.');
@@ -632,6 +701,13 @@ export default function CampusLeafletMap() {
     setNearest(best);
   }, [userPos, entities]);
 
+  // From this zoom level onward, landmarks/facilities/amenities and
+  // department markers join the buildings on the map — below it, only
+  // the campus buildings/blocks themselves show, the same "buildings
+  // first, everything else after a little zoom" layering Google Maps
+  // uses.
+  const DETAIL_ZOOM = MIN_ZOOM + 1;
+
   // Plot markers whenever the entity list changes
   useEffect(() => {
     const map = mapRef.current;
@@ -642,9 +718,15 @@ export default function CampusLeafletMap() {
     );
 
     const markers = withLocation.map((entity) => {
+      // Only an actual building/block counts as "primary" — landmarks,
+      // facilities, amenities, and departments are all secondary detail
+      // that only shows up once the user has zoomed in a bit.
+      const isPrimary = entity.type === 'block' && (!entity.category || entity.category === 'building');
+
       const marker = L.marker([entity.location.lat, entity.location.lng], {
         icon: thumbnailIcon(entity.photoUrl),
-      }).addTo(map);
+      });
+      marker._isPrimary = isPrimary;
 
       const card = popupCard(entity);
 
@@ -738,6 +820,21 @@ export default function CampusLeafletMap() {
 
     markersRef.current = markers;
 
+    // Buildings/blocks are always on the map; everything else (the
+    // secondary layer) is added/removed together based on zoom.
+    const primaryMarkers = markers.filter((m) => m._isPrimary);
+    const secondaryMarkers = markers.filter((m) => !m._isPrimary);
+    primaryMarkers.forEach((m) => m.addTo(map));
+    const secondaryLayer = L.layerGroup(secondaryMarkers);
+
+    const updateMarkerTiers = () => {
+      const detailed = map.getZoom() >= DETAIL_ZOOM;
+      if (detailed && !map.hasLayer(secondaryLayer)) secondaryLayer.addTo(map);
+      else if (!detailed && map.hasLayer(secondaryLayer)) map.removeLayer(secondaryLayer);
+    };
+    updateMarkerTiers();
+    map.on('zoomend', updateMarkerTiers);
+
     if (withLocation.length === 1) {
       map.setView([withLocation[0].location.lat, withLocation[0].location.lng], MAX_ZOOM - 2);
     } else if (withLocation.length > 1) {
@@ -746,6 +843,8 @@ export default function CampusLeafletMap() {
     }
 
     return () => {
+      map.off('zoomend', updateMarkerTiers);
+      map.removeLayer(secondaryLayer);
       markers.forEach((m) => map.removeLayer(m));
       markersRef.current = [];
     };
@@ -806,7 +905,10 @@ export default function CampusLeafletMap() {
 
         {farNotice && (
           <div className="campus-location-banner">
-            <span>📍 You're about {farNotice.distanceText} away from DGC campus.</span>
+            <span>
+              🚶 You're {farNotice.distanceText} from DGC campus — get within 500 m of the college for me to
+              chart walking directions, or try one of these instead:
+            </span>
             <div className="campus-banner-actions">
               <button type="button" onClick={useLiveLocationAnyway}>
                 Use my live location
@@ -852,14 +954,9 @@ export default function CampusLeafletMap() {
           </div>
         )}
 
-        {!farNotice && !pickerOpen && !routeStatus && (locationNote || nearest) && (
+        {!farNotice && !pickerOpen && !routeStatus && locationNote && (
           <div className="campus-location-banner">
-            {locationNote && <span>📍 {locationNote}</span>}
-            {nearest && (
-              <span>
-                🏫 Nearest to you: <strong>{nearest.entity.name}</strong> ({formatDistance(nearest.km)})
-              </span>
-            )}
+            <span>{locationNote}</span>
             <button
               type="button"
               className="campus-banner-close"
@@ -872,6 +969,8 @@ export default function CampusLeafletMap() {
             </button>
           </div>
         )}
+
+        {locateToast && <div className="campus-locate-toast">{locateToast}</div>}
       </div>
     </div>
   );

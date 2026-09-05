@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { FaMapMarkedAlt, FaRegImage } from 'react-icons/fa';
 import '../styles/map.css';
 import CampusLeafletMap from '../components/CampusLeafletMap';
 
@@ -190,14 +191,16 @@ function Map() {
             className={`map-toggle-btn ${view === 'interactive' ? 'active' : ''}`}
             onClick={() => setView('interactive')}
           >
-            📍 Interactive Map
+            <FaMapMarkedAlt />
+            Interactive Map
           </button>
           <button
             type="button"
             className={`map-toggle-btn ${view === 'image' ? 'active' : ''}`}
             onClick={() => setView('image')}
           >
-            🗺️ Campus Layout Image
+            <FaRegImage />
+            Campus Layout Image
           </button>
         </div>
       </div>
