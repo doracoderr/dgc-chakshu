@@ -875,6 +875,10 @@ main {
   border-radius: 10px;
   min-height: 80px;
   transition: background 0.15s ease;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
 }
 
 .faculty-preview-more:hover {

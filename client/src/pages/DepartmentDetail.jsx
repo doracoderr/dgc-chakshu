@@ -21,6 +21,7 @@ export default function DepartmentDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lightboxSrc, setLightboxSrc] = useState(null);
+  const [showAllFaculty, setShowAllFaculty] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -63,7 +64,7 @@ export default function DepartmentDetail() {
   // otherwise fall back to routing to its block.
   const directionsTargetId = department.location?.lat != null ? department._id : department.blockId?._id;
 
-  const facultyPreview = faculty.slice(0, FACULTY_PREVIEW_LIMIT);
+  const facultyPreview = showAllFaculty ? faculty : faculty.slice(0, FACULTY_PREVIEW_LIMIT);
   const hasMoreFaculty = faculty.length > FACULTY_PREVIEW_LIMIT;
 
   return (
@@ -168,12 +169,27 @@ export default function DepartmentDetail() {
               />
             ))}
 
-            {hasMoreFaculty && (
-              <Link to="/faculty" className="faculty-preview-more">
+            {hasMoreFaculty && !showAllFaculty && (
+              <button
+                type="button"
+                className="faculty-preview-more"
+                onClick={() => setShowAllFaculty(true)}
+              >
                 +{faculty.length - FACULTY_PREVIEW_LIMIT} more →
-              </Link>
+              </button>
             )}
           </div>
+
+          {hasMoreFaculty && showAllFaculty && (
+            <button
+              type="button"
+              className="faculty-preview-more"
+              style={{ marginTop: 12 }}
+              onClick={() => setShowAllFaculty(false)}
+            >
+              Show less ↑
+            </button>
+          )}
         </div>
       )}
 
