@@ -185,24 +185,6 @@ function Map() {
       {/* Header */}
       <div className="map-header">
         <h1>DGC Campus Map</h1>
-        <div className="map-view-toggle">
-          <button
-            type="button"
-            className={`map-toggle-btn ${view === 'interactive' ? 'active' : ''}`}
-            onClick={() => setView('interactive')}
-          >
-            <FaMapMarkedAlt />
-            Interactive Map
-          </button>
-          <button
-            type="button"
-            className={`map-toggle-btn ${view === 'image' ? 'active' : ''}`}
-            onClick={() => setView('image')}
-          >
-            <FaRegImage />
-            Campus Layout Image
-          </button>
-        </div>
       </div>
 
       {view === 'interactive' ? (
@@ -297,6 +279,26 @@ function Map() {
         </div>
       </div>
       )}
+
+      {/* Toggle — moved below the map itself */}
+      <div className="map-view-toggle map-view-toggle--bottom">
+        <button
+          type="button"
+          className={`map-toggle-btn ${view === 'interactive' ? 'active' : ''}`}
+          onClick={() => setView('interactive')}
+        >
+          <FaMapMarkedAlt />
+          Interactive Map
+        </button>
+        <button
+          type="button"
+          className={`map-toggle-btn ${view === 'image' ? 'active' : ''}`}
+          onClick={() => setView('image')}
+        >
+          <FaRegImage />
+          Campus Layout Image
+        </button>
+      </div>
     </div>
   );
 }
