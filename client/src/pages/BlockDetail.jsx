@@ -209,6 +209,17 @@ export default function BlockDetail() {
         <ShareButton title={block.name} />
       </div>
 
+      {block.coverImage && (
+        <div className="landmark-detail-media" style={{ marginBottom: '1.2rem' }}>
+          <img
+            src={block.coverImage}
+            alt={block.name}
+            className="zoomable-image"
+            onClick={() => setLightboxSrc(block.coverImage)}
+          />
+        </div>
+      )}
+
       <h1>{block.name}</h1>
       {block.description && <p className="subtitle">{block.description}</p>}
 
@@ -278,6 +289,8 @@ export default function BlockDetail() {
       <p className="admin-hint blueprint-note">
         This layout is auto-generated from room data and isn't to scale. A real floor plan will replace it once available.
       </p>
+
+      <Lightbox src={lightboxSrc} alt={block.name} onClose={() => setLightboxSrc(null)} />
     </div>
   );
 }
