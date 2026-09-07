@@ -222,7 +222,7 @@ const LOCATE_ICON_SVG = `
 // zoom +/- buttons (like the "locate me" icon next to zoom controls on
 // Google Maps).
 const LocateControl = L.Control.extend({
-  options: { position: 'topright' },
+  options: { position: 'bottomright' },
   onAdd() {
     const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control campus-locate-control');
     const btn = L.DomUtil.create('a', 'campus-locate-control-btn', container);
@@ -327,7 +327,7 @@ export default function CampusLeafletMap() {
         }));
         setEntities([...blocks, ...departments]);
       })
-      .catch((err) => setError(`Could not load buildings: ${err.message}`))
+      .catch(() => setError("Couldn't load the campus map right now — check your connection and try refreshing."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -373,7 +373,7 @@ export default function CampusLeafletMap() {
     const mins = Math.max(1, Math.round((totalKm / WALK_KMPH) * 60));
 
     setRouteStatus(
-      `🚶 ${originLabel ? `From ${originLabel} — ` : ''}${formatDistance(totalKm)} • ~${mins} min walk to ${destEntity.name}`
+      `🚶 ${originLabel ? `From ${originLabel}, it's` : "It's"} ${formatDistance(totalKm)} • about ${mins} min on foot to ${destEntity.name}`
     );
   };
 
@@ -399,7 +399,7 @@ export default function CampusLeafletMap() {
 
     const proceed = (pos) => {
       if (!pos) {
-        setRouteStatus('Could not get your location for directions.');
+        setRouteStatus("Couldn't get your location — please allow location access and try again.");
         return;
       }
       const distKm = distanceKm(pos, { lat: CAMPUS_CENTER[0], lng: CAMPUS_CENTER[1] });
@@ -414,16 +414,9 @@ export default function CampusLeafletMap() {
     if (userPosRef.current) {
       proceed(userPosRef.current);
     } else {
-      setRouteStatus('📍 Getting your location…');
+      setRouteStatus('📍 Hang tight, finding you on the map…');
       handleLocate(() => proceed(userPosRef.current));
     }
-  };
-
-  // "Use my live location anyway" choice on the far-away notice.
-  const useLiveLocationAnyway = () => {
-    const entity = farNotice?.entity || pendingDestRef.current;
-    setFarNotice(null);
-    if (entity && userPosRef.current) routeBetween(userPosRef.current, entity);
   };
 
   // "Pick a building instead" choice — shows a simple list of available
@@ -454,7 +447,7 @@ export default function CampusLeafletMap() {
       zoomControl: false,
     });
 
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     // Ctrl/Cmd + scroll zooms the map. A plain scroll used to fall
     // through and scroll the whole PAGE instead — but since the map
@@ -593,7 +586,7 @@ export default function CampusLeafletMap() {
     setNearest(null);
     locateControlRef.current?.setLoading(false);
     locateControlRef.current?.setActive(false);
-    if (notify) showLocateToast('📍 Location turned off');
+    if (notify) showLocateToast("📍 Live location turned off");
   };
 
   // "My location" — like Google Maps: first click asks for GPS, drops a
@@ -603,7 +596,7 @@ export default function CampusLeafletMap() {
   // fix (used by the Directions button to chain straight into routing).
   const handleLocate = (onDone) => {
     if (!navigator.geolocation) {
-      setError('Location is not supported on this device/browser.');
+      setError('Your browser doesn\'t support location — try a different browser.');
       return;
     }
 
@@ -642,7 +635,7 @@ export default function CampusLeafletMap() {
               zIndexOffset: 1000,
             })
               .addTo(map)
-              .bindPopup('You are here');
+              .bindPopup('📍 You are here!');
           }
           // Only recenter on the very first fix — later updates just
           // move the dot, so panning/zooming while tracking isn't
@@ -656,7 +649,7 @@ export default function CampusLeafletMap() {
         const distFromCampus = distanceKm(coords, { lat: CAMPUS_CENTER[0], lng: CAMPUS_CENTER[1] });
         if (distFromCampus > FAR_AWAY_KM) {
           setLocationNote(
-            `📍 You're ${formatDistance(distFromCampus)} away from DGC campus. Come within 500 m of the college and I'll be able to guide you in! 🚶`
+            `📍 You're ${formatDistance(distFromCampus)} from DGC campus. Get within 500 m and I'll help guide you around! 🚶`
           );
         } else {
           setLocationNote(null);
@@ -664,7 +657,7 @@ export default function CampusLeafletMap() {
 
         if (!gotFirstFix) {
           gotFirstFix = true;
-          showLocateToast('📍 Location turned on');
+          showLocateToast('📍 Got you! Live location is on');
           onDone?.();
         }
       },
@@ -673,7 +666,7 @@ export default function CampusLeafletMap() {
         locatingRef.current = false;
         locateControlRef.current?.setLoading(false);
         stopLiveTracking();
-        setError('Could not get your location. Please allow location access and try again.');
+        setError("Couldn't find you — please allow location access and try again.");
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
     );
@@ -878,13 +871,6 @@ export default function CampusLeafletMap() {
 
   return (
     <div className="leaflet-map-wrapper">
-      <div className="campus-map-legend">
-        <span><span className="campus-marker-thumb-mini" /> Tap a building for details</span>
-        <span>🧭 Directions from any popup</span>
-        <span>📍 Tap the pin (top-right) for your live location</span>
-        <span>🖱️ Ctrl + scroll to zoom</span>
-      </div>
-
       {loading && <p className="map-info">Loading campus buildings…</p>}
       {error && (
         <div className="map-error-msg">
@@ -906,13 +892,10 @@ export default function CampusLeafletMap() {
         {farNotice && (
           <div className="campus-location-banner">
             <span>
-              🚶 You're {farNotice.distanceText} from DGC campus — get within 500 m of the college for me to
-              chart walking directions, or try one of these instead:
+              🚶 Looks like you're {farNotice.distanceText} from DGC campus — get within 500 m and I'll map out
+              the walk for you!
             </span>
             <div className="campus-banner-actions">
-              <button type="button" onClick={useLiveLocationAnyway}>
-                Use my live location
-              </button>
               <button type="button" onClick={() => setPickerOpen(true)}>
                 Pick my building instead
               </button>
@@ -926,7 +909,7 @@ export default function CampusLeafletMap() {
         {pickerOpen && (
           <div className="campus-building-picker">
             <div className="campus-building-picker-header">
-              <span>Which building are you starting from?</span>
+              <span>Where are you starting from? 🚶</span>
               <button type="button" onClick={() => setPickerOpen(false)}>
                 ✕
               </button>
@@ -948,8 +931,8 @@ export default function CampusLeafletMap() {
         {!farNotice && !pickerOpen && routeStatus && (
           <div className="campus-location-banner">
             <span>{routeStatus}</span>
-            <button type="button" className="campus-banner-close" onClick={clearRoute}>
-              ✕ Clear
+            <button type="button" className="campus-banner-close" onClick={clearRoute} title="Clear route" aria-label="Clear route">
+              ✕
             </button>
           </div>
         )}
@@ -971,6 +954,13 @@ export default function CampusLeafletMap() {
         )}
 
         {locateToast && <div className="campus-locate-toast">{locateToast}</div>}
+      </div>
+
+      <div className="campus-map-legend">
+        <span><span className="campus-marker-thumb-mini" /> Tap any building to explore it</span>
+        <span>🧭 Get directions from any popup</span>
+        <span>📍 Find yourself with the pin (bottom-right)</span>
+        <span>🖱️ Ctrl + scroll to zoom in/out</span>
       </div>
     </div>
   );
