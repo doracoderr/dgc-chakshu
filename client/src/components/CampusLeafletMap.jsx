@@ -11,14 +11,14 @@ const CAMPUS_BOUNDS = [
   [28.4658, 77.02255], // south-west
   [28.4685, 77.02500], // north-east
 ];
-// Noticeably larger box used only to limit panning — gives popups near the
-// north/south edge of campus (e.g. IGNOU Study Centre) enough slack to
-// auto-pan into view instead of jittering against a hard wall.
+// VERY LARGE pan bounds — gives popups near edges (IGNOU, Canteen, etc.)
+// MASSIVE slack to auto-pan into view completely without clipping.
+// These are max pan boundaries only — much larger than actual campus.
 const PAN_BOUNDS = [
-  [28.4645, 77.02120],
-  [28.4698, 77.02640],
+  [28.4600, 77.01950],
+  [28.4743, 77.02800],
 ];
-const MIN_ZOOM = 16; // one step further out by default than before
+const MIN_ZOOM = 15; // allow zooming out one more level for better overview
 const MAX_ZOOM = 20;
 // OpenStreetMap only actually has tiles up to this zoom around campus —
 // past it Leaflet just upscales the last real tile instead of showing a
@@ -254,6 +254,65 @@ const LocateControl = L.Control.extend({
   },
 });
 
+// Searchable building picker modal
+function BuildingPickerModal({ entities, onSelect, onClose, pendingDestId }) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filtered = entities.filter((e) => {
+    const hasLocation = e.location?.lat != null && e.location?.lng != null;
+    const notDestination = e.id !== pendingDestId;
+    const matchesSearch = e.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return hasLocation && notDestination && matchesSearch;
+  });
+
+  return (
+    <div className="campus-building-picker">
+      <div className="campus-building-picker-header">
+        <span>Where are you starting from? 🚶</span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="campus-picker-close-btn"
+          aria-label="Close picker"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="campus-picker-search">
+        <input
+          type="text"
+          placeholder="Search building..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="campus-picker-search-input"
+          autoFocus
+        />
+      </div>
+
+      <ul className="campus-picker-list">
+        {filtered.length > 0 ? (
+          filtered.map((e) => (
+            <li key={e.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(e)}
+                className="campus-picker-item"
+              >
+                {e.name}
+              </button>
+            </li>
+          ))
+        ) : (
+          <li className="campus-picker-empty">
+            <p>No buildings found</p>
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+}
+
 export default function CampusLeafletMap() {
   const mapElRef = useRef(null);
   const mapRef = useRef(null);
@@ -271,6 +330,13 @@ export default function CampusLeafletMap() {
   // as "turn it off". Refs are mutable and always read fresh instead.
   const liveTrackingRef = useRef(false);
   const locatingRef = useRef(false);
+  // Tracks whether the user manually dismissed the "you're far from
+  // campus" note. Without this, every fresh GPS fix from watchPosition
+  // (it keeps firing every few seconds while live tracking is on)
+  // re-ran the distance check and put the banner right back up even
+  // after the user had just closed it — making it look like the popup
+  // kept reopening on its own.
+  const locationNoteDismissedRef = useRef(false);
   const [liveTracking, setLiveTracking] = useState(false);
 
   const [entities, setEntities] = useState([]); // merged blocks + departments
@@ -386,6 +452,15 @@ export default function CampusLeafletMap() {
     setRouteStatus(null);
     setFarNotice(null);
     setPickerOpen(false);
+    // Also dismiss the plain "you're 2.3 km from campus" note. Without
+    // this, closing the route-status banner (which sits in the exact
+    // same spot) immediately revealed that banner underneath — since
+    // live GPS tracking was still on and the user was still far away —
+    // making it look like the popup "reopened on its own" right after
+    // being closed.
+    setLocationNote(null);
+    setNearest(null);
+    locationNoteDismissedRef.current = true;
   };
 
   // Directions button in a popup calls this. If the user is on/near
@@ -487,8 +562,24 @@ export default function CampusLeafletMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: MAX_ZOOM,
       maxNativeZoom: TILE_MAX_NATIVE_ZOOM,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: '<a href="https://www.openstreetmap.org/copyright" style="font-size: 11px;">© OpenStreetMap</a>',
     }).addTo(map);
+
+    // Style the attribution control to be very small and positioned at top-left
+    const attribControl = map.attributionControl;
+    if (attribControl) {
+      attribControl.setPosition('topleft');
+      const attribContainer = attribControl.getContainer();
+      if (attribContainer) {
+        attribContainer.style.fontSize = '9px';
+        attribContainer.style.padding = '1px 3px';
+        attribContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+        attribContainer.style.borderRadius = '3px';
+        attribContainer.style.marginTop = '5px';
+        attribContainer.style.marginLeft = '5px';
+        attribContainer.style.lineHeight = '1.2';
+      }
+    }
 
     // Fade the base tiles' own labels/icons (hospitals, clinics, shops,
     // etc.) at the default zoom so they don't compete with our building
@@ -584,6 +675,9 @@ export default function CampusLeafletMap() {
     userPosRef.current = null;
     setLocationNote(null);
     setNearest(null);
+    // Live tracking is fully stopping — reset so a future "locate me"
+    // session starts fresh and can show the far-away note again.
+    locationNoteDismissedRef.current = false;
     locateControlRef.current?.setLoading(false);
     locateControlRef.current?.setActive(false);
     if (notify) showLocateToast("📍 Live location turned off");
@@ -645,13 +739,19 @@ export default function CampusLeafletMap() {
           }
         }
 
-        // Far from campus? Just say so, simply.
+        // Far from campus? Just say so, simply — but only if the user
+        // hasn't already dismissed this note for the current "far"
+        // stretch. Coming back within range resets that, so walking
+        // away again later shows a fresh note.
         const distFromCampus = distanceKm(coords, { lat: CAMPUS_CENTER[0], lng: CAMPUS_CENTER[1] });
         if (distFromCampus > FAR_AWAY_KM) {
-          setLocationNote(
-            `📍 You're ${formatDistance(distFromCampus)} from DGC campus. Get within 500 m and I'll help guide you around! 🚶`
-          );
+          if (!locationNoteDismissedRef.current) {
+            setLocationNote(
+              `📍 You're ${formatDistance(distFromCampus)} from DGC campus. Get within 500 m and I'll help guide you around! 🚶`
+            );
+          }
         } else {
+          locationNoteDismissedRef.current = false;
           setLocationNote(null);
         }
 
@@ -727,12 +827,21 @@ export default function CampusLeafletMap() {
         navigate(entity.link);
       });
       card.querySelector('.campus-marker-directions').addEventListener('click', () => {
+        // Close this marker's popup first. Without this, the popup card
+        // stayed open at the same time as the "you're far from campus"
+        // banner (or the route-status banner) that requestDirections()
+        // can trigger — the two overlapped on screen, which looked like
+        // two separate messages stacked/scrolled on top of each other.
+        marker.closePopup();
         requestDirections(entity);
       });
 
       marker.bindPopup(card, {
         closeButton: true,
-        autoPan: false, // hovering must never move the map — that was the real cause of the flicker/ghosting
+        autoPan: true, // Enable auto-pan to center popup in view
+        autoPanPaddingTopLeft: [20, 120], // Padding from top-left (account for navbar)
+        autoPanPaddingBottomRight: [20, 20], // Padding from bottom-right
+        autoPanSpeed: 10, // Smooth animation
       });
 
       // Only one popup open at a time — closes any others so clustered
@@ -756,47 +865,33 @@ export default function CampusLeafletMap() {
         marker.openPopup();
       };
 
-      // Popups can render partly outside the visible map area — off the
-      // top at any zoom, or off any other edge too — and get clipped.
-      // On a deliberate click we nudge the view by exactly however much
-      // is hidden, on whichever edges are affected, so the whole card
-      // (image included) always ends up fully visible. Never runs on
-      // hover, so hovering between markers stays flicker-free.
+      // Leaflet's native autoPan handles most cases, but we add extra
+      // reveal logic for edge cases and image loading scenarios.
+      // This works WITH autoPan (not against it).
       const revealPopup = () => {
         const popup = marker.getPopup();
-        const popupEl = popup?.isOpen() ? popup.getElement() : null;
-        if (!popupEl) return;
-        const margin = 14;
-        const mapRect = map.getContainer().getBoundingClientRect();
-        const popupRect = popupEl.getBoundingClientRect();
+        if (!popup?.isOpen()) return;
 
-        let panX = 0;
-        let panY = 0;
-        const overflowTop = mapRect.top - popupRect.top;
-        const overflowBottom = popupRect.bottom - mapRect.bottom;
-        const overflowLeft = mapRect.left - popupRect.left;
-        const overflowRight = popupRect.right - mapRect.right;
-
-        if (overflowTop > 0) panY = -(overflowTop + margin);
-        else if (overflowBottom > 0) panY = overflowBottom + margin;
-
-        if (overflowLeft > 0) panX = -(overflowLeft + margin);
-        else if (overflowRight > 0) panX = overflowRight + margin;
-
-        if (panX !== 0 || panY !== 0) {
-          map.panBy([panX, panY], { animate: true });
-        }
+        // Trigger Leaflet's internal autoPan again if needed
+        // This ensures popup stays centered even after image loads
+        popup._adjustPan?.();
       };
 
       const openAndReveal = () => {
         openThisOne();
-        requestAnimationFrame(revealPopup);
-        // The popup's photo loads asynchronously and grows the card
-        // afterwards — re-check once it's in so a late-loading image
-        // can't push the top back out of view.
+
+        // Let Leaflet's autoPan do its work first
+        // Then trigger re-adjustment after image loads
         const img = card.querySelector('.campus-popup-img');
         if (img && !img.complete) {
-          img.addEventListener('load', revealPopup, { once: true });
+          // Image is loading — wait for it then adjust pan
+          img.addEventListener('load', () => {
+            // Force Leaflet to re-check popup position after image loads
+            setTimeout(() => revealPopup(), 150);
+          }, { once: true });
+        } else {
+          // No image or already loaded — make sure popup is visible
+          setTimeout(() => revealPopup(), 100);
         }
       };
 
@@ -889,8 +984,26 @@ export default function CampusLeafletMap() {
       <div className="leaflet-map-container-outer">
         <div ref={mapElRef} className="leaflet-map-container" />
 
-        {farNotice && (
+        {/* FIX: only show the "far away" banner when the picker isn't
+            open — previously both rendered at the same time and stacked
+            on top of each other, which is what made the banner's own X
+            button appear to float in the middle of the picker list. */}
+        {farNotice && !pickerOpen && (
           <div className="campus-location-banner">
+            {/* Close button is now a DIRECT child of the banner (not
+                nested inside .campus-banner-actions) so it picks up the
+                same top-right absolute-positioned "X" as every other
+                banner, instead of rendering as a full-width stacked
+                pill button next to "Pick my building instead". */}
+            <button
+              type="button"
+              className="campus-banner-close"
+              onClick={clearRoute}
+              title="Dismiss"
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
             <span>
               🚶 Looks like you're {farNotice.distanceText} from DGC campus — get within 500 m and I'll map out
               the walk for you!
@@ -899,33 +1012,17 @@ export default function CampusLeafletMap() {
               <button type="button" onClick={() => setPickerOpen(true)}>
                 Pick my building instead
               </button>
-              <button type="button" className="campus-banner-close" onClick={clearRoute}>
-                ✕
-              </button>
             </div>
           </div>
         )}
 
         {pickerOpen && (
-          <div className="campus-building-picker">
-            <div className="campus-building-picker-header">
-              <span>Where are you starting from? 🚶</span>
-              <button type="button" onClick={() => setPickerOpen(false)}>
-                ✕
-              </button>
-            </div>
-            <ul>
-              {entities
-                .filter((e) => e.location?.lat != null && e.location?.lng != null && e.id !== pendingDestRef.current?.id)
-                .map((e) => (
-                  <li key={e.id}>
-                    <button type="button" onClick={() => pickBuildingAsStart(e)}>
-                      {e.name}
-                    </button>
-                  </li>
-                ))}
-            </ul>
-          </div>
+          <BuildingPickerModal
+            entities={entities}
+            onSelect={pickBuildingAsStart}
+            onClose={() => setPickerOpen(false)}
+            pendingDestId={pendingDestRef.current?.id}
+          />
         )}
 
         {!farNotice && !pickerOpen && routeStatus && (
@@ -946,6 +1043,7 @@ export default function CampusLeafletMap() {
               onClick={() => {
                 setLocationNote(null);
                 setNearest(null);
+                locationNoteDismissedRef.current = true;
               }}
             >
               ✕
