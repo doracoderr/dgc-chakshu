@@ -30,6 +30,8 @@ export default function FacultyDirectory() {
   const [viewMode, setViewMode] = useState('grid');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [previewImage, setPreviewImage] = useState(null);
+
   /* ============================================================
      LOAD FACULTY
      ============================================================ */
@@ -85,6 +87,26 @@ export default function FacultyDirectory() {
   const getImage = (member) => {
     return member.photo || member.coverImage || '';
   };
+
+  /* ============================================================
+     IMAGE PREVIEW (click to enlarge)
+     ============================================================ */
+
+  useEffect(() => {
+    if (!previewImage) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setPreviewImage(null);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [previewImage]);
 
   /* ============================================================
      FILTER + SORT
@@ -209,7 +231,7 @@ export default function FacultyDirectory() {
           HEADER
          ====================================================== */}
 
-      <div className="faculty-directory-header">
+        <div className="faculty-directory-header">
         <div className="faculty-directory-title">
           <div className="faculty-directory-title-icon">
             <FaChalkboardTeacher />
@@ -222,6 +244,17 @@ export default function FacultyDirectory() {
 
             <p>
               Explore all faculty members across the campus.
+            </p>
+
+            <p className="faculty-directory-source">
+              Source:{' '}
+              <a
+                href="http://dgcgurugram.ac.in/Faculty"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                DGC Gurugram
+              </a>
             </p>
           </div>
         </div>
@@ -242,6 +275,7 @@ export default function FacultyDirectory() {
           </div>
         </div>
       </div>
+
 
       {/* ======================================================
           TOOLBAR
@@ -370,7 +404,22 @@ export default function FacultyDirectory() {
               >
                 {/* IMAGE */}
 
-                <div className="faculty-directory-card-image">
+                <div
+                  className={
+                    getImage(member)
+                      ? 'faculty-directory-card-image is-clickable'
+                      : 'faculty-directory-card-image'
+                  }
+                  onClick={
+                    getImage(member)
+                      ? () =>
+                          setPreviewImage({
+                            src: getImage(member),
+                            name: member.name || 'Faculty',
+                          })
+                      : undefined
+                  }
+                >
                   {getImage(member) ? (
                     <img
                       src={getImage(member)}
@@ -380,6 +429,7 @@ export default function FacultyDirectory() {
                   ) : (
                     <div className="faculty-directory-image-placeholder">
                       <FaUserTie />
+                      <span>Image not available</span>
                     </div>
                   )}
                 </div>
@@ -502,6 +552,40 @@ export default function FacultyDirectory() {
           of{' '}
           {filteredFaculty.length}{' '}
           faculty members
+        </div>
+      )}
+
+      {/* ======================================================
+          IMAGE PREVIEW MODAL
+         ====================================================== */}
+
+      {previewImage && (
+        <div
+          className="faculty-directory-preview-overlay"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="faculty-directory-preview-box"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="faculty-directory-preview-close"
+              onClick={() => setPreviewImage(null)}
+              aria-label="Close preview"
+            >
+              <FaTimes />
+            </button>
+
+            <img
+              src={previewImage.src}
+              alt={previewImage.name}
+            />
+
+            <div className="faculty-directory-preview-name">
+              {previewImage.name}
+            </div>
+          </div>
         </div>
       )}
     </div>
