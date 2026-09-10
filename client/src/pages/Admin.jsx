@@ -1521,7 +1521,7 @@ function RoomForm({
         name: form.name,
 
         roomNumber:
-          form.roomNumber,
+          form.roomNumber.trim(),
 
         type:
           form.type === 'other'
@@ -1629,13 +1629,12 @@ function RoomForm({
       <div className="admin-field-row">
         <div className="admin-field">
           <label>
-            Room Number <span>*</span>
+            Room Number
           </label>
 
           <input
             type="text"
-            placeholder="e.g. 101"
-            required
+            placeholder="e.g. 101 (optional)"
             value={
               form.roomNumber
             }
