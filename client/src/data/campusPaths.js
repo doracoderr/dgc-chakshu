@@ -32,58 +32,68 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 // { nodeId: { lat, lng } }
-// Filled in from roads drawn on geojson.io, snapped to the nearest
-// building each one sits next to (see the comment on each node).
+// All nodes below come from live GPS walk recordings (2026-09-10) — the
+// previous hand-estimated node set has been removed at the user's request,
+// so only actually-walked roads are on the map for now.
 export const PATH_NODES = {
-  apj_gate: { lat: 28.466656, lng: 77.023532 }, // right outside A.P.J. Kalam Block
-  apj_polsci_bend: { lat: 28.466600, lng: 77.023560 }, // bend so this hop doesn't cut straight through the block between them
-  polsci_gate: { lat: 28.466563, lng: 77.023495 }, // outside Dept. of Political Science
-  csdept_gate: { lat: 28.466659, lng: 77.023298 }, // outside Dept. of Computer Science
-  rkhall_junction: { lat: 28.466431, lng: 77.023117 }, // near R.K. Hall
-  arts_junction: { lat: 28.466385, lng: 77.023191 }, // near Arts Block
-  lib_polsci_junction: { lat: 28.466420, lng: 77.023403 }, // path bend between Library and Pol. Sci.
-  lib_north: { lat: 28.466315, lng: 77.023317 }, // right outside the Library
-  engdept_gate: { lat: 28.466475, lng: 77.023054 }, // near Dept. of English
+  // "Old sci to main gate" walk, simplified from 73 recorded points:
+  old_sci_walk_1: { lat: 28.466423, lng: 77.024048 }, // walk start, east side near CS dept block
+  old_sci_walk_2: { lat: 28.466819, lng: 77.024281 },
+  old_sci_walk_3: { lat: 28.467164, lng: 77.024669 },
+  old_sci_walk_4: { lat: 28.467697, lng: 77.024817 },
+  old_sci_walk_5: { lat: 28.468218, lng: 77.024561 },
+  old_sci_walk_6: { lat: 28.468397, lng: 77.024625 },
+  old_sci_block_junction: { lat: 28.468691, lng: 77.024870 }, // near Old Science Block/IGNOU — shared endpoint with "Clg main roads" walk below (recorded ~9m apart, treated as the same junction)
 
-  // TODO: add more nodes here once the rest of campus (IGNOU, Old Science
-  // Block, Principal Office, Tagore Auditorium, Chanakya Block, hostels,
-  // parking, entry gate, etc.) is drawn.
+  // "Clg main roads" walk, simplified from 75 recorded points, continues
+  // from old_sci_block_junction back down toward the library side:
+  clg_main_walk_1: { lat: 28.468256, lng: 77.024644 },
+  clg_main_walk_2: { lat: 28.466826, lng: 77.024079 },
+  clg_main_walk_3: { lat: 28.466583, lng: 77.023894 },
+  clg_main_walk_end: { lat: 28.466643, lng: 77.023557 }, // west end of this walk, near the library/back side
+
+  // "Rk hall front" walk, simplified from 15 recorded points:
+  rkhall_front_start: { lat: 28.466557, lng: 77.023004 }, // in front of R.K. Hall
+  rkhall_front_mid: { lat: 28.466492, lng: 77.023002 },
+  rkhall_front_end: { lat: 28.466333, lng: 77.023305 }, // far end of the R.K. Hall front walk
+
+  // TODO: add more nodes here as more roads get walked and sent over.
 };
 
 // [ [nodeIdA, nodeIdB], ... ] — each pair is a walkable segment between
 // two nodes above.
 export const PATH_EDGES = [
-  ['apj_gate', 'apj_polsci_bend'],
-  ['apj_polsci_bend', 'polsci_gate'],
-  ['polsci_gate', 'lib_polsci_junction'],
-  ['lib_polsci_junction', 'lib_north'],
-  ['lib_north', 'arts_junction'],
-  ['arts_junction', 'rkhall_junction'],
-  ['rkhall_junction', 'engdept_gate'],
-  ['polsci_gate', 'csdept_gate'],
+  ['old_sci_walk_1', 'old_sci_walk_2'],
+  ['old_sci_walk_2', 'old_sci_walk_3'],
+  ['old_sci_walk_3', 'old_sci_walk_4'],
+  ['old_sci_walk_4', 'old_sci_walk_5'],
+  ['old_sci_walk_5', 'old_sci_walk_6'],
+  ['old_sci_walk_6', 'old_sci_block_junction'],
+  ['old_sci_block_junction', 'clg_main_walk_1'],
+  ['clg_main_walk_1', 'clg_main_walk_2'],
+  ['clg_main_walk_2', 'clg_main_walk_3'],
+  ['clg_main_walk_3', 'clg_main_walk_end'],
+  ['rkhall_front_start', 'rkhall_front_mid'],
+  ['rkhall_front_mid', 'rkhall_front_end'],
 
-  // NOTE: rkhall_junction <-> csdept_gate is intentionally NOT connected
-  // directly — that's just the narrow back gap behind the Library, not the
-  // real walking route. Going from CS Dept towards R.K. Hall/English Dept
-  // now correctly goes the long way round, past the Library's front
-  // (polsci_gate -> lib_polsci_junction -> lib_north -> arts_junction).
+  // NOTE: these three walked roads are not yet connected to each other —
+  // there's no recorded GPS path linking "Rk hall front" to the other two,
+  // so no edge is drawn between them (no guessed straight-line bridges).
 
-  // TODO: more edges as more roads are drawn.
+  // TODO: more edges as more roads are walked and sent over.
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
 // ⚠️ ACCURACY NOTE
 // ─────────────────────────────────────────────────────────────────────────
-// The node coordinates above are ESTIMATED from the building photos' GPS
-// tags, nudged by hand to avoid the worst case of a route cutting straight
-// through a building. They are NOT traced from the real paved walkways, so
-// routes can still occasionally look slightly "off" against the satellite/
-// building outlines, especially over longer hops.
+// The nodes above ARE traced from real GPS walks (live "Walk & Record"
+// mode), so they should track the actual paved walkways closely — accuracy
+// depends on the phone's GPS fix at the time of walking.
 //
-// For pixel/GPS-accurate roads: open
-// https://geojson.io/?map=19/28.46660/77.02330, trace each real walkway
-// with the Line tool (click at every bend/junction, comparing against the
-// "Campus Layout Image" for the overall shape), then Save → Export →
-// GeoJSON, and send that file back — it converts directly into NODES +
-// EDGES here, no manual coordinate typing needed.
+// For more roads: open https://geojson.io/?map=19/28.46660/77.02330, trace
+// each real walkway with the Line tool (click at every bend/junction,
+// comparing against the "Campus Layout Image" for the overall shape), then
+// Save → Export → GeoJSON, and send that file back — it converts directly
+// into NODES + EDGES here, no manual coordinate typing needed. Or walk it
+// live with the road tracer's GPS mode and send the backup JSON.
 // ─────────────────────────────────────────────────────────────────────────
