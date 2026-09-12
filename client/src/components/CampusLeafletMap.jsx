@@ -631,12 +631,19 @@ export default function CampusLeafletMap() {
     mapRef.current = map;
 
     map.fitBounds(CAMPUS_BOUNDS, { padding: [34, 34] });
-    setTimeout(() => map.invalidateSize(), 200);
+    const invalidateSizeTimer = setTimeout(() => {
+      // Guard against the map having been removed (e.g. React
+      // dev-mode double-invoking effects) before this timer fires —
+      // calling invalidateSize() on a removed map throws because its
+      // container no longer has a cached _leaflet_pos.
+      if (mapRef.current) map.invalidateSize();
+    }, 200);
 
     const handleResize = () => map.invalidateSize();
     window.addEventListener('resize', handleResize);
 
     return () => {
+      clearTimeout(invalidateSizeTimer);
       window.removeEventListener('resize', handleResize);
       mapContainerEl.removeEventListener('wheel', handleWheelZoom);
       map.off('zoomend', updateTileDeclutter);
