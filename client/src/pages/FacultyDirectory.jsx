@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import {
   FaChalkboardTeacher,
@@ -12,6 +13,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaTimes,
+  FaCalendarAlt,
 } from 'react-icons/fa';
 
 import api from '../api/axios';
@@ -474,6 +476,13 @@ export default function FacultyDirectory() {
                       </div>
                     </div>
                   </div>
+
+                  <Link
+                    to={`/timetable?facultyId=${member._id}`}
+                    className="faculty-directory-timetable-link"
+                  >
+                    <FaCalendarAlt /> View Timetable
+                  </Link>
                 </div>
               </article>
             ))}
