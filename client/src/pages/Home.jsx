@@ -5,6 +5,9 @@ import {
   FaChalkboardTeacher,
   FaUserTie,
   FaMapMarkedAlt,
+  FaCalendarAlt,
+  FaClock,
+  FaLayerGroup,
 } from 'react-icons/fa';
 import api from '../api/axios';
 import LocationCard from '../components/LocationCard';
@@ -13,6 +16,9 @@ const quickLinks = [
   { icon: <FaBuilding />, title: 'Blocks', to: '/blocks' },
   { icon: <FaChalkboardTeacher />, title: 'Departments', to: '/departments' },
   { icon: <FaUserTie />, title: 'Faculty', to: '/faculty' },
+  { icon: <FaClock />, title: 'Timetable', to: '/timetable' },
+  { icon: <FaCalendarAlt />, title: 'Events', to: '/events' },
+  { icon: <FaLayerGroup />, title: 'Programs', to: '/programs' },
   { icon: <FaMapMarkedAlt />, title: 'Map', to: '/map' },
 ];
 

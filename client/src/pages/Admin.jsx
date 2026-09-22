@@ -3537,15 +3537,20 @@ export default function Admin() {
           </h1>
         </div>
 
-        <button
-          type="button"
-          className="admin-logout-btn"
-          onClick={
-            handleLogout
-          }
-        >
-          Log out
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <a href="/admin/campus" className="admin-logout-btn" style={{ textDecoration: 'none' }}>
+            Timetable / Events / Programs
+          </a>
+          <button
+            type="button"
+            className="admin-logout-btn"
+            onClick={
+              handleLogout
+            }
+          >
+            Log out
+          </button>
+        </div>
       </div>
 
       {/* ======================================================

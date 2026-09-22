@@ -14,6 +14,10 @@ import RoomDetail from '../pages/RoomDetail';
 import SearchResults from '../pages/SearchResults';
 import Map from '../pages/Map';
 import Admin from '../pages/Admin';
+import AdminCampus from '../pages/AdminCampus';
+import Timetable from '../pages/Timetable';
+import Events from '../pages/Events';
+import Programs from '../pages/Programs';
 
 export default function AppRoutes() {
   return (
@@ -32,7 +36,11 @@ export default function AppRoutes() {
       <Route path="/map" element={<Map />} />
       <Route path="/rooms/:id" element={<RoomDetail />} />
       <Route path="/search" element={<SearchResults />} />
+      <Route path="/timetable" element={<Timetable />} />
+      <Route path="/events" element={<Events />} />
+      <Route path="/programs" element={<Programs />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/campus" element={<AdminCampus />} />
     </Routes>
   );
 }
