@@ -512,6 +512,31 @@
   border-top: 1px solid #edf1f5;
 }
 
+.faculty-directory-timetable-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #eef6ff;
+  color: #1769aa;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.faculty-directory-timetable-link:hover {
+  background: #dcedff;
+}
+
+.faculty-directory-timetable-link > svg {
+  font-size: 11px;
+}
+
 .faculty-directory-meta-item {
   min-width: 0;
   display: flex;

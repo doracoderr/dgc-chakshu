@@ -162,6 +162,9 @@ export default function Navbar() {
         <Link to="/departments" onClick={closeMenu}>Departments</Link>
         <Link to="/rooms" onClick={closeMenu}>Rooms</Link>
         <Link to="/faculty" onClick={closeMenu}>Faculty</Link>
+        <Link to="/timetable" onClick={closeMenu}>Timetable</Link>
+        <Link to="/events" onClick={closeMenu}>Events</Link>
+        <Link to="/programs" onClick={closeMenu}>Programs</Link>
         <Link to="/about" onClick={closeMenu}>About</Link>
       </div>
 

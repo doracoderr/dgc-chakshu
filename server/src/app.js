@@ -8,6 +8,9 @@ const departmentRoutes = require('./routes/department.routes');
 const facultyRoutes = require('./routes/faculty.routes');
 const searchRoutes = require('./routes/search.routes');
 const uploadRoutes = require('./routes/upload.routes');
+const timetableRoutes = require('./routes/timetable.routes');
+const eventRoutes = require('./routes/event.routes');
+const programRoutes = require('./routes/program.routes');
 
 const app = express();
 
@@ -30,6 +33,8 @@ app.use(cors({
         }
       }
 }));
+// Timetable image upload is base64 (up to ~4 MB) — must be parsed before the default 100 kb parser.
+app.use('/api/timetable', express.json({ limit: '6mb' }));
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
@@ -42,6 +47,9 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/faculty', facultyRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/timetable', timetableRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/programs', programRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found', error: { code: 'NOT_FOUND' } });
